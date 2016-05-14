@@ -8,6 +8,7 @@ import random
 
 description = "Bot for Idiotech's Discord by iScrE4m"
 bot = commands.Bot(command_prefix='!', description=description, pm_help=True)
+loop = asyncio.get_event_loop()
 
 """def has_permissions(author: discord.Member, roles: set):
     U_roles = set([r.name for r in author.roles])
@@ -20,6 +21,11 @@ bot = commands.Bot(command_prefix='!', description=description, pm_help=True)
 
 
 def is_idiotech():
+    """
+    Checks if user requesting a command is Idiotech, if not command will not execute
+
+    Usage: wrapper of command
+    """
     def predicate(ctx):
         return ctx.message.author.id == "176291669254209539"
 
@@ -27,6 +33,11 @@ def is_idiotech():
 
 
 def is_scream():
+    """
+    Checks if user requesting a command is iScrE4m, if not command will not execute
+
+    Usage: wrapper of command
+    """
     def predicate(ctx):
         return ctx.message.author.id == "132577770046750720"
 
@@ -46,7 +57,6 @@ Arguments: Time in minutes, names of games separated by ;
 Example: !giveaway 60 Overwatch;Half-Life 3"""
 
 
-loop = asyncio.get_event_loop()
 
 
 @bot.command(pass_context=True, description=giveawaydescription)
@@ -60,7 +70,9 @@ async def giveaway(ctx):
                     ctx.message.author.mention, game, game))
             loop.create_task(ga.countdown())
     except ValueError:
-        pass
+        await whisper(ctx.message.author, "Error trying to open a giveaway, don't forget number of minutes!")
+    except IndexError:
+        await whisper(ctx.message.author, "Error trying to open a giveaway, don't forget number of minutes!")
 
 
 @bot.command(pass_context=True, description="Enroll in a giveaway for a certain game. Example !enroll Overwatch")
@@ -71,11 +83,9 @@ async def enroll(ctx):
         if opened.game == game:
             if ctx.message.channel == opened.channel:
                 opened.enroll(user)
-                await bot.start_private_message(user)
-                await bot.send_message(user, "You enrolled for {}".format(game))
+                await whisper(user, "You enrolled for {}".format(game))
             else:
-                await bot.start_private_message(user)
-                await bot.send_message(user, "You tried to enter a giveaway from  wrong channel, sorry can't do that")
+                await whisper(user, "You tried to enter a giveaway from  wrong channel, sorry can't do that")
 
 
 @bot.command(description="Checks statuses of opened giveaways")
@@ -116,6 +126,11 @@ async def log(ctx):
     with open("log.txt", "rb") as logfile:
         await bot.send_file(admin, logfile, filename="log.txt",
                             content="Log file for mentioned users from last 500 messages in public channel.")
+
+
+@bot.command(description="Links to my GitHub")
+async def github():
+    await destructmsg("https://github.com/iScrE4m/IdiotechDiscordBot", 20)
 
 
 @bot.command(description="Links to Idiotech's Twitch")
@@ -164,7 +179,17 @@ giveawayslist = []
 
 
 class Giveaway:
+    """
+    Object for giveaways, after creating call loop.create_event(self.countdown)
+    """
     def __init__(self, game, countdown, channel):
+        """
+        Create a giveaway instance
+
+        :param game:        Name of a game to giveaway
+        :param countdown:   Number of minutes until conclusion
+        :param channel:     Channel object where to open the giveaway
+        """
         self.game = game
         self.time = countdown * 60
         self.enrolled = []
@@ -194,9 +219,27 @@ class Giveaway:
 
 
 async def destructmsg(msg, seconds):
+    """
+    Send autodestructive message to channel of original message
+
+    :param msg:     String
+    :param seconds: Integer of seconds after which to delete the message
+    :return:
+    """
     message = await bot.say(msg)
     await asyncio.sleep(seconds)
     await bot.delete_message(message)
+
+
+async def whisper(user, msg):
+    """
+    Send private message to a user
+
+    :param user: User object
+    :param msg:  String
+    """
+    await bot.start_private_message(user)
+    await bot.send_message(user, msg)
 
 
 with open("token.txt", "r") as file:
