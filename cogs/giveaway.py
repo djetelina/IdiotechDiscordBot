@@ -74,19 +74,20 @@ class Giveaways:
             countdown = int(ctx.message.content.split(' ')[1])
             games = " ".join(ctx.message.content.split(' ')[2:]).split(';')
             for game in games:
+                game = " ".join(game.split())
                 ga = Giveaway(game, countdown, ctx.message.channel, ctx.message.author, self.bot)
                 await self.bot.say("{} just opened a giveaway for {}. Type '!enroll {}' to enroll".format(
                         ctx.message.author.mention, game, game))
                 loop.create_task(ga.countdown())
         except ValueError:
-            await s.whisper(ctx.message.author, "You must enter minutes as whole number (no decimal point)!", self.bot)
+            await s.whisper(ctx.message.author, "Error trying to open a giveaway, don't forget number of minutes", self.bot)
         except IndexError:
-            await s.whisper(ctx.message.author, "Error trying to open a giveaway, don't forget number of minutes!",
+            await s.whisper(ctx.message.author, "Error trying to open a giveaway, don't forget number of minutes",
                             self.bot)
 
     @commands.command(pass_context=True, description=desc.cancelga, brief=desc.cancelgab)
     async def cancelga(self, ctx):
-        game = ctx.message.content.split(' ')[1:]
+        game = " ".join(ctx.message.content.split(' ')[1:])
         for ga in giveawayslist:
             if ga.game == game and ctx.message.author == ga.owner:
                 await ga.cancel()
