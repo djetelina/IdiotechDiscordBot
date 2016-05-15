@@ -62,7 +62,7 @@ class Giveaway:
 
     async def cancel(self):
         await self.bot.send_message(self.channel,
-                                    "{} canceled his giveaway for {}".format(self.owner.mention, self.game))
+                                    "{} canceled their giveaway for {}".format(self.owner.mention, self.game))
         self.status = 0
         giveawayslist.remove(self)
 
@@ -131,9 +131,9 @@ class Giveaways:
         if len(giveawayslist) > 0:
             reply = "\nCurrently opened giveaways:\n=========="
             for ga in giveawayslist:
-                reply += "\n*{}* in {} ({} seconds left, {} people enrolled)".format(
-                        ga.game, ga.channel.mention, ga.time, len(ga.enrolled))
-            reply += "==========\nEnter giveaway with !enroll **GameName**"
+                reply += "\n***{}*** in {} by {}. ({} seconds left, {} people enrolled)".format(
+                        ga.game, ga.channel.mention, ga.owner.mention, ga.time, len(ga.enrolled))
+            reply += "\n==========\nEnter giveaway with !enroll **GameName**"
         else:
             reply = "No giveaways open"
 
