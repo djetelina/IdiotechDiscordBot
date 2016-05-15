@@ -61,12 +61,20 @@ class General:
         sf = now.astimezone(sf_tz).strftime(fmt)
         if param == "advanced":
             await s.destructmsg(
-                    "**Sydney**: {} (GMT+10) | **London**: {} (GMT+1) | **New York**: {} (GMT-4) | **San Francisco** {} (GMT-7)".format(
-                            australia, london, ny, sf), 20, self.bot)
+                "**Sydney**: {} (GMT+10) | **London**: {} (GMT+1) | **New York**: {} (GMT-4) | **San "
+                "Francisco** {} (GMT-7)".format(australia, london, ny, sf), 30, self.bot)
+        elif param == "syd":
+            await s.destructmsg("**Sydney** {} (GMT+10)".format(australia), 30, self.bot)
+        elif param == "ldn":
+            await s.destructmsg("**London** {} (GMT+1)".format(london), 30, self.bot)
+        elif param == "nyc":
+            await s.destructmsg("**New York** {} (GMT-4)".format(ny), 30, self.bot)
+        elif param == "sfo":
+            await s.destructmsg("**San Francisco** {} (GMT-7)".format(sf), 30, self.bot)
         else:
             await s.destructmsg(
                     "**Sydney**: {} | **London**: {} | **New York**: {} | **San Francisco** {}".format(
-                            australia, london, ny, sf), 20, self.bot)
+                            australia, london, ny, sf), 30, self.bot)
 
 
 def setup(bot):

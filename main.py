@@ -2,9 +2,14 @@ import discord
 from discord.ext import commands
 import descriptions as desc
 import checks
+import random
+import simplify as s
 
 bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
 extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', ]
+"""
+Don't forget to re-add swear.py ^^
+"""
 
 
 @bot.event
