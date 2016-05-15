@@ -23,6 +23,8 @@ class Giveaway:
         :param owner:       User object of owner
         """
         self.game = game
+        if countdown > 30:
+            countdown = 30
         self.time = countdown * 60
         self.enrolled = []
         self.channel = channel
@@ -43,9 +45,13 @@ class Giveaway:
                 winner = random.choice(self.enrolled)
                 await self.bot.send_message(self.channel, "{}'s giveaway winner of {} is: {}".format(
                         self.owner.mention, self.game, winner.mention))
+                await s.whisper(self.owner, "Winner of your giveaway for {}: {}".format(
+                        winner.mention, self.game), self.bot)
+                await s.whisper(winner, "You won a giveaway for {} by {}".format(self.game, self.owner), self.bot)
             except IndexError:
                 await self.bot.send_message(self.channel,
                                             "Nobody enrolled for {} and the giveaway has concluded".format(self.game))
+                await s.whisper(self.owner, "Nobody enrolled for your giveaway of {}".format(self.game), self.bot)
             giveawayslist.remove(self)
 
     def enroll(self, user):
@@ -106,26 +112,31 @@ class Giveaways:
             return
         for opened in giveawayslist:
             if opened.game == game:
-                if ctx.message.channel == opened.channel:
+                if ctx.message.channel == opened.channel and user not in opened.enrolled:
                     opened.enroll(user)
                     found = 1
                     await s.whisper(user, "You enrolled for {}".format(game), self.bot)
+                elif user in opened.enrolled:
+                    found = 1
+                    await s.whisper(user, "You are already enrolled for this game", self.bot)
                 else:
                     found = 1
                     await s.whisper(user, "You tried to enter a giveaway from  wrong channel, sorry can't do that",
                                     self.bot)
         if not found:
-            await s.whisper(user, "Giveaway for your game not found", self.bot)
+            await s.whisper(user, "Giveaway for the game you mentioned not found", self.bot)
 
     @commands.command(description=desc.giveaways, brief=desc.giveawaysb)
     async def giveaways(self):
         if len(giveawayslist) > 0:
-            reply = "Currently opened giveaways:"
+            reply = "\nCurrently opened giveaways:\n=========="
             for ga in giveawayslist:
-                reply += " {} in {} ({} seconds left, {} people enrolled)".format(
+                reply += "\n*{}* in {} ({} seconds left, {} people enrolled)".format(
                         ga.game, ga.channel.mention, ga.time, len(ga.enrolled))
+            reply += "==========\nEnter giveaway with !enroll **GameName**"
         else:
             reply = "No giveaways open"
+
         await self.bot.say(reply)
 
 
