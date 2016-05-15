@@ -44,6 +44,18 @@ def is_scream():
     return commands.check(predicate)
 
 
+def is_random():  # not necessary, but saves adding it later when it might be
+    """
+    Checks if user requesting a command is Extra_Random, if not command will not execute
+
+    Usage: wrapper of command
+    """
+    def predicate(ctx):
+        return ctx.message.author.id == "92562410493202432"
+
+    return commands.check(predicate)
+
+
 @bot.event
 async def on_ready():
     print('Logged in as')
