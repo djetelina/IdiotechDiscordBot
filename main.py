@@ -4,7 +4,7 @@ import descriptions as desc
 import checks
 
 bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
-extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', ]
+extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', 'cogs.swear', ]
 
 
 def is_random():  # not necessary, but saves adding it later when it might be
