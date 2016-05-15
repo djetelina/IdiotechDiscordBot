@@ -35,6 +35,7 @@ HIDDEN COMMANDS (only used by some)
 
 iscream = "Only available for iScrE4m"
 idiotech = "Only available for Idiotech"
+findlast = "Find last message sent by specified user"
 
 """
 SIMPLE LINKS

@@ -17,6 +17,14 @@ class Restricted:
     async def dance(self):
         await self.bot.say('Moves like Jagger I tell you')
 
+
+    """
+    @commands.command(pass_context=True, hidden=True, description=desc.findlast)
+    async def findlast(self, ctx):
+        user = ctx
+        # this will search all channels for specified user's last message, and post it in channel it was called from
+    """
+
     @commands.command(pass_context=True, hidden=True, description=desc.idiotech)
     @checks.is_idiotech()
     async def log(self, ctx):

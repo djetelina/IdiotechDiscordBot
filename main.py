@@ -2,21 +2,14 @@ import discord
 from discord.ext import commands
 import descriptions as desc
 import checks
+import random
+import simplify as s
 
 bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
-extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', 'cogs.swear', ]
-
-
-def is_random():  # not necessary, but saves adding it later when it might be
-    """
-    Checks if user requesting a command is Extra_Random, if not command will not execute
-
-    Usage: wrapper of command
-    """
-    def predicate(ctx):
-        return ctx.message.author.id == "92562410493202432"
-
-    return commands.check(predicate)
+extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', ]
+"""
+Don't forget to re-add swear.py ^^
+"""
 
 
 @bot.event
