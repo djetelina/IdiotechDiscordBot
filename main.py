@@ -57,8 +57,6 @@ Arguments: Time in minutes, names of games separated by ;
 Example: !giveaway 60 Overwatch;Half-Life 3"""
 
 
-
-
 @bot.command(pass_context=True, description=giveawaydescription)
 async def giveaway(ctx):
     try:
@@ -172,7 +170,7 @@ async def time():
     london = now.astimezone(lon_tz).strftime(fmt)
     ny_tz = pytz.timezone('US/Eastern')
     ny = now.astimezone(ny_tz).strftime(fmt)
-    await destructmsg("Sydney: {} (GMT+10) | London: {} | New York: {}".format(australia, london, ny), 20)
+    await destructmsg("Sydney: {} (GMT+10) | London: {} (GMT+1) | New York: {} (GMT-4)".format(australia, london, ny), 20)
 
 
 giveawayslist = []
