@@ -17,8 +17,15 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if 'cogs.swear' in extensions:
+    if message.author is bot.user:
+        return
+
+    swear = bot.get_cog('Swear')
+
+    if swear is not None:
         await cogs.swear.message(bot, message)
+
+    await bot.process_commands(message)
 
 
 @bot.command(hidden=True)
@@ -26,6 +33,8 @@ async def on_message(message):
 async def load(*, module: str):
     """
     Loads a module.
+
+    :param module: Module to be loaded, cogs.general -> from cogs folder general module
     """
     module = module.strip()
     try:
@@ -35,7 +44,6 @@ async def load(*, module: str):
         await bot.say('{}: {}'.format(type(e).__name__, e))
     else:
         await bot.say('\U0001f44c')
-        extensions.append(module)
 
 
 @bot.command(hidden=True)
@@ -50,7 +58,6 @@ async def unload(*, module: str):
         await bot.say('{}: {}'.format(type(e).__name__, e))
     else:
         await bot.say('\U0001f44c')
-        extensions.remove(module)
 
 
 if __name__ == '__main__':

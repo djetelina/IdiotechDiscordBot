@@ -2,7 +2,10 @@
 Description strings
 """
 
-main = """Bot for Idiotech's Discord by iScrE4m"""
+main = """Bot for Idiotech's Discord by iScrE4m
+
+Commands can have subcommands, you can type !help for those too
+For example: !help giveaway open"""
 
 """
 GIVEAWAY RELATED
