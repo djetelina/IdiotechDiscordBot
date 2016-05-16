@@ -23,10 +23,17 @@ async def on_message(message):
     swear = bot.get_cog('Swear')
 
     if swear is not None:
-        await cogs.swear.message(bot, message)
+        await swear.message(bot, message)
 
     await bot.process_commands(message)
 
+
+@bot.event
+async def on_command(command, ctx):
+    stats = bot.get_cog('Stats')
+
+    if stats is not None:
+        await stats.on_command_p(command.name)
 
 @bot.command(hidden=True)
 @checks.is_scream()
