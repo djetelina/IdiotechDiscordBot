@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import descriptions as desc
 import checks
+import cogs
 
 bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
 extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', ]
@@ -12,6 +13,12 @@ async def on_ready():
     """After logging in"""
     print(bot.user.name + ' logged in')
     await bot.change_status(game=discord.Game(name='!help'))
+
+
+@bot.event
+async def on_message(message):
+    if 'cogs.swear' in extensions:
+        await cogs.swear.message(bot, message)
 
 
 @bot.command(hidden=True)
@@ -28,6 +35,7 @@ async def load(*, module: str):
         await bot.say('{}: {}'.format(type(e).__name__, e))
     else:
         await bot.say('\U0001f44c')
+        extensions.append(module)
 
 
 @bot.command(hidden=True)
@@ -42,6 +50,7 @@ async def unload(*, module: str):
         await bot.say('{}: {}'.format(type(e).__name__, e))
     else:
         await bot.say('\U0001f44c')
+        extensions.remove(module)
 
 
 if __name__ == '__main__':

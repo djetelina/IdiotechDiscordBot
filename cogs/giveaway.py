@@ -48,7 +48,8 @@ class Giveaway:
                         self.owner.mention, self.game, winner.mention))
                 await s.whisper(self.owner, "Winner of your giveaway for {}: {}".format(
                         self.game, winner.mention), self.bot)
-                await s.whisper(winner, "You won a giveaway for **{}** by {}".format(self.game, self.owner), self.bot)
+                await s.whisper(winner, "You won a giveaway for **{}** by {}".format(
+                        self.game, self.owner.mention), self.bot)
             except IndexError:
                 await self.bot.send_message(self.channel,
                                             "Nobody enrolled for {} and the giveaway has concluded".format(self.game))
@@ -93,19 +94,20 @@ class Giveaways:
     async def _open(self, ctx, countdown: int, *, games: str):
         games = games.split(';')
         for game in games:
+            print(game)
             ga = Giveaway(game, countdown, ctx.message.channel, ctx.message.author, self.bot)
             await self.bot.say("{} just opened a giveaway for {}. Type '!enroll {}' to enroll".format(
                     ctx.message.author.mention, game, game))
             loop.create_task(ga.countdown())
 
     @giveaway.command(name="cancel", pass_context=True, description=desc.cancelga, brief=desc.cancelgab)
-    async def _cancel(self, ctx, game: str):
+    async def _cancel(self, ctx, *, game: str):
         for ga in giveawayslist:
             if ga.game == game and ctx.message.author == ga.owner:
                 await ga.cancel()
 
     @commands.command(pass_context=True, description=desc.enroll, brief=desc.enrollb)
-    async def enroll(self, ctx, game: str):
+    async def enroll(self, ctx, *, game: str):
         user = ctx.message.author
         found = 0
         if len(giveawayslist) == 0:
@@ -126,6 +128,7 @@ class Giveaways:
                                     self.bot)
         if not found:
             await s.whisper(user, "Giveaway for the game you mentioned not found", self.bot)
+        await self.bot.delete_message(ctx.message)
 
 
 def parsesecs(sec: int) -> str:

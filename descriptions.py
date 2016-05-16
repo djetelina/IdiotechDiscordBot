@@ -10,7 +10,7 @@ GIVEAWAY RELATED
 
 giveaway = """Open a giveaway for current channel
 
-Example: !giveaway 60 Overwatch;Half-Life 3"""
+Example: !giveaway open 60 Overwatch;Half-Life 3"""
 giveawayb = "Open a giveaway"
 
 cancelga = """Cancel your giveaways for a game
