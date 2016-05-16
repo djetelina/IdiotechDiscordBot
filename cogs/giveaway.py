@@ -3,6 +3,7 @@ import descriptions as desc
 import simplify as s
 import random
 import asyncio
+import time
 
 giveawayslist = []
 loop = asyncio.get_event_loop()
@@ -46,8 +47,8 @@ class Giveaway:
                 await self.bot.send_message(self.channel, "{}'s giveaway winner of {} is: {}".format(
                         self.owner.mention, self.game, winner.mention))
                 await s.whisper(self.owner, "Winner of your giveaway for {}: {}".format(
-                        winner.mention, self.game), self.bot)
-                await s.whisper(winner, "You won a giveaway for {} by {}".format(self.game, self.owner), self.bot)
+                        self.game, winner.mention), self.bot)
+                await s.whisper(winner, "You won a giveaway for **{}** by {}".format(self.game, self.owner), self.bot)
             except IndexError:
                 await self.bot.send_message(self.channel,
                                             "Nobody enrolled for {} and the giveaway has concluded".format(self.game))
@@ -111,7 +112,7 @@ class Giveaways:
             await s.whisper(user, "There are no giveaways opened", self.bot)
             return
         for opened in giveawayslist:
-            if opened.game == game:
+            if opened.game.lower() == game.lower():
                 if ctx.message.channel == opened.channel and user not in opened.enrolled:
                     opened.enroll(user)
                     found = 1
@@ -131,13 +132,21 @@ class Giveaways:
         if len(giveawayslist) > 0:
             reply = "\nCurrently opened giveaways:\n=========="
             for ga in giveawayslist:
-                reply += "\n*{}* in {} ({} seconds left, {} people enrolled)".format(
-                        ga.game, ga.channel.mention, ga.time, len(ga.enrolled))
-            reply += "==========\nEnter giveaway with !enroll **GameName**"
+                reply += "\n**{}** in {} ({}), {} people enrolled)".format(
+                        ga.game, ga.channel.mention, parsesecs(ga.time), len(ga.enrolled))
+            reply += "\n==========\nEnter giveaway with !enroll **GameName**"
         else:
             reply = "No giveaways open"
 
         await self.bot.say(reply)
+
+
+def parsesecs(sec: int) -> str:
+    if sec >= 60:
+        tleft = time.strftime("%M minutes left", time.gmtime(sec)).lstrip('0')
+    else:
+        tleft = time.strftime("%S seconds left", time.gmtime(sec)).lstrip('0')
+    return tleft
 
 
 def setup(bot):
