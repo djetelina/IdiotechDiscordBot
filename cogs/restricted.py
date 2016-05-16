@@ -19,8 +19,8 @@ class Restricted:
 
     @commands.command(pass_context=True, hidden=True, description=desc.idiotech)
     @checks.is_idiotech()
-    async def log(self, ctx):
-        users = " ".join(ctx.message.content.split(' ')[1:]).split(';')
+    async def log(self, ctx, users: str):
+        users = users.split(';')
         public = ctx.message.server.get_channel("176293292865093632")
         admin = ctx.message.server.get_channel("176304607172100097")
         with open("log.txt", "w", encoding='utf-8') as logfile:

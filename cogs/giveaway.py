@@ -63,7 +63,7 @@ class Giveaway:
 
     async def cancel(self):
         await self.bot.send_message(self.channel,
-                                    "{} canceled his giveaway for {}".format(self.owner.mention, self.game))
+                                    "{} canceled their giveaway for {}".format(self.owner.mention, self.game))
         self.status = 0
         giveawayslist.remove(self)
 
@@ -75,39 +75,39 @@ class Giveaways:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True, description=desc.giveaway, brief=desc.giveawayb)
+    @commands.group(pass_context=True, description=desc.giveaways, brief=desc.giveawaysb)
     async def giveaway(self, ctx):
-        try:
-            countdown = int(ctx.message.content.split(' ')[1])
-            games = " ".join(ctx.message.content.split(' ')[2:]).split(';')
-            for game in games:
-                game = " ".join(game.split())
-                ga = Giveaway(game, countdown, ctx.message.channel, ctx.message.author, self.bot)
-                await self.bot.say("{} just opened a giveaway for {}. Type '!enroll {}' to enroll".format(
-                        ctx.message.author.mention, game, game))
-                loop.create_task(ga.countdown())
-        except ValueError:
-            await s.whisper(ctx.message.author, "Error trying to open a giveaway, don't forget number of minutes", self.bot)
-        except IndexError:
-            await s.whisper(ctx.message.author, "Error trying to open a giveaway, don't forget number of minutes",
-                            self.bot)
+        if ctx.invoked_subcommand is None:
+            if len(giveawayslist) > 0:
+                reply = "\nCurrently opened giveaways:\n=========="
+                for ga in giveawayslist:
+                    reply += "\n**{}** in {} by {} ({}, {} people enrolled)".format(
+                            ga.game, ga.channel.mention, ga.owner.mention, parsesecs(ga.time), len(ga.enrolled))
+                reply += "\n==========\nEnter giveaway with !enroll **GameName**"
+            else:
+                reply = "No giveaways open"
 
-    @commands.command(pass_context=True, description=desc.cancelga, brief=desc.cancelgab)
-    async def cancelga(self, ctx):
-        game = " ".join(ctx.message.content.split(' ')[1:])
+            await self.bot.say(reply)
+
+    @giveaway.command(name="open", pass_context=True, description=desc.giveaway, brief=desc.giveawayb)
+    async def _open(self, ctx, countdown: int, *, games: str):
+        games = games.split(';')
+        for game in games:
+            ga = Giveaway(game, countdown, ctx.message.channel, ctx.message.author, self.bot)
+            await self.bot.say("{} just opened a giveaway for {}. Type '!enroll {}' to enroll".format(
+                    ctx.message.author.mention, game, game))
+            loop.create_task(ga.countdown())
+
+    @giveaway.command(name="cancel", pass_context=True, description=desc.cancelga, brief=desc.cancelgab)
+    async def _cancel(self, ctx, game: str):
         for ga in giveawayslist:
             if ga.game == game and ctx.message.author == ga.owner:
                 await ga.cancel()
 
     @commands.command(pass_context=True, description=desc.enroll, brief=desc.enrollb)
-    async def enroll(self, ctx):
+    async def enroll(self, ctx, game: str):
         user = ctx.message.author
         found = 0
-        try:
-            game = ' '.join(ctx.message.content.split(' ')[1:])
-        except TypeError:
-            await s.whisper(user, "You have to choose a game when enrolling", self.bot)
-            return
         if len(giveawayslist) == 0:
             await s.whisper(user, "There are no giveaways opened", self.bot)
             return
@@ -127,21 +127,15 @@ class Giveaways:
         if not found:
             await s.whisper(user, "Giveaway for the game you mentioned not found", self.bot)
 
-    @commands.command(description=desc.giveaways, brief=desc.giveawaysb)
-    async def giveaways(self):
-        if len(giveawayslist) > 0:
-            reply = "\nCurrently opened giveaways:\n=========="
-            for ga in giveawayslist:
-                reply += "\n**{}** in {} ({}), {} people enrolled)".format(
-                        ga.game, ga.channel.mention, parsesecs(ga.time), len(ga.enrolled))
-            reply += "\n==========\nEnter giveaway with !enroll **GameName**"
-        else:
-            reply = "No giveaways open"
-
-        await self.bot.say(reply)
-
 
 def parsesecs(sec: int) -> str:
+    """
+    Parses seconds into time left format
+    This is to be used only for giveaways which have limit of 30 minutes
+
+    :param sec: number of seconds
+    :return:    string with time left
+    """
     if sec >= 60:
         tleft = time.strftime("%M minutes left", time.gmtime(sec)).lstrip('0')
     else:
