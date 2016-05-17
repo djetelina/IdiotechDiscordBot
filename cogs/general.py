@@ -59,9 +59,9 @@ class General:
         time = get_time()
         # Sorry for readability, string too long
         await s.destructmsg(
-                "**Sydney**: {} (GMT+10) | **London**: {} (GMT+1)" +
-                " | **New York**: {} (GMT-4) | **San Francisco** {} (GMT-7)".format(
-                        time["sydney"], time["london"], time["ny"], time["sf"]), 30, self.bot)
+            "**Sydney**: {} (GMT+10) | **London**: {} (GMT+1) "
+            " | **New York**: {} (GMT-4) | **San Francisco** {} (GMT-7)".format(
+                time["sydney"], time["london"], time["ny"], time["sf"]), 30, self.bot)
 
     @time.command(name='sydney', description=desc.time_sydney, brief=desc.time_sydney)
     async def _sydney(self):

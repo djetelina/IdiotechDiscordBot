@@ -1,6 +1,7 @@
 from discord.ext import commands
 import checks
 import descriptions as desc
+import channels as chan
 
 
 class Restricted:
@@ -21,8 +22,8 @@ class Restricted:
     @checks.is_idiotech()
     async def log(self, ctx, users: str):
         users = users.split(';')
-        public = ctx.message.server.get_channel("176293292865093632")
-        admin = ctx.message.server.get_channel("176304607172100097")
+        public = self.bot.get_channel(chan.channels['public'])
+        admin = self.bot.get_channel(chan.channels['admin'])
         with open("log.txt", "w", encoding='utf-8') as logfile:
             async for msg in self.bot.logs_from(public, limit=500):
                 if msg.author.name in users:

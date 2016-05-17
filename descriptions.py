@@ -11,12 +11,15 @@ For example: !help giveaway open"""
 GIVEAWAY RELATED
 """
 
-giveaway = """Open a giveaway for current channel
+openga = """Open a giveaway for specified channel
 
-Example: !giveaway open 60 Overwatch;Half-Life 3"""
-giveawayb = "Open a giveaway"
+Available channels:
+    private
 
-cancelga = """Cancel your giveaways for a game
+Example: !giveaway open private 60 Overwatch"""
+opengab = "Open a giveaway"
+
+cancelga = """Cancel your giveaway for a game
 
 Arguments: Game name (only one)
 
@@ -30,10 +33,28 @@ Example: !enroll Audiosurf 2
 """
 enrollb = "Enroll in a giveaway"
 
-giveaways = """Check status of running giveaways
+giveaway = """Check status of running giveaways
 
 Example: !giveaway"""
-giveawaysb = "Check status of running giveaways"
+giveawayb = "Check status of running giveaways"
+
+linkga = "Provide a link for your prepared giveaway"
+
+codega = """Provide a code for your prepared or running giveaway
+
+It will be sent to the winner after the giveaway is over in this format:
+`Your game code: <GAMECODE>`
+
+You can also specify if your game code is Steam, origin, etc. or add any note.
+Simply write anything before or after the code, your whole message after `!giveaway code` will be sent
+
+Example: !giveaway code 123-ABC-356 (STEAM)
+"""
+codegab = "Provide a code for your prepared or running giveaway"
+
+descga = "Provide a description for your prepared giveaway"
+
+confirmga = "Start your prepared giveaway"
 
 """
 HIDDEN COMMANDS (only used by some)

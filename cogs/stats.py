@@ -23,7 +23,7 @@ class Stats:
 
     @commands.command(descirption=desc.stats, brief=desc.stats)
     async def stats(self):
-        await s.destructmsg("I have served you {} commands totally and {} since last session".format(
+        await s.destructmsg("I have served you {} commands in my lifetime and {} since I was last restarted".format(
             self.totalcmd(), self.sessioncmd
         ), 30, self.bot)
 

@@ -5,7 +5,7 @@ import checks
 import cogs
 
 bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
-extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', ]
+extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', 'cogs.stats', ]
 
 
 @bot.event

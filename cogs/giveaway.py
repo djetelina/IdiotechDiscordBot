@@ -1,17 +1,19 @@
 from discord.ext import commands
 import descriptions as desc
 import simplify as s
+import channels as chan
 import random
 import asyncio
 import time
 
 giveawayslist = []
 loop = asyncio.get_event_loop()
+whitechannels = ['private', 'code']
 
 
 class Giveaway:
     """
-    Object for giveaways, after creating call loop.create_event(self.countdown)
+    Object for giveaway, after creating call loop.create_event(self.countdown)
     """
 
     def __init__(self, game, countdown, channel, owner, bot):
@@ -30,6 +32,9 @@ class Giveaway:
         self.enrolled = []
         self.channel = channel
         self.owner = owner
+        self.url = 0
+        self.code = 0
+        self.desc = 0
         self.status = 1
         self.bot = bot
         giveawayslist.append(self)
@@ -50,6 +55,10 @@ class Giveaway:
                         self.game, winner.mention), self.bot)
                 await s.whisper(winner, "You won a giveaway for **{}** by {}".format(
                         self.game, self.owner.mention), self.bot)
+                if self.code:
+                    await s.whisper(winner, "Your game code: {}".format(self.code), self.bot)
+                    await s.whisper(self.owner, "I have sent them the code you provided.", self.bot)
+
             except IndexError:
                 await self.bot.send_message(self.channel,
                                             "Nobody enrolled for {} and the giveaway has concluded".format(self.game))
@@ -76,7 +85,7 @@ class Giveaways:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(pass_context=True, description=desc.giveaways, brief=desc.giveawaysb)
+    @commands.group(pass_context=True, description=desc.giveaway, brief=desc.giveawayb)
     async def giveaway(self, ctx):
         if ctx.invoked_subcommand is None:
             if len(giveawayslist) > 0:
@@ -86,32 +95,94 @@ class Giveaways:
                             ga.game, ga.channel.mention, ga.owner.mention, parsesecs(ga.time), len(ga.enrolled))
                 reply += "\n==========\nEnter giveaway with !enroll **GameName**"
             else:
-                reply = "No giveaways open"
+                reply = "No giveaway open"
 
             await self.bot.say(reply)
 
-    @giveaway.command(name="open", pass_context=True, description=desc.giveaway, brief=desc.giveawayb)
-    async def _open(self, ctx, countdown: int, *, games: str):
-        games = games.split(';')
-        for game in games:
-            print(game)
-            ga = Giveaway(game, countdown, ctx.message.channel, ctx.message.author, self.bot)
-            await self.bot.say("{} just opened a giveaway for {}. Type '!enroll {}' to enroll".format(
-                    ctx.message.author.mention, game, game))
-            loop.create_task(ga.countdown())
+    @giveaway.command(name="open", pass_context=True, description=desc.openga, brief=desc.opengab)
+    async def _open(self, ctx, channel: str, countdown: int, *, game: str):
+        has_opened = False
+        for giveaway in giveawayslist:
+            if ctx.message.author == giveaway.owner:
+                has_opened = True
+        if not has_opened:
+            try:
+                destination = self.bot.get_channel(chan.channels[channel])
+                if channel in whitechannels:
+                    Giveaway(game, countdown, destination, ctx.message.author, self.bot)
+                    await s.whisper(ctx.message.author, """I have prepared the giveaway.
+
+                    If you want me to automatically PM the winner the code please use:
+                    `!giveaway code <CODE>`
+
+                    If you want to add a link to the game's page (like steam url) please use:
+                    This message will show once after you open the giveaway:
+                    `!giveaway link <URL>`
+
+                    If you want to say more about the game or a giveaway, like where is it redeemable,
+                    if you are also giving away DLC with it etc.
+                    You can also include url here instead of using the previous command
+                    This message will show once after you open the giveaway:
+                    `!giveaway description <DESCRIPTION>`
+
+                    I will open the enrollments to your giveaway after you send me `!giveaway confirm`
+                    """, self.bot)
+                else:
+                    await s.whisper(
+                        ctx.message.author, "I'm sorry, but you can't open a giveaway in this channel.", self.bot)
+            except KeyError:
+                await s.whisper(ctx.message.author, "I don't know channel *{}*".format(channel), self.bot)
+        else:
+            await s.whisper(ctx.message.author, "You already have one giveaway open", self.bot)
+
+    @giveaway.command(name="link", pass_context=True, description=desc.linkga, brief=desc.linkga)
+    async def _link(self, ctx, url: str):
+        for giveaway in giveawayslist:
+            if ctx.message.author == giveaway.owner:
+                giveaway.url = url
+                await s.whisper(giveaway.owner, "Link accepted", self.bot)
+
+    @giveaway.command(name="code", pass_context=True, description=desc.codega, brief=desc.codegab)
+    async def _code(self, ctx, *, code: str):
+        for giveaway in giveawayslist:
+            if ctx.message.author == giveaway.owner:
+                giveaway.code = code
+                await s.whisper(giveaway.owner, "Code accepted", self.bot)
+
+    @giveaway.command(name="description", pass_context=True, description=desc.descga, brief=desc.descga)
+    async def _description(self, ctx, *, description: str):
+        for giveaway in giveawayslist:
+            if ctx.message.author == giveaway.owner:
+                giveaway.description = description
+                await s.whisper(giveaway.owner, "Description accepted", self.bot)
+
+    @giveaway.command(name="confirm", pass_context=True, description=desc.confirmga, brief=desc.confirmga)
+    async def _confirm(self, ctx):
+        for giveaway in giveawayslist:
+            if ctx.message.author == giveaway.owner:
+                await s.whisper(giveaway.owner, "Thank you, I'll open the giveaway now.", self.bot)
+                loop.create_task(giveaway.countdown())
+                await self.bot.send_message(
+                    giveaway.channel, "@here {0} just opened a giveaway for {1}. Type '!enroll {1}' to enroll".format(
+                        giveaway.owner.mention, giveaway.game))
+                if giveaway.description:
+                    await self.bot.send_message(giveaway.channel, "Description: {}".format(giveaway.description))
+                if giveaway.url:
+                    await self.bot.send_message(giveaway.channel, giveaway.url)
 
     @giveaway.command(name="cancel", pass_context=True, description=desc.cancelga, brief=desc.cancelgab)
     async def _cancel(self, ctx, *, game: str):
         for ga in giveawayslist:
             if ga.game == game and ctx.message.author == ga.owner:
                 await ga.cancel()
+                await s.whisper(ga.owner, "Giveaway canceled", self.bot)
 
     @commands.command(pass_context=True, description=desc.enroll, brief=desc.enrollb)
     async def enroll(self, ctx, *, game: str):
         user = ctx.message.author
         found = 0
         if len(giveawayslist) == 0:
-            await s.whisper(user, "There are no giveaways opened", self.bot)
+            await s.whisper(user, "There are no giveaway opened", self.bot)
             return
         for opened in giveawayslist:
             if opened.game.lower() == game.lower():
@@ -134,7 +205,7 @@ class Giveaways:
 def parsesecs(sec: int) -> str:
     """
     Parses seconds into time left format
-    This is to be used only for giveaways which have limit of 30 minutes
+    This is to be used only for giveaway which have limit of 30 minutes
 
     :param sec: number of seconds
     :return:    string with time left
