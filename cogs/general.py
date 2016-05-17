@@ -83,7 +83,7 @@ class General:
         time = get_time()
         await s.destructmsg("**San Francisco**: {} (GMT-7)".format(time["sf"]), 30, self.bot)
 
-    @commands.command(hidden=True)
+    @commands.command(description=desc.rd, brief=desc.rd)
     async def rd(self):
         ow_rd = datetime(2016, 5, 24, 0, 0, 0)
         bf_rd = datetime(2016, 10, 21, 0, 0, 0)
