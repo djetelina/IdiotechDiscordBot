@@ -93,6 +93,7 @@ time_sydney = "Checks local time in Sydney and it's GMT position"
 time_london = "Checks local time in London and it's GMT position"
 time_ny = "Checks local time in New York and it's GMT position"
 time_sf = "Checks local time in San Francisco and it's GMT position"
+rd = "List of games and countdown till their releases"
 
 """
 STATS
