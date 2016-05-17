@@ -83,6 +83,40 @@ class General:
         time = get_time()
         await s.destructmsg("**San Francisco**: {} (GMT-7)".format(time["sf"]), 30, self.bot)
 
+    @commands.command(hidden=True)
+    async def rd(self):
+        ow_rd = datetime(2016, 5, 24, 0, 0, 0)
+        bf_rd = datetime(2016, 10, 21, 0, 0, 0)
+        nms_rd = datetime(2016, 6, 21, 0, 0, 0)
+        d2_rd = datetime(2016, 11, 11, 0, 0, 0)
+
+        ow_days, ow_hrs, ow_mins = rd_calc(ow_rd)
+        bf_days, bf_hrs, bf_mins = rd_calc(bf_rd)  # BF1 and Civ6 have the same release date
+        nms_days, nms_hrs, nms_mins = rd_calc(nms_rd)
+        d2_days, d2_hrs, d2_mins = rd_calc(d2_rd)
+
+        full_msg = "__**Release Dates List** - *Times, Dates and Games are subject to change*__ \n \n" \
+                   "***Overwatch*** releases in {},{} hours and {} minutes.\n" \
+                   "***Battlefield*** ***1*** and ***Civilization*** ***6*** release in {},{} hours and {} minu" \
+                   "tes. \n" \
+                   "***No Man's Sky*** releases in {},{} hours and {} minutes.\n" \
+                   "***Dishonored*** ***2*** releases in {},{} hours and {} minutes.\n" \
+                   "".format(ow_days, ow_hrs, ow_mins, bf_days, bf_hrs, bf_mins, nms_days, nms_hrs, nms_mins,
+                             d2_days, d2_hrs, d2_mins)
+
+        await s.destructmsg(full_msg, 60, self.bot)
+
+
+def rd_calc(rd):
+
+    tdelta = rd - datetime.utcnow()
+    tstr = str(tdelta)
+
+    days, notdays = tstr.split(",")
+    hrs, mins, secs = notdays.split(":")
+
+    return days, hrs, mins
+
 
 def get_time() -> dict:
     """
