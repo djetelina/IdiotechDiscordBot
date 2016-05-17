@@ -62,6 +62,15 @@ HIDDEN COMMANDS (only used by some)
 
 iscream = "Only available for iScrE4m"
 idiotech = "Only available for Idiotech"
+rtfh = """Force a person to read !help for a command
+It will PM them the result of !help
+Mention the person, or the bot will not know who's your target
+Also available for subcommands
+
+Example: !rtfh @Idiotech giveaway open
+"""
+rtfhb = "Force a person to read !help for a command"
+
 
 """
 SIMPLE LINKS
@@ -90,3 +99,4 @@ STATS
 """
 
 stats = "I'll show you how much you need me!"
+statsga = "I'll show you how much giveaways I helped you organize"

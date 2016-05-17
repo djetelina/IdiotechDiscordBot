@@ -13,6 +13,17 @@ class Restricted:
     async def develop(self):
         await self.bot.say('iScrE4m is streaming my development over at http://twitch.tv/iScrE4m - come watch!')
 
+    @commands.command(hidden=True, pass_context=True, description=desc.rtfh, brief=desc.rtfhb)
+    @checks.mod_or_permissions(manage_messages=True)
+    async def rtfh(self, ctx, target: str, cmd: str):
+        ctx.message.author = ctx.message.mentions[0]
+        msg = ctx.message.content.split()
+        try:
+            subcmd = msg[3]
+            await commands.bot._default_help_command(ctx, cmd, subcmd)
+        except IndexError:
+            await commands.bot._default_help_command(ctx, cmd)
+
     @commands.command(hidden=True, description=desc.idiotech)
     @checks.is_idiotech()
     async def dance(self):

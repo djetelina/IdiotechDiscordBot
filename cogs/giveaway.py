@@ -48,6 +48,9 @@ class Giveaway:
                 break
         if self.status:
             try:
+                stats = self.bot.get_cog('Stats')
+                if stats is not None:
+                    await stats.on_giveaway(self.game)
                 winner = random.choice(self.enrolled)
                 await self.bot.send_message(self.channel, "{}'s giveaway winner of {} is: {}".format(
                         self.owner.mention, self.game, winner.mention))
