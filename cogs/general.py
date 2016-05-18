@@ -4,9 +4,7 @@ import descriptions as desc
 import pytz
 import aiohttp
 from datetime import datetime
-import time
-from pytz import timezone
-# from dateutil import tz
+
 
 class General:
     def __init__(self, bot):
@@ -61,29 +59,29 @@ class General:
         time = get_time()
         # Sorry for readability, string too long
         await s.destructmsg(
-            "**Sydney**: {} (UTC+10) | **London**: {} (UTC+1) "
-            " | **New York**: {} (UTC-4) | **San Francisco** {} (UTC-7)".format(
+            "**Sydney**: {} (GMT+10) | **London**: {} (GMT+1) "
+            " | **New York**: {} (GMT-4) | **San Francisco** {} (GMT-7)".format(
                 time["sydney"], time["london"], time["ny"], time["sf"]), 30, self.bot)
 
     @time.command(name='sydney', description=desc.time_sydney, brief=desc.time_sydney)
     async def _sydney(self):
         time = get_time()
-        await s.destructmsg("**Sydney**: {} (UTC+10)".format(time["sydney"]), 30, self.bot)
+        await s.destructmsg("**Sydney**: {} (GMT+10)".format(time["sydney"]), 30, self.bot)
 
     @time.command(name='london', description=desc.time_london, brief=desc.time_london)
     async def _london(self):
         time = get_time()
-        await s.destructmsg("**London**: {} (UTC+1)".format(time["london"]), 30, self.bot)
+        await s.destructmsg("**London**: {} (GMT+1)".format(time["london"]), 30, self.bot)
 
     @time.command(name='ny', description=desc.time_ny, brief=desc.time_ny)
     async def _ny(self):
         time = get_time()
-        await s.destructmsg("**New York**: {} (UTC-4)".format(time["ny"]), 30, self.bot)
+        await s.destructmsg("**New York**: {} (GMT-4)".format(time["ny"]), 30, self.bot)
 
     @time.command(name='sf', description=desc.time_sf, brief=desc.time_sf)
     async def _sf(self):
         time = get_time()
-        await s.destructmsg("**San Francisco**: {} (UTC-7)".format(time["sf"]), 30, self.bot)
+        await s.destructmsg("**San Francisco**: {} (GMT-7)".format(time["sf"]), 30, self.bot)
 
     @commands.command(description=desc.rd, brief=desc.rd)
     async def rd(self):
@@ -136,24 +134,17 @@ def get_time() -> dict:
 
     :return: Dictionary with {"city":"%H:%M"}
     """
+    prague = pytz.timezone('Europe/Prague')
+    now = prague.localize(datetime.now())
     fmt = '%H:%M'
-
-    # http://www.saltycrane.com/blog/2009/05/converting-time-zones-datetime-objects-python/
-
-    now_utc = datetime.now(timezone('UTC'))  # print(now_utc.strftime(fmt))
-
-    now_pacific = now_utc.astimezone(timezone('US/Pacific'))
-    sf = now_pacific.strftime(fmt)
-
-    now_london = now_utc.astimezone(timezone('Europe/London'))
-    london = now_london.strftime(fmt)
-
-    now_sydney = now_utc.astimezone(timezone('Australia/Sydney'))
-    sydney = now_sydney.strftime(fmt)
-
-    now_ny = now_utc.astimezone(timezone('US/Eastern'))
-    ny = now_ny.strftime(fmt)
-
+    au_tz = pytz.timezone('Australia/Sydney')
+    sydney = now.astimezone(au_tz).strftime(fmt)
+    lon_tz = pytz.timezone('Europe/London')
+    london = now.astimezone(lon_tz).strftime(fmt)
+    ny_tz = pytz.timezone('US/Eastern')
+    ny = now.astimezone(ny_tz).strftime(fmt)
+    sf_tz = pytz.timezone('US/Pacific')
+    sf = now.astimezone(sf_tz).strftime(fmt)
     return {"sydney": sydney, "london": london, "ny": ny, "sf": sf}
 
 
