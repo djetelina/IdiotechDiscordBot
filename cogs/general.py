@@ -1,12 +1,9 @@
 from discord.ext import commands
 import simplify as s
 import descriptions as desc
-import pytz
 import aiohttp
 from datetime import datetime
-import time
 from pytz import timezone
-# from dateutil import tz
 
 class General:
     def __init__(self, bot):
