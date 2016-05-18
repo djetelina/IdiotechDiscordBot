@@ -168,15 +168,15 @@ class Giveaways:
                 await self.bot.send_message(
                     giveaway.channel, "@here {0} just opened a giveaway for {1}. Type '!enroll {1}' to enroll".format(
                         giveaway.owner.mention, giveaway.game))
-                if giveaway.description:
+                if giveaway.desc:
                     await self.bot.send_message(giveaway.channel, "Description: {}".format(giveaway.description))
                 if giveaway.url:
                     await self.bot.send_message(giveaway.channel, giveaway.url)
 
     @giveaway.command(name="cancel", pass_context=True, description=desc.cancelga, brief=desc.cancelgab)
-    async def _cancel(self, ctx, *, game: str):
+    async def _cancel(self, ctx):
         for ga in giveawayslist:
-            if ga.game == game and ctx.message.author == ga.owner:
+            if ctx.message.author == ga.owner:
                 await ga.cancel()
                 await s.whisper(ga.owner, "Giveaway canceled", self.bot)
 
