@@ -1,12 +1,9 @@
 from discord.ext import commands
 import simplify as s
 import descriptions as desc
-import pytz
 import aiohttp
 from datetime import datetime
-import time
 from pytz import timezone
-# from dateutil import tz
 
 class General:
     def __init__(self, bot):
@@ -137,9 +134,7 @@ def get_time() -> dict:
     :return: Dictionary with {"city":"%H:%M"}
     """
     fmt = '%H:%M'
-
     # http://www.saltycrane.com/blog/2009/05/converting-time-zones-datetime-objects-python/
-
     now_utc = datetime.now(timezone('UTC'))  # print(now_utc.strftime(fmt))
 
     now_pacific = now_utc.astimezone(timezone('US/Pacific'))
