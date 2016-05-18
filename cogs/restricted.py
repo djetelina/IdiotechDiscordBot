@@ -2,6 +2,7 @@ from discord.ext import commands
 import checks
 import descriptions as desc
 import channels as chan
+import discord
 
 
 class Restricted:
@@ -12,6 +13,22 @@ class Restricted:
     @checks.is_scream()
     async def develop(self):
         await self.bot.say('iScrE4m is streaming my development over at http://twitch.tv/iScrE4m - come watch!')
+
+    @commands.command(hidden=True, description="not for you")
+    @checks.is_scream()
+    async def avatar(self, image: str):
+        try:
+            with open("cogs/avatar/" + image, "rb") as avatar:
+                f = avatar.read()
+                bytes = bytearray(f)
+                await self.bot.edit_profile(avatar=bytes)
+        except:
+            await self.bot.say("Can't find that image")
+
+    @commands.command(hidden=True, description="not for you")
+    @checks.is_scream()
+    async def play(self, *, playing: str):
+        await self.bot.change_status(game=discord.Game(name=playing))
 
     @commands.command(hidden=True, pass_context=True, description=desc.rtfh, brief=desc.rtfhb)
     @checks.mod_or_permissions(manage_messages=True)

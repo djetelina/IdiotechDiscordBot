@@ -7,7 +7,7 @@ import os
 class Stats:
     def __init__(self, bot):
         self.bot = bot
-        self.db_path = os.path.join(os.getcwd(), "cogs/db/stats.db")
+        self.db_path = os.path.join(os.getcwd(), "cogs/db/stats_active.db")
         self.database = sqlite3.connect(self.db_path , timeout=1)
         self.database.row_factory = sqlite3.Row
         self.db = self.database.cursor()
