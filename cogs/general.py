@@ -1,10 +1,9 @@
 from discord.ext import commands
 import simplify as s
 import descriptions as desc
-import pytz
 import aiohttp
 from datetime import datetime
-
+from pytz import timezone
 
 class General:
     def __init__(self, bot):
@@ -59,29 +58,29 @@ class General:
         time = get_time()
         # Sorry for readability, string too long
         await s.destructmsg(
-            "**Sydney**: {} (GMT+10) | **London**: {} (GMT+1) "
-            " | **New York**: {} (GMT-4) | **San Francisco** {} (GMT-7)".format(
+            "**Sydney**: {} (UTC+10) | **London**: {} (UTC+1) "
+            " | **New York**: {} (UTC-4) | **San Francisco** {} (UTC-7)".format(
                 time["sydney"], time["london"], time["ny"], time["sf"]), 30, self.bot)
 
     @time.command(name='sydney', description=desc.time_sydney, brief=desc.time_sydney)
     async def _sydney(self):
         time = get_time()
-        await s.destructmsg("**Sydney**: {} (GMT+10)".format(time["sydney"]), 30, self.bot)
+        await s.destructmsg("**Sydney**: {} (UTC+10)".format(time["sydney"]), 30, self.bot)
 
     @time.command(name='london', description=desc.time_london, brief=desc.time_london)
     async def _london(self):
         time = get_time()
-        await s.destructmsg("**London**: {} (GMT+1)".format(time["london"]), 30, self.bot)
+        await s.destructmsg("**London**: {} (UTC+1)".format(time["london"]), 30, self.bot)
 
     @time.command(name='ny', description=desc.time_ny, brief=desc.time_ny)
     async def _ny(self):
         time = get_time()
-        await s.destructmsg("**New York**: {} (GMT-4)".format(time["ny"]), 30, self.bot)
+        await s.destructmsg("**New York**: {} (UTC-4)".format(time["ny"]), 30, self.bot)
 
     @time.command(name='sf', description=desc.time_sf, brief=desc.time_sf)
     async def _sf(self):
         time = get_time()
-        await s.destructmsg("**San Francisco**: {} (GMT-7)".format(time["sf"]), 30, self.bot)
+        await s.destructmsg("**San Francisco**: {} (UTC-7)".format(time["sf"]), 30, self.bot)
 
     @commands.command(description=desc.rd, brief=desc.rd)
     async def rd(self):
@@ -89,20 +88,30 @@ class General:
         bf_rd = datetime(2016, 10, 21, 0, 0, 0)
         nms_rd = datetime(2016, 6, 21, 0, 0, 0)
         d2_rd = datetime(2016, 11, 11, 0, 0, 0)
+        dx_rd = datetime(2016, 8, 23, 0, 0, 0)
+        hi_rd = datetime(2016, 6, 6, 0, 0, 0)
 
-        ow_days, ow_hrs, ow_mins = rd_calc(ow_rd)
+        ow_days, ow_hrs, ow_mins = rd_calc(ow_rd) # OW and TW:W have the same release date
         bf_days, bf_hrs, bf_mins = rd_calc(bf_rd)  # BF1 and Civ6 have the same release date
         nms_days, nms_hrs, nms_mins = rd_calc(nms_rd)
         d2_days, d2_hrs, d2_mins = rd_calc(d2_rd)
+        dx_days, dx_hrs, dx_mins = rd_calc(dx_rd)
+        hi_days, hi_hrs, hi_mins = rd_calc(hi_rd)
 
-        full_msg = "__**Release Dates List** - *Times, Dates and Games are subject to change*__ \n \n" \
-                   "***Overwatch*** releases in {},{} hours and {} minutes.\n" \
-                   "***Battlefield*** ***1*** and ***Civilization*** ***6*** release in {},{} hours and {} minu" \
-                   "tes. \n" \
-                   "***No Man's Sky*** releases in {},{} hours and {} minutes.\n" \
-                   "***Dishonored*** ***2*** releases in {},{} hours and {} minutes.\n" \
-                   "".format(ow_days, ow_hrs, ow_mins, bf_days, bf_hrs, bf_mins, nms_days, nms_hrs, nms_mins,
-                             d2_days, d2_hrs, d2_mins)
+        # template: "*** *** releases in {},{} hours and {} minutes.\n".format(_days, _hrs, _mins)
+
+        title_msg = "__**Release Dates List** - *Times, Dates and Games are subject to change*__ \n \n"
+        ow_msg = "***Overwatch*** and ***Total War: Warhammer*** release in {},{} hours and {} minutes.\n".format(ow_days, ow_hrs, ow_mins)
+        nms_msg = "***No Man's Sky*** releases in {},{} hours and {} minutes.\n".format(nms_days, nms_hrs, nms_mins)
+        bf_msg = "***Battlefield*** ***1*** and ***Civilization*** ***6*** release in {},{} hours and {} minu" \
+                 "tes. \n".format(bf_days, bf_hrs, bf_mins)
+        d2_msg = "***Dishonored*** ***2*** releases in {},{} hours and {} minutes.\n".format(d2_days, d2_hrs, d2_mins)
+        dx_msg = "***Deus Ex: Mankind Divided*** releases in {},{} hours and {} minutes.\n".format(dx_days, dx_hrs,
+                                                                                                   dx_mins)
+        hi_msg = "***Hearts of Iron*** ***4*** releases in {},{} hours and {}minutes.\n".format(hi_days, hi_hrs, hi_mins)
+        # having it like this should make changing them easier compared to how it was previously set up
+
+        full_msg = title_msg + ow_msg + hi_msg + nms_msg + dx_msg + bf_msg + d2_msg
 
         await s.destructmsg(full_msg, 60, self.bot)
 
@@ -124,17 +133,24 @@ def get_time() -> dict:
 
     :return: Dictionary with {"city":"%H:%M"}
     """
-    prague = pytz.timezone('Europe/Prague')
-    now = prague.localize(datetime.now())
     fmt = '%H:%M'
-    au_tz = pytz.timezone('Australia/Sydney')
-    sydney = now.astimezone(au_tz).strftime(fmt)
-    lon_tz = pytz.timezone('Europe/London')
-    london = now.astimezone(lon_tz).strftime(fmt)
-    ny_tz = pytz.timezone('US/Eastern')
-    ny = now.astimezone(ny_tz).strftime(fmt)
-    sf_tz = pytz.timezone('US/Pacific')
-    sf = now.astimezone(sf_tz).strftime(fmt)
+
+    # http://www.saltycrane.com/blog/2009/05/converting-time-zones-datetime-objects-python/
+
+    now_utc = datetime.now(timezone('UTC'))  # print(now_utc.strftime(fmt))
+
+    now_pacific = now_utc.astimezone(timezone('US/Pacific'))
+    sf = now_pacific.strftime(fmt)
+
+    now_london = now_utc.astimezone(timezone('Europe/London'))
+    london = now_london.strftime(fmt)
+
+    now_sydney = now_utc.astimezone(timezone('Australia/Sydney'))
+    sydney = now_sydney.strftime(fmt)
+
+    now_ny = now_utc.astimezone(timezone('US/Eastern'))
+    ny = now_ny.strftime(fmt)
+
     return {"sydney": sydney, "london": london, "ny": ny, "sf": sf}
 
 
