@@ -4,7 +4,7 @@ import descriptions as desc
 import aiohttp
 from datetime import datetime
 from pytz import timezone
-import collections
+
 
 class General:
     def __init__(self, bot):
@@ -83,6 +83,24 @@ class General:
         time = get_time()
         await s.destructmsg("**San Francisco**: {} (UTC-7)".format(time["sf"]), 30, self.bot)
 
+    @commands.command(description=desc.ss, brief=desc.ss)
+    async def steamstatus(self):
+        with aiohttp.ClientSession() as session:
+            async with session.get('http://is.steam.rip/api/v1/?request=SteamStatus')as resp:
+                data = await resp.json()
+                if str(data["result"]["success"]) == "True":
+                    ses = ("**Session Logon:** " + data["result"]["SteamStatus"]["services"]["SessionsLogon"] + "\n")
+                    com = ("**Steam Community:** " + data["result"]["SteamStatus"]["services"]["SteamCommunity"] + "\n")
+                    eco = ("**Steam Economy:** " + data["result"]["SteamStatus"]["services"]["IEconItems"] + "\n")
+                    # lead = ("Leaderboards: " + data["result"]["SteamStatus"]["services"]["LeaderBoards"] + "\n")
+
+                    header = "__**Steam Status**__\n\n"
+                    reply = header + ses + com + eco
+                else:
+                    reply = "Failed - Error: " + data["result"]["error"]
+
+        await s.destructmsg(reply, 30, self.bot)
+
     @commands.command(description=desc.rd, brief=desc.rd)
     async def rd(self):
         dates = {
@@ -103,24 +121,6 @@ class General:
             msg += "\n{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
 
         await s.destructmsg("```"+msg+"```", 30, self.bot)
-
-    @commands.command(description=desc.ss, brief=desc.ss)
-    async def steamstatus(self):
-        with aiohttp.ClientSession() as session:
-            async with session.get('http://is.steam.rip/api/v1/?request=SteamStatus')as resp:
-                data = await resp.json()
-                if str(data["result"]["success"]) == "True":
-                    ses = ("**Session Logon:** " + data["result"]["SteamStatus"]["services"]["SessionsLogon"] + "\n")
-                    com = ("**Steam Community:** " + data["result"]["SteamStatus"]["services"]["SteamCommunity"] + "\n")
-                    eco  = ("**Steam Economy:** " + data["result"]["SteamStatus"]["services"]["IEconItems"] + "\n")
-                    # lead = ("Leaderboards: " + data["result"]["SteamStatus"]["services"]["LeaderBoards"] + "\n")
-
-                    header = "__**Steam Status**__\n\n"
-                    reply = header + ses + com + eco
-                else:
-                    reply = "Failed - Error: " + data["result"]["error"]
-
-        await s.destructmsg(reply, 30, self.bot)
 
 
 def rd_calc(rd):
