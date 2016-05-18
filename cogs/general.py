@@ -21,7 +21,7 @@ class General:
     @commands.command(description=desc.twitch, brief=desc.twitch)
     async def twitch(self):
         with aiohttp.ClientSession() as session:
-            async with session.get('https://api.twitch.tv/kraken/streams?channel=idiotechgaming')as resp:  # idiotechgaming
+            async with session.get('https://api.twitch.tv/kraken/streams?channel=idiotechgaming')as resp:
                 data = await resp.json()
                 if len(data["streams"]) > 0:
                     game = data["streams"][0]["game"]
