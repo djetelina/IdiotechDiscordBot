@@ -21,11 +21,23 @@ class General:
     @commands.command(description=desc.twitch, brief=desc.twitch)
     async def twitch(self):
         with aiohttp.ClientSession() as session:
-            async with session.get('https://api.twitch.tv/kraken/streams?channel=idiotechgaming')as resp:
+            async with session.get('https://api.twitch.tv/kraken/streams?channel=idiotechgaming')as resp:  # idiotechgaming
                 data = await resp.json()
                 if len(data["streams"]) > 0:
                     game = data["streams"][0]["game"]
-                    reply = "Idiotech is live streaming {}! https://www.twitch.tv/idiotechgaming".format(game)
+                    views = data["streams"][0]["viewers"]
+
+                    fmt = "%Y-%m-%dT%H:%M:%SZ"
+                    hrs, mins, secs = dur_calc(datetime.strptime(data["streams"][0]["created_at"], fmt))
+
+                    if views == 1:
+                        peep = "person"
+                    else:
+                        peep = "people"
+
+                    reply = "**Idiotech** is live streaming **{}** with **{}** {} watching! " \
+                            "\nCurrent Uptime: {} hours, {} minutes and {} seconds." \
+                            "\nhttps://www.twitch.tv/idiotechgaming".format(game, views, peep, hrs, mins, secs)
                 else:
                     reply = "https://www.twitch.tv/idiotechgaming (OFFLINE)"
         await s.destructmsg(reply, 20, self.bot)
@@ -132,6 +144,17 @@ def rd_calc(rd):
     hrs, mins, secs = notdays.split(":")
 
     return days, hrs, mins
+
+
+def dur_calc(rd):
+
+    tdelta = datetime.utcnow() - rd
+    tstr = str(tdelta)
+
+    hrs, mins, secs = tstr.split(":")
+    secs, fuck = secs.split(".")
+
+    return hrs, mins, secs
 
 
 def get_time() -> dict:
