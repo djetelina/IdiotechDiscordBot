@@ -4,7 +4,7 @@ import descriptions as desc
 import aiohttp
 from datetime import datetime
 from pytz import timezone
-import collections
+
 
 class General:
     def __init__(self, bot):
@@ -25,7 +25,19 @@ class General:
                 data = await resp.json()
                 if len(data["streams"]) > 0:
                     game = data["streams"][0]["game"]
-                    reply = "Idiotech is live streaming {}! https://www.twitch.tv/idiotechgaming".format(game)
+                    views = data["streams"][0]["viewers"]
+
+                    fmt = "%Y-%m-%dT%H:%M:%SZ"
+                    hrs, mins, secs = dur_calc(datetime.strptime(data["streams"][0]["created_at"], fmt))
+
+                    if views == 1:
+                        peep = "person"
+                    else:
+                        peep = "people"
+
+                    reply = "**Idiotech** is live streaming **{}** with **{}** {} watching! " \
+                            "\nCurrent Uptime: {} hours, {} minutes and {} seconds." \
+                            "\nhttps://www.twitch.tv/idiotechgaming".format(game, views, peep, hrs, mins, secs)
                 else:
                     reply = "https://www.twitch.tv/idiotechgaming (OFFLINE)"
         await s.destructmsg(reply, 20, self.bot)
@@ -83,6 +95,24 @@ class General:
         time = get_time()
         await s.destructmsg("**San Francisco**: {} (UTC-7)".format(time["sf"]), 30, self.bot)
 
+    @commands.command(description=desc.ss, brief=desc.ss)
+    async def steamstatus(self):
+        with aiohttp.ClientSession() as session:
+            async with session.get('http://is.steam.rip/api/v1/?request=SteamStatus')as resp:
+                data = await resp.json()
+                if str(data["result"]["success"]) == "True":
+                    ses = ("**Session Logon:** " + data["result"]["SteamStatus"]["services"]["SessionsLogon"] + "\n")
+                    com = ("**Steam Community:** " + data["result"]["SteamStatus"]["services"]["SteamCommunity"] + "\n")
+                    eco = ("**Steam Economy:** " + data["result"]["SteamStatus"]["services"]["IEconItems"] + "\n")
+                    # lead = ("Leaderboards: " + data["result"]["SteamStatus"]["services"]["LeaderBoards"] + "\n")
+
+                    header = "__**Steam Status**__\n\n"
+                    reply = header + ses + com + eco
+                else:
+                    reply = "Failed - Error: " + data["result"]["error"]
+
+        await s.destructmsg(reply, 30, self.bot)
+
     @commands.command(description=desc.rd, brief=desc.rd)
     async def rd(self):
         dates = {
@@ -104,24 +134,6 @@ class General:
 
         await s.destructmsg("```"+msg+"```", 30, self.bot)
 
-    @commands.command(description=desc.ss, brief=desc.ss)
-    async def steamstatus(self):
-        with aiohttp.ClientSession() as session:
-            async with session.get('http://is.steam.rip/api/v1/?request=SteamStatus')as resp:
-                data = await resp.json()
-                if str(data["result"]["success"]) == "True":
-                    ses = ("**Session Logon:** " + data["result"]["SteamStatus"]["services"]["SessionsLogon"] + "\n")
-                    com = ("**Steam Community:** " + data["result"]["SteamStatus"]["services"]["SteamCommunity"] + "\n")
-                    eco  = ("**Steam Economy:** " + data["result"]["SteamStatus"]["services"]["IEconItems"] + "\n")
-                    # lead = ("Leaderboards: " + data["result"]["SteamStatus"]["services"]["LeaderBoards"] + "\n")
-
-                    header = "__**Steam Status**__\n\n"
-                    reply = header + ses + com + eco
-                else:
-                    reply = "Failed - Error: " + data["result"]["error"]
-
-        await s.destructmsg(reply, 30, self.bot)
-
 
 def rd_calc(rd):
 
@@ -132,6 +144,17 @@ def rd_calc(rd):
     hrs, mins, secs = notdays.split(":")
 
     return days, hrs, mins
+
+
+def dur_calc(rd):
+
+    tdelta = datetime.utcnow() - rd
+    tstr = str(tdelta)
+
+    hrs, mins, secs = tstr.split(":")
+    secs, fuck = secs.split(".")
+
+    return hrs, mins, secs
 
 
 def get_time() -> dict:
