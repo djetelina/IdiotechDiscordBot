@@ -115,10 +115,10 @@ class General:
             async with session.get(steam_api)as resp:
                 data = await resp.json()
                 if str(data["result"]["success"]) == "True":
-                    login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize
-                    community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize
-                    economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize
-                    leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize
+                    login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
+                    community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
+                    economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
+                    leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
 
                     reply = """__**Steam Status**__
 
@@ -131,7 +131,7 @@ class General:
 
         await s.destructmsg(reply, 30, self.bot)
 
-    @commands.command(pass_context=True, description=desc.releasae_dates, brief=desc.releasae_dates)
+    @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
         """
         We are using manual argument detection instead of @commands.group,

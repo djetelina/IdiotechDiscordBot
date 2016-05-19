@@ -98,7 +98,11 @@ time_sydney = "Checks local time in Sydney and it's GMT position"
 time_london = "Checks local time in London and it's GMT position"
 time_ny = "Checks local time in New York and it's GMT position"
 time_sf = "Checks local time in San Francisco and it's GMT position"
-releasae_dates = "List of games and countdown till their releases"
+release_dates = """List of games and countdown until their releases
+If you provide additional argument, it will look through list of games and find those starting with provided argument
+
+Example: !release over"""
+release_datesb = "List of games and countdown until their releases"
 steam_status = "Check Status of Steam Servers"
 
 """

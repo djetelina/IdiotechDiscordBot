@@ -28,7 +28,7 @@ async def on_message(message):
 
 
 @bot.event
-async def on_command(command):
+async def on_command(command, ctx):
     stats = bot.get_cog('Stats')
 
     if stats is not None:
