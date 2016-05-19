@@ -8,7 +8,20 @@ from pytz import timezone
 
 class General:
     def __init__(self, bot):
+        """
+        Edit self.dates with releases we want to track
+        """
         self.bot = bot
+        self.dates = {
+            "Overwatch": datetime(2016, 5, 24, 0, 0, 0),
+            "Total War: Warhammer": datetime(2016, 5, 24, 0, 0, 0),
+            "Hearts of Iron 4": datetime(2016, 6, 6, 0, 0, 0),
+            "No Man's Sky": datetime(2016, 6, 21, 0, 0, 0),
+            "Deus Ex: Mankind Divided": datetime(2016, 8, 23, 0, 0, 0),
+            "Battlefield 1": datetime(2016, 10, 21, 0, 0, 0),
+            "Civilization 6": datetime(2016, 10, 21, 0, 0, 0),
+            "Dishonored 2": datetime(2016, 11, 11, 0, 0, 0),
+            }
 
     @commands.command(description=desc.reddit, brief=desc.reddit)
     async def reddit(self):
@@ -96,7 +109,7 @@ class General:
         await s.destructmsg("**San Francisco**: {} (UTC-7)".format(time["sf"]), 30, self.bot)
 
     @commands.command(description=desc.steam_status, brief=desc.steam_status)
-    async def steamstatus(self):
+    async def steam(self):
         steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
         with aiohttp.ClientSession() as session:
             async with session.get(steam_api)as resp:
@@ -114,33 +127,43 @@ class General:
                     **Economy servers:** {}""".format(login, community, economy)
 
                 else:
-                    reply = "Failed - Error: " + data["result"]["error"]
+                    reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
 
         await s.destructmsg(reply, 30, self.bot)
 
-    @commands.command(description=desc.releasae_dates, brief=desc.releasae_dates)
-    async def rd(self):
-        dates = {
-            "Overwatch": datetime(2016, 5, 24, 0, 0, 0),
-            "Total War: Warhammer": datetime(2016, 5, 24, 0, 0, 0),
-            "Hearts of Iron 4": datetime(2016, 6, 6, 0, 0, 0),
-            "No Man's Sky": datetime(2016, 6, 21, 0, 0, 0),
-            "Deus Ex: Mankind Divided": datetime(2016, 8, 23, 0, 0, 0),
-            "Battlefield 1": datetime(2016, 10, 21, 0, 0, 0),
-            "Civilization 6": datetime(2016, 10, 21, 0, 0, 0),
-            "Dishonored 2": datetime(2016, 11, 11, 0, 0, 0),
-            }
+    @commands.command(pass_context=True, description=desc.releasae_dates, brief=desc.releasae_dates)
+    async def release(self, ctx):
+        """
+        We are using manual argument detection instead of @commands.group,
+        because we want subcommands to be dynamic based on our self.dates dictionary
+        """
+        arg = " ".join(ctx.message.content.split()[1:])
+        if len(arg) > 0:
+            for game in self.dates:
+                if game.lower().startswith(arg):
+                    days, hrs, mins = rd_calc(self.dates[game])
+                    msg = "{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
+                    await s.destructmsg(msg, 30, self.bot)
+                    break
+            else:
+                await s.destructmsg("No game in our release list found, that starts with {}".format(arg), 30, self.bot)
+        else:
+            msg = "Release Dates List - Times, Dates and Games are subject to change\n"
 
-        msg = "Release Dates List - Times, Dates and Games are subject to change\n"
+            for game, time in sorted(self.dates.items(), key=lambda x: x[1]):
+                days, hrs, mins = rd_calc(self.dates[game])
+                msg += "\n{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
 
-        for game, time in sorted(dates.items(), key=lambda x: x[1]):
-            days, hrs, mins = rd_calc(dates[game])
-            msg += "\n{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
-
-        await s.destructmsg("```"+msg+"```", 30, self.bot)
+            await s.destructmsg("```{}```".format(msg), 30, self.bot)
 
 
 def rd_calc(rd):
+    """
+    Calculator for release dates
+
+    :param rd:  datetime()
+    :return:    three strings with time left
+    """
 
     tdelta = rd - datetime.utcnow()
     tstr = str(tdelta)
@@ -152,12 +175,18 @@ def rd_calc(rd):
 
 
 def dur_calc(rd):
+    """
+    Calculator for duration of time streaming
+
+    :param rd:  Timestamp of stream start from twitch API
+    :return:    three strings with time passed
+    """
 
     tdelta = datetime.utcnow() - rd
     tstr = str(tdelta)
 
     hrs, mins, secs = tstr.split(":")
-    secs, fuck = secs.split(".")
+    secs = secs.split(".")[0]
 
     return hrs, mins, secs
 
@@ -170,9 +199,7 @@ def get_time() -> dict:
     """
     fmt = '%H:%M'
 
-    # http://www.saltycrane.com/blog/2009/05/converting-time-zones-datetime-objects-python/
-
-    now_utc = datetime.now(timezone('UTC'))  # print(now_utc.strftime(fmt))
+    now_utc = datetime.now(timezone('UTC'))
 
     now_pacific = now_utc.astimezone(timezone('US/Pacific'))
     sf = now_pacific.strftime(fmt)
@@ -186,7 +213,12 @@ def get_time() -> dict:
     now_ny = now_utc.astimezone(timezone('US/Eastern'))
     ny = now_ny.strftime(fmt)
 
-    return {"sydney": sydney, "london": london, "ny": ny, "sf": sf}
+    return {
+        "sydney": sydney,
+        "london": london,
+        "ny": ny,
+        "sf": sf
+    }
 
 
 def setup(bot):

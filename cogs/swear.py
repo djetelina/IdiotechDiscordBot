@@ -2,7 +2,6 @@ import asyncio
 import simplify as s
 import random
 
-
 """
 DRAFT VERSION
 """
@@ -31,14 +30,17 @@ class Warns:
             if time > 0:
                 time -= 1
                 await asyncio.sleep(1)
+
             else:
                 break
+
         self.points -= 1
         self.point_check()
 
     def point_check(self):
         if self.points >= 3:
             loop.create_task(self.warn_user())
+
         elif self.points == 0:
             del watchlist[self.user]
 
@@ -62,17 +64,18 @@ class Swear:
         for word in self.greylist:
             if word in message.content:
                 self.trigger(message)
-                return
+                break
 
     def check_black(self, message):
         for word in self.blacklist:
             if word in message.content:
                 self.trigger(message)
-                return
+                break
 
     def trigger(self, message):
         if message.author in watchlist:
             watchlist[message.author].new()
+
         else:
             Warns(message.author, self.bot)
 

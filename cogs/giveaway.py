@@ -6,14 +6,18 @@ import random
 import asyncio
 import time
 
+# List with running giveaway instances
 giveawayslist = []
-loop = asyncio.get_event_loop()
+# Channels where we are allowed to host giveaways
 whitechannels = ['private', 'code']
+loop = asyncio.get_event_loop()
 
 
 class Giveaway:
     """
-    Object for giveaway, after creating call loop.create_event(self.countdown)
+    Giveaway object
+
+    To start counting down the giveaway timer we call loop.create_event(self.countdown())
     """
 
     def __init__(self, game, countdown, channel, owner, bot):
@@ -40,38 +44,53 @@ class Giveaway:
         giveawayslist.append(self)
 
     async def countdown(self):
+        """
+        Start counting down the giveaway
+        """
         while True:
             if self.time > 0:
                 self.time -= 1
                 await asyncio.sleep(1)
             else:
                 break
+        # After the countdown is complete, check if the givaway hasn't been cancelled
         if self.status:
             try:
                 stats = self.bot.get_cog('Stats')
                 if stats is not None:
                     await stats.on_giveaway(self.game)
+
                 winner = random.choice(self.enrolled)
                 await self.bot.send_message(self.channel, "{}'s giveaway winner of {} is: {}".format(
-                        self.owner.mention, self.game, winner.mention))
+                    self.owner.mention, self.game, winner.mention))
                 await s.whisper(self.owner, "Winner of your giveaway for {}: {}".format(
-                        self.game, winner.mention), self.bot)
+                    self.game, winner.mention), self.bot)
                 await s.whisper(winner, "You won a giveaway for **{}** by {}".format(
-                        self.game, self.owner.mention), self.bot)
+                    self.game, self.owner.mention), self.bot)
+
                 if self.code:
                     await s.whisper(winner, "Your game code: {}".format(self.code), self.bot)
                     await s.whisper(self.owner, "I have sent them the code you provided.", self.bot)
 
             except IndexError:
-                await self.bot.send_message(self.channel,
-                                            "Nobody enrolled for {} and the giveaway has concluded".format(self.game))
+                await self.bot.send_message(
+                    self.channel, "Nobody enrolled for {} and the giveaway has concluded".format(self.game))
                 await s.whisper(self.owner, "Nobody enrolled for your giveaway of {}".format(self.game), self.bot)
+
             giveawayslist.remove(self)
 
     def enroll(self, user):
         self.enrolled.append(user)
 
     def remove(self, user):
+        """
+        Right now not used
+        Possible ways to implement:
+            !enroll cancel
+            Remove somebody from giveaway and permit them from entering
+                Would need to add blacklist function
+                    This is okay with #public not being whitelisted
+        """
         self.enrolled.remove(user)
 
     async def cancel(self):
@@ -85,6 +104,7 @@ class Giveaways:
     """
     Giveaway category of commands
     """
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -95,8 +115,9 @@ class Giveaways:
                 reply = "\nCurrently opened giveaways:\n=========="
                 for ga in giveawayslist:
                     reply += "\n**{}** in {} by {} ({}, {} people enrolled)".format(
-                            ga.game, ga.channel.mention, ga.owner.mention, parsesecs(ga.time), len(ga.enrolled))
+                        ga.game, ga.channel.mention, ga.owner.mention, parsesecs(ga.time), len(ga.enrolled))
                 reply += "\n==========\nEnter giveaway with !enroll **GameName**"
+
             else:
                 reply = "No giveaway open"
 
@@ -108,6 +129,7 @@ class Giveaways:
         for giveaway in giveawayslist:
             if ctx.message.author == giveaway.owner:
                 has_opened = True
+
         if not has_opened:
             try:
                 destination = self.bot.get_channel(chan.channels[channel])
@@ -130,11 +152,14 @@ class Giveaways:
 
                     I will open the enrollments to your giveaway after you send me `!giveaway confirm`
                     """, self.bot)
+
                 else:
                     await s.whisper(
                         ctx.message.author, "I'm sorry, but you can't open a giveaway in this channel.", self.bot)
+
             except KeyError:
                 await s.whisper(ctx.message.author, "I don't know channel *{}*".format(channel), self.bot)
+
         else:
             await s.whisper(ctx.message.author, "You already have one giveaway open", self.bot)
 
@@ -168,8 +193,10 @@ class Giveaways:
                 await self.bot.send_message(
                     giveaway.channel, "@here {0} just opened a giveaway for {1}. Type '!enroll {1}' to enroll".format(
                         giveaway.owner.mention, giveaway.game))
+
                 if giveaway.desc:
                     await self.bot.send_message(giveaway.channel, "Description: {}".format(giveaway.description))
+
                 if giveaway.url:
                     await self.bot.send_message(giveaway.channel, giveaway.url)
 
@@ -184,24 +211,30 @@ class Giveaways:
     async def enroll(self, ctx, *, game: str):
         user = ctx.message.author
         found = 0
+
         if len(giveawayslist) == 0:
             await s.whisper(user, "There are no giveaway opened", self.bot)
             return
+
         for opened in giveawayslist:
             if opened.game.lower() == game.lower():
                 if ctx.message.channel == opened.channel and user not in opened.enrolled:
                     opened.enroll(user)
                     found = 1
                     await s.whisper(user, "You enrolled for {}".format(game), self.bot)
+
                 elif user in opened.enrolled:
                     found = 1
                     await s.whisper(user, "You are already enrolled for this game", self.bot)
+
                 else:
                     found = 1
                     await s.whisper(user, "You tried to enter a giveaway from  wrong channel, sorry can't do that",
                                     self.bot)
+
         if not found:
             await s.whisper(user, "Giveaway for the game you mentioned not found", self.bot)
+
         await self.bot.delete_message(ctx.message)
 
 
@@ -215,8 +248,10 @@ def parsesecs(sec: int) -> str:
     """
     if sec >= 60:
         tleft = time.strftime("%M minutes left", time.gmtime(sec)).lstrip('0')
+
     else:
         tleft = time.strftime("%S seconds left", time.gmtime(sec)).lstrip('0')
+
     return tleft
 
 
