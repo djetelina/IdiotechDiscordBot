@@ -23,7 +23,7 @@ async def on_message(message):
     swear = bot.get_cog('Swear')
 
     if swear is not None:
-        await swear.message(bot, message)
+        await swear.message(message)
 
     await bot.process_commands(message)
 

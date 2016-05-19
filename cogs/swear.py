@@ -16,13 +16,14 @@ class Warns:
         self.user = user
         self.bot = bot
         self.points = 0
+        self.warnings = ["Please don't swear!", "Don't swear, thanks!"]
         watchlist.update({self.user: self})
         self.new()
 
     def new(self):
         self.points += 1
         self.point_check()
-        loop.create_task(self.decay)
+        loop.create_task(self.decay())
 
     async def decay(self):
         time = 120
@@ -37,12 +38,12 @@ class Warns:
 
     def point_check(self):
         if self.points >= 3:
-            loop.create_task(self.warn_user)
+            loop.create_task(self.warn_user())
         elif self.points == 0:
             del watchlist[self.user]
 
     async def warn_user(self):
-        s.whisper(self.user, "I'm warning you", self.bot)
+        await s.whisper(self.user, random.choice(self.warnings), self.bot)
 
 
 class Swear:
@@ -57,21 +58,21 @@ class Swear:
             self.check_grey(message)
             self.check_black(message)
 
-    async def check_grey(self, message):
+    def check_grey(self, message):
         for word in self.greylist:
             if word in message.content:
                 self.trigger(message)
                 return
 
-    async def check_black(self, message):
+    def check_black(self, message):
         for word in self.blacklist:
             if word in message.content:
                 self.trigger(message)
                 return
 
-    async def trigger(self, message):
+    def trigger(self, message):
         if message.author in watchlist:
-            watchlist['message.author'].new()
+            watchlist[message.author].new()
         else:
             Warns(message.author, self.bot)
 
