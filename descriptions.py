@@ -2,7 +2,12 @@
 Description strings
 """
 
-main = """Bot for Idiotech's Discord by iScrE4m
+main = """Bot for Idiotech's Discord
+
+Owner: iScrE4m
+Contributors: Extra_Random
+Source code: https://github.com/iScrE4m/IdiotechDiscordBot
+Request a feature: https://github.com/iScrE4m/IdiotechDiscordBot/issues
 
 Commands can have subcommands, you can type !help for those too
 For example: !help giveaway open"""
@@ -93,8 +98,8 @@ time_sydney = "Checks local time in Sydney and it's GMT position"
 time_london = "Checks local time in London and it's GMT position"
 time_ny = "Checks local time in New York and it's GMT position"
 time_sf = "Checks local time in San Francisco and it's GMT position"
-rd = "List of games and countdown till their releases"
-ss = "Check Status of Steam Servers"
+releasae_dates = "List of games and countdown till their releases"
+steam_status = "Check Status of Steam Servers"
 
 """
 STATS

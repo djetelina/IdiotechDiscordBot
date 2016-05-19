@@ -95,25 +95,30 @@ class General:
         time = get_time()
         await s.destructmsg("**San Francisco**: {} (UTC-7)".format(time["sf"]), 30, self.bot)
 
-    @commands.command(description=desc.ss, brief=desc.ss)
+    @commands.command(description=desc.steam_status, brief=desc.steam_status)
     async def steamstatus(self):
+        steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
         with aiohttp.ClientSession() as session:
-            async with session.get('http://is.steam.rip/api/v1/?request=SteamStatus')as resp:
+            async with session.get(steam_api)as resp:
                 data = await resp.json()
                 if str(data["result"]["success"]) == "True":
-                    ses = ("**Session Logon:** " + data["result"]["SteamStatus"]["services"]["SessionsLogon"] + "\n")
-                    com = ("**Steam Community:** " + data["result"]["SteamStatus"]["services"]["SteamCommunity"] + "\n")
-                    eco = ("**Steam Economy:** " + data["result"]["SteamStatus"]["services"]["IEconItems"] + "\n")
-                    # lead = ("Leaderboards: " + data["result"]["SteamStatus"]["services"]["LeaderBoards"] + "\n")
+                    login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize
+                    community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize
+                    economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize
+                    leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize
 
-                    header = "__**Steam Status**__\n\n"
-                    reply = header + ses + com + eco
+                    reply = """__**Steam Status**__
+
+                    **Login servers:** {}
+                    **Community servers:** {}
+                    **Economy servers:** {}""".format(login, community, economy)
+
                 else:
                     reply = "Failed - Error: " + data["result"]["error"]
 
         await s.destructmsg(reply, 30, self.bot)
 
-    @commands.command(description=desc.rd, brief=desc.rd)
+    @commands.command(description=desc.releasae_dates, brief=desc.releasae_dates)
     async def rd(self):
         dates = {
             "Overwatch": datetime(2016, 5, 24, 0, 0, 0),

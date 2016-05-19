@@ -30,6 +30,11 @@ class Restricted:
     async def play(self, *, playing: str):
         await self.bot.change_status(game=discord.Game(name=playing))
 
+    @commands.command(pass_context=True, hidden=True, description="not for you")
+    @checks.is_scream()
+    async def nick(self, ctx, *, nick: str):
+        await self.bot.change_nickname(ctx.message.server.me , nick)
+
     @commands.command(hidden=True, pass_context=True, description=desc.rtfh, brief=desc.rtfhb)
     @checks.mod_or_permissions(manage_messages=True)
     async def rtfh(self, ctx, target: str, cmd: str):
