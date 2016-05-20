@@ -70,15 +70,16 @@ class General:
                                    '?access_token={}'.format(t.fb_key)) as resp:
                 data = await resp.json()
 
-                page = "https://www.facebook.com/idiotechgaming/"  # FaceBook Page link
-
                 msg1 = data["data"][0]["message"]
                 y,m,d, = date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
 
-                time = "**Posted:** {}{} of {}, {}.\n\n".format(d, get_date_suf(d), calendar.month_name[int(m)], y)
-                title = "**Latest Facebook Post**\n"
+                msg = "**Latest Facebook Post**\n" \
+                    "**Posted:** {}{} of {}, {}.\n\n" \
+                    "```{}```"  \
+                    "https://www.facebook.com/idiotechgaming/" \
+                    "".format(d, get_date_suf(d), calendar.month_name[int(m)], y, msg1)
 
-                await s.destructmsg(title+time+"```"+msg1+"```\n"+page, 30, self.bot)
+                await s.destructmsg(msg, 30, self.bot)
 
     @commands.command(description=desc.youtube, brief=desc.youtube)
     async def youtube(self):

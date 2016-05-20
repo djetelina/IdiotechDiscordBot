@@ -1,3 +1,3 @@
-token = ""
-fb_key = ""
-yt_key = ""
+token = "MTgxMTc3MDA0MDg1NzM5NTIw.Chlh4A.BUo7TpDZJdeZQFUQKZsPnyC1GfY"
+fb_key = "1596431190668061|TSH2BRoYN54IVS_cs-dXAiJ9vKY"
+yt_key = "AIzaSyCj3fY8OGsL1Qs3WwGPuG2oftILgz8rtpc"
