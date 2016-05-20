@@ -8,7 +8,7 @@ token = ""
 """
 Found here: https://discordapp.com/developers/applications/me
 The token for the Discord Bot, Will require creating an Application.
-The token is found under "APP BOT USER" and then "Token:"
+The token is found under "APP BOT USER" and then "Token: "
 """
 
 fb_key = ""
