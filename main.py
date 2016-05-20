@@ -2,15 +2,24 @@ import discord
 from discord.ext import commands
 import descriptions as desc
 import checks
+import tokens as t
+from datetime import datetime
 
 bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
 extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', 'cogs.stats', ]
+
+fb = t.fb_key
+yt = t.yt_key
+dt = t.token  # discord token
+if fb == "": print("MISSING FACEBOOK KEY")
+if yt == "": print("MISSING YOUTUBE KEY")
+if dt == "": print("MISSING DISCORD TOKEN")
 
 
 @bot.event
 async def on_ready():
     """After logging in"""
-    print(bot.user.name + ' logged in')
+    print(bot.user.name + ' logged in at ' + str(datetime.now()))
     await bot.change_status(game=discord.Game(name='!help'))
 
 
@@ -81,7 +90,5 @@ if __name__ == '__main__':
         except Exception as e:
             print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
-    with open("token.txt", "r") as file:
-        token = file.readline()
+    bot.run(t.token)
 
-    bot.run(token)
