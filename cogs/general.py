@@ -186,7 +186,7 @@ class General:
         arg = " ".join(ctx.message.content.split()[1:])
         if len(arg) > 0:
             for game in self.dates:
-                if game.lower().startswith(arg):
+                if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
                     days, hrs, mins = calc_until(self.dates[game])
                     msg = "{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
                     await s.destructmsg(msg, 30, self.bot)
