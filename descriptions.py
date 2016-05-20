@@ -83,21 +83,28 @@ SIMPLE LINKS
 
 reddit = "Link to Idiotech's subreddit"
 github = "Link to this bot's source code"
-twitch = "Link to Idiotech's Twitch"
+twitch = """Status of Idiotech's Twitch
+If Idiotech is live, viewer count and the
+game he is playing will be shown."""
+twitchb = "Status of Idiotech's Twitch"
 twitter = "Link to Idiotech's Twitter"
-youtube = "Link to Idiotech's YouTube"
+youtube = "Link to Idiotech's Channel and Details of most recent upload"
+fb = "Link to Idiotech's Facebook, also shows latest post"
 rules = "READ THE RULES!"
+
+
 
 """
 Utility commands
 """
 
 time = "Check local times over the world"
-time_advanced = "Checks local time over the world and their GMT positions"
-time_sydney = "Checks local time in Sydney and it's GMT position"
-time_london = "Checks local time in London and it's GMT position"
-time_ny = "Checks local time in New York and it's GMT position"
-time_sf = "Checks local time in San Francisco and it's GMT position"
+time_advanced = "Checks local time over the world and their UTC positions"
+time_sydney = "Checks local time in Sydney and it's UTC position"
+time_london = "Checks local time in London and it's UTC position"
+time_ny = "Checks local time in New York and it's UTC position"
+time_sf = "Checks local time in San Francisco and it's UTC position"
+time_perth = "Checks local time in Perth and its UTC position"
 release_dates = """List of games and countdown until their releases
 If you provide additional argument, it will look through list of games and find those starting with provided argument
 

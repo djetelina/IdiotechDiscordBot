@@ -4,6 +4,8 @@ import descriptions as desc
 import aiohttp
 from datetime import datetime
 from pytz import timezone
+import tokens as t
+import calendar
 
 
 class General:
@@ -12,8 +14,10 @@ class General:
         Edit self.dates with releases we want to track
         """
         self.bot = bot
+
+        # Dates have to be in relation to UTC (so if release is 5am BST, it would be 4am UTC)
         self.dates = {
-            "Overwatch": datetime(2016, 5, 24, 0, 0, 0),
+            "Overwatch": datetime(2016, 5, 23, 23, 0, 0),  # launches 12:00am bst, -1 because its in UTC time
             "Total War: Warhammer": datetime(2016, 5, 24, 0, 0, 0),
             "Hearts of Iron 4": datetime(2016, 6, 6, 0, 0, 0),
             "No Man's Sky": datetime(2016, 6, 21, 0, 0, 0),
@@ -31,7 +35,7 @@ class General:
     async def github(self):
         await s.destructmsg("https://github.com/iScrE4m/IdiotechDiscordBot", 20, self.bot)
 
-    @commands.command(description=desc.twitch, brief=desc.twitch)
+    @commands.command(description=desc.twitch, brief=desc.twitchb)
     async def twitch(self):
         with aiohttp.ClientSession() as session:
             async with session.get('https://api.twitch.tv/kraken/streams?channel=idiotechgaming')as resp:
@@ -41,7 +45,7 @@ class General:
                     views = data["streams"][0]["viewers"]
 
                     fmt = "%Y-%m-%dT%H:%M:%SZ"
-                    hrs, mins, secs = dur_calc(datetime.strptime(data["streams"][0]["created_at"], fmt))
+                    hrs, mins, secs = calc_duration(datetime.strptime(data["streams"][0]["created_at"], fmt))
 
                     if views == 1:
                         peep = "person"
@@ -59,9 +63,45 @@ class General:
     async def twitter(self):
         await s.destructmsg('https://twitter.com/idiotechgaming', 20, self.bot)
 
+    @commands.command(description=desc.fb, brief=desc.fb)
+    async def facebook(self):
+        with aiohttp.ClientSession() as session:
+            async with session.get('https://graph.facebook.com/v2.6/idiotechgaming/posts'
+                                   '?access_token={}'.format(t.fb_key)) as resp:
+                data = await resp.json()
+
+                page = "https://www.facebook.com/idiotechgaming/"  # FaceBook Page link
+
+                msg1 = data["data"][0]["message"]
+                y,m,d, = date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
+
+                time = "**Posted:** {}{} of {}, {}.\n\n".format(d, get_date_suf(d), calendar.month_name[int(m)], y)
+                title = "**Latest Facebook Post**\n"
+
+                await s.destructmsg(title+time+"```"+msg1+"```\n"+page, 30, self.bot)
+
     @commands.command(description=desc.youtube, brief=desc.youtube)
     async def youtube(self):
-        await s.destructmsg('https://www.youtube.com/c/idiotechgaming', 20, self.bot)
+        with aiohttp.ClientSession() as session:
+            async with session.get('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0YagOInbZx'
+                                   'j10gaWwb1Nag&maxResults=1&order=date&key={}'.format(t.yt_key)) as resp:
+                data = await resp.json()
+                channel = "https://www.youtube.com/c/idiotechgaming"
+
+                mo = "**"  # Modifier (e.g. * for italic, ** for bold, __ for underline and so on)
+                title = mo + "Latest Upload: " + mo\
+                        + data["items"][0]["snippet"]["title"]  # [::-1]  # msg + vid title, [::-1] reverses str
+                uploaded = data["items"][0]["snippet"]["publishedAt"]  # datetime video was uploaded
+                date = str(uploaded).split('T')[0]  # just the date of upload
+
+                year, month, day = date.split('-')
+                month = calendar.month_name[int(month)]  # takes month number and returns word form (i.e. 05 = may)
+
+                uploaded = mo + "Uploaded: " + mo + "{} the {}{}, {}.".format(month, day, get_date_suf(day), year)
+                # link = "```https://youtu.be/" + data["items"][0]["id"]["videoId"] + "```"
+                # uses ``` to stop video from being embed
+
+                await s.destructmsg(title + "\n" + uploaded + "\n\n"+channel, 30, self.bot)
 
     @commands.command(description=desc.rules, brief=desc.rules)
     async def rules(self):
@@ -76,17 +116,18 @@ class General:
         """
         if ctx.invoked_subcommand is None:
             time = get_time()
-            await s.destructmsg("**Sydney**: {} | **London**: {} | **New York**: {} | **San Francisco** {}".format(
-                    time["sydney"], time["london"], time["ny"], time["sf"]), 30, self.bot)
+            await s.destructmsg("**San Francisco**: {} | **New York**: {} | **London**: {} | **Sydney** {}".format(
+                    time["sf"], time["ny"], time["london"], time["sydney"]), 30, self.bot)
 
     @time.command(name='advanced', description=desc.time_advanced, brief=desc.time_advanced)
     async def _advanced(self):
         time = get_time()
-        # Sorry for readability, string too long
         await s.destructmsg(
-            "**Sydney**: {} (UTC+10) | **London**: {} (UTC+1) "
-            " | **New York**: {} (UTC-4) | **San Francisco** {} (UTC-7)".format(
-                time["sydney"], time["london"], time["ny"], time["sf"]), 30, self.bot)
+            "**San Francisco** {} (UTC-7) "
+            "| **New York**: {} (UTC-4) "
+            "| **London**: {} (UTC+1) "
+            "| **Sydney**: {} (UTC+10) "
+            "".format(time["sf"], time["ny"], time["london"], time["sydney"]), 30, self.bot)
 
     @time.command(name='sydney', description=desc.time_sydney, brief=desc.time_sydney)
     async def _sydney(self):
@@ -108,6 +149,11 @@ class General:
         time = get_time()
         await s.destructmsg("**San Francisco**: {} (UTC-7)".format(time["sf"]), 30, self.bot)
 
+    @time.command(name='perth', description=desc.time_perth, brief=desc.time_perth)
+    async def _perth(self):
+        time = get_time()
+        await s.destructmsg("**Perth**: {} (UTC+8)".format(time["perth"]), 30, self.bot)
+
     @commands.command(description=desc.steam_status, brief=desc.steam_status)
     async def steam(self):
         steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
@@ -118,7 +164,7 @@ class General:
                     login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
                     community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
                     economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
-                    leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
+                    # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
 
                     reply = """__**Steam Status**__
 
@@ -141,9 +187,10 @@ class General:
         if len(arg) > 0:
             for game in self.dates:
                 if game.lower().startswith(arg):
-                    days, hrs, mins = rd_calc(self.dates[game])
+                    days, hrs, mins = calc_until(self.dates[game])
                     msg = "{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
                     await s.destructmsg(msg, 30, self.bot)
+
                     break
             else:
                 await s.destructmsg("No game in our release list found, that starts with {}".format(arg), 30, self.bot)
@@ -151,17 +198,54 @@ class General:
             msg = "Release Dates List - Times, Dates and Games are subject to change\n"
 
             for game, time in sorted(self.dates.items(), key=lambda x: x[1]):
-                days, hrs, mins = rd_calc(self.dates[game])
+                days, hrs, mins = calc_until(self.dates[game])
                 msg += "\n{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
 
             await s.destructmsg("```{}```".format(msg), 30, self.bot)
 
 
-def rd_calc(rd):
-    """
-    Calculator for release dates
+def get_date_suf(day):
+    # Get the suffix to add to date ('st' for 1, 'nd' for 2 and so on) code from http://stackoverflow.com/a/5891598
+    if 4 <= int(day) <= 20 or 24 <= int(day) <= 30:
+        suffix = "th"
+    else:
+        suffix = ["st", "nd", "rd"][day % 10 - 1]
+    return suffix
 
-    :param rd:  datetime()
+
+def date_split(date):
+    """
+    Returns the given datetime as three strings: year, month and day
+
+    :param date: The datetime to split into year, month and day
+    :return: year, month, day
+    """
+
+    to_split = str(date).split('T')[0]
+    year, month, day = to_split.split('-')
+
+    return year, month, day
+
+
+def date_now():
+    """
+    Returns the date now as three strings: year, month and day
+
+    :return: year, month, day
+    """
+
+    now = datetime.utcnow()
+    date, time = str(now).split(' ')
+    year, month, day = date.split('-')
+
+    return year, month, day
+
+
+def calc_until(rd):
+    """
+    Calculates the amount of time between now and 'rd'
+
+    :param rd:  release date as datetime()
     :return:    three strings with time left
     """
 
@@ -174,15 +258,15 @@ def rd_calc(rd):
     return days, hrs, mins
 
 
-def dur_calc(rd):
+def calc_duration(start):
     """
-    Calculator for duration of time streaming
+    Calculates the amount of time between 'start' and now
 
-    :param rd:  Timestamp of stream start from twitch API
+    :param start:  Datetime
     :return:    three strings with time passed
     """
 
-    tdelta = datetime.utcnow() - rd
+    tdelta = datetime.utcnow() - start
     tstr = str(tdelta)
 
     hrs, mins, secs = tstr.split(":")
@@ -210,6 +294,9 @@ def get_time() -> dict:
     now_sydney = now_utc.astimezone(timezone('Australia/Sydney'))
     sydney = now_sydney.strftime(fmt)
 
+    now_perth = now_utc.astimezone(timezone('Australia/Perth'))
+    perth = now_perth.strftime(fmt)
+
     now_ny = now_utc.astimezone(timezone('US/Eastern'))
     ny = now_ny.strftime(fmt)
 
@@ -217,7 +304,8 @@ def get_time() -> dict:
         "sydney": sydney,
         "london": london,
         "ny": ny,
-        "sf": sf
+        "sf": sf,
+        "perth": perth
     }
 
 
