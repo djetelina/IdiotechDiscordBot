@@ -84,7 +84,6 @@ class General:
     @commands.command(description=desc.youtube, brief=desc.youtube)
     async def youtube(self):
 
-        """
         with aiohttp.ClientSession() as session:
             async with session.get('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0YagOInbZx'
                                    'j10gaWwb1Nag&maxResults=1&order=date&key={}'.format(t.yt_key)) as resp:
@@ -105,7 +104,6 @@ class General:
                 # uses ``` to stop video from being embed
 
                 await s.destructmsg(title + "\n" + uploaded + "\n\n"+channel, 30, self.bot)
-        """
 
         await s.destructmsg("https://www.youtube.com/c/idiotechgaming", 30, self.bot)
 
@@ -185,10 +183,9 @@ class General:
 
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
-        """
-        We are using manual argument detection instead of @commands.group,
-        because we want subcommands to be dynamic based on our self.dates dictionary
-        """
+        # We are using manual argument detection instead of @commands.group,
+        # because we want subcommands to be dynamic based on our self.dates dictionary
+
         arg = " ".join(ctx.message.content.split()[1:])
         if len(arg) > 0:
             for game in self.dates:
