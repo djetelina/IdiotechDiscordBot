@@ -28,8 +28,8 @@ Create a new project, then on the API overviews go to YouTube Data API and enabl
 Then go to Credentials and create an API Key there.
 """
 
-fc_key = ""
+weather_key = ""
 """
-Found here: https://developer.forecast.io/
-Register Account, then its found at the bottom of the page
+Found here: https://home.openweathermap.org/api_keys
+Sign up then go to profile and then 'API keys'
 """
