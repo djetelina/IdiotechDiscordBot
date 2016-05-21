@@ -26,7 +26,7 @@ class Weather:
         spaces = ' ' in loc  # checks if there is spaces in given text - False = No Spaces
         # print(spaces)  # debug - remove
         if not spaces:
-            await s.destructmsg("***Getting Weather Status for {}. This make take a while.***".format(loc), 15, self.bot)
+            await s.destructmsg("***Getting Weather Status for {}. This may take a while.***".format(loc), 15, self.bot)
             # seems to take around 15 seconds to find weather information
 
             weather_api = self.base_url + loc + self.a_url + self.key
