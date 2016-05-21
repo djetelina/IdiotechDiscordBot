@@ -211,7 +211,7 @@ def get_date_suf(day):
     if 4 <= int(day) <= 20 or 24 <= int(day) <= 30:
         suffix = "th"
     else:
-        suffix = ["st", "nd", "rd"][day % 10 - 1]
+        suffix = ["st", "nd", "rd"][int(day) % 10 - 1]
     return suffix
 
 
