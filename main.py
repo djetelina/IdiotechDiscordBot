@@ -6,7 +6,7 @@ import tokens as t
 from datetime import datetime
 
 bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
-extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', 'cogs.stats', ]
+extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', 'cogs.stats', 'cogs.weather', ]
 
 fb = t.fb_key
 yt = t.yt_key
