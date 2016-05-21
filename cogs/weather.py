@@ -21,7 +21,8 @@ class Weather:
         self.base_url = "http://api.openweathermap.org/data/2.5/weather?q="  # base url (before query and key)
         self.a_url = "&appid="  # additional url (comes after query and before key)
 
-    @commands.command(passcontext=True, description="Get Weather Status in <loc> (a given city name)", brief="Weather")
+    @commands.command(passcontext=True, description="Get Weather Status in <loc> (a given city name)",
+                      brief="Finds Weather Status for input city")
     async def weather(self,  *, loc: str):  # loc = location
         spaces = ' ' in loc  # checks if there is spaces in given text - False = No Spaces
         if not spaces:
