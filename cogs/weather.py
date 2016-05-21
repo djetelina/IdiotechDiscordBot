@@ -21,21 +21,19 @@ class Weather:
         self.base_url = "http://api.openweathermap.org/data/2.5/weather?q="  # base url (before query and key)
         self.a_url = "&appid="  # additional url (comes after query and before key)
 
-    @commands.command(passcontext=True, description="Weather", brief="Weather")
+    @commands.command(passcontext=True, description="Get Weather Status in <loc> (a given city name)", brief="Weather")
     async def weather(self,  *, loc: str):  # loc = location
         spaces = ' ' in loc  # checks if there is spaces in given text - False = No Spaces
-        # print(spaces)  # debug - remove
         if not spaces:
             await s.destructmsg("***Getting Weather Status for {}. This may take a while.***".format(loc), 15, self.bot)
             # seems to take around 15 seconds to find weather information
 
             weather_api = self.base_url + loc + self.a_url + self.key
-            # print(weather_api)
 
             with aiohttp.ClientSession() as session:
                 async with session.get(weather_api)as resp:
                     data = await resp.json()
-                    # print(data)
+
                     temp = data["main"]["temp"]
                     brief = data["weather"][0]["main"]  # ie cloudy
                     desc = data["weather"][0]["description"]  # ie very cloudy/ overcast clouds and so on
