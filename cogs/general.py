@@ -113,11 +113,10 @@ class General:
 
     @commands.group(pass_context=True, description=desc.time, brief=desc.time)
     async def time(self, ctx):
-        """
-        Group for !time command, set subcommands by wrapping them in @time.command(name='subcommand_name)
-        We use function get_time() to get all the times over the world.
-        To add a city, edit get_time() and add it into dictionary
-        """
+        # Group for !time command, set subcommands by wrapping them in @time.command(name='subcommand_name)
+        # We use function get_time() to get all the times over the world.
+        # To add a city, edit get_time() and add it into dictionary
+
         if ctx.invoked_subcommand is None:
             time = get_time()
             await s.destructmsg("**San Francisco**: {} | **New York**: {} | **London**: {} | **Sydney** {}".format(
