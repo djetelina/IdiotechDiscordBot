@@ -89,7 +89,7 @@ class General:
             async with session.get('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0YagOInbZx'
                                    'j10gaWwb1Nag&maxResults=1&order=date&key={}'.format(t.yt_key)) as resp:
                 data = await resp.json()
-                channel = "https://www.youtube.com/c/idiotechgaming"
+                # channel = "https://www.youtube.com/c/idiotechgaming"
 
                 mo = "**"  # Modifier (e.g. * for italic, ** for bold, __ for underline and so on)
                 title = mo + "Latest Upload: " + mo\
@@ -101,11 +101,10 @@ class General:
                 month = calendar.month_name[int(month)]  # takes month number and returns word form (i.e. 05 = may)
 
                 uploaded = mo + "Uploaded: " + mo + "{} the {}{}, {}.".format(month, day, get_date_suf(day), year)
-                # link = "```https://youtu.be/" + data["items"][0]["id"]["videoId"] + "```"
+                link = "https://youtu.be/" + data["items"][0]["id"]["videoId"] + ""
                 # uses ``` to stop video from being embed
 
-                await s.destructmsg(title + "\n" + uploaded + "\n\n"+channel, 30, self.bot)
-
+                await s.destructmsg(title + "\n" + uploaded + "\n\n"+link, 30, self.bot)
 
     @commands.command(description=desc.rules, brief=desc.rules)
     async def rules(self):
