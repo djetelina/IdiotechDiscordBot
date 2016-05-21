@@ -6,14 +6,14 @@ import tokens as t
 from datetime import datetime
 
 bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
-extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', 'cogs.stats', 'cogs.weather', ]
-
-fb = t.fb_key
-yt = t.yt_key
-dt = t.token  # discord token
-if fb == "": print("MISSING FACEBOOK KEY")
-if yt == "": print("MISSING YOUTUBE KEY")
-if dt == "": print("MISSING DISCORD TOKEN")
+extensions = [
+    'cogs.giveaway',
+    'cogs.general',
+    'cogs.restricted',
+    'cogs.stats',
+    'cogs.weather',
+    'cogs.swear',
+]
 
 
 @bot.event
