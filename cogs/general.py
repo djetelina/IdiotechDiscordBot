@@ -70,18 +70,20 @@ class General:
                                    '?access_token={}'.format(t.fb_key)) as resp:
                 data = await resp.json()
 
-                page = "https://www.facebook.com/idiotechgaming/"  # FaceBook Page link
-
                 msg1 = data["data"][0]["message"]
                 y,m,d, = date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
 
-                time = "**Posted:** {}{} of {}, {}.\n\n".format(d, get_date_suf(d), calendar.month_name[int(m)], y)
-                title = "**Latest Facebook Post**\n"
+                msg = "**Latest Facebook Post**\n" \
+                    "**Posted:** {}{} of {}, {}.\n\n" \
+                    "```{}```"  \
+                    "https://www.facebook.com/idiotechgaming/" \
+                    "".format(d, get_date_suf(d), calendar.month_name[int(m)], y, msg1)
 
-                await s.destructmsg(title+time+"```"+msg1+"```\n"+page, 30, self.bot)
+                await s.destructmsg(msg, 30, self.bot)
 
     @commands.command(description=desc.youtube, brief=desc.youtube)
     async def youtube(self):
+
         with aiohttp.ClientSession() as session:
             async with session.get('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0YagOInbZx'
                                    'j10gaWwb1Nag&maxResults=1&order=date&key={}'.format(t.yt_key)) as resp:
@@ -103,17 +105,18 @@ class General:
 
                 await s.destructmsg(title + "\n" + uploaded + "\n\n"+channel, 30, self.bot)
 
+        await s.destructmsg("https://www.youtube.com/c/idiotechgaming", 30, self.bot)
+
     @commands.command(description=desc.rules, brief=desc.rules)
     async def rules(self):
         await self.bot.say('Please read <#179965419728273408>')
 
     @commands.group(pass_context=True, description=desc.time, brief=desc.time)
     async def time(self, ctx):
-        """
-        Group for !time command, set subcommands by wrapping them in @time.command(name='subcommand_name)
-        We use function get_time() to get all the times over the world.
-        To add a city, edit get_time() and add it into dictionary
-        """
+        # Group for !time command, set subcommands by wrapping them in @time.command(name='subcommand_name)
+        # We use function get_time() to get all the times over the world.
+        # To add a city, edit get_time() and add it into dictionary
+
         if ctx.invoked_subcommand is None:
             time = get_time()
             await s.destructmsg("**San Francisco**: {} | **New York**: {} | **London**: {} | **Sydney** {}".format(
@@ -179,10 +182,9 @@ class General:
 
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
-        """
-        We are using manual argument detection instead of @commands.group,
-        because we want subcommands to be dynamic based on our self.dates dictionary
-        """
+        # We are using manual argument detection instead of @commands.group,
+        # because we want subcommands to be dynamic based on our self.dates dictionary
+
         arg = " ".join(ctx.message.content.split()[1:])
         if len(arg) > 0:
             for game in self.dates:

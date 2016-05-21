@@ -27,3 +27,9 @@ Found here: https://console.developers.google.com/apis/library
 Create a new project, then on the API overviews go to YouTube Data API and enable it.
 Then go to Credentials and create an API Key there.
 """
+
+weather_key = ""
+"""
+Found here: https://home.openweathermap.org/api_keys
+Sign up then go to profile and then 'API keys'
+"""
