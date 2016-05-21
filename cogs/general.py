@@ -71,7 +71,7 @@ class General:
                 data = await resp.json()
 
                 msg1 = data["data"][0]["message"]
-                y,m,d, = date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
+                y, m, d, = date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
 
                 msg = "**Latest Facebook Post**\n" \
                     "**Posted:** {}{} of {}, {}.\n\n" \
@@ -101,7 +101,7 @@ class General:
                 month = calendar.month_name[int(month)]  # takes month number and returns word form (i.e. 05 = may)
 
                 uploaded = mo + "Uploaded: " + mo + "{} the {}{}, {}.".format(month, day, get_date_suf(day), year)
-                link = "https://youtu.be/" + data["items"][0]["id"]["videoId"] + ""
+                link = "https://youtu.be/" + data["items"][0]["id"]["videoId"]
                 # uses ``` to stop video from being embed
 
                 await s.destructmsg(title + "\n" + uploaded + "\n\n"+link, 30, self.bot)
