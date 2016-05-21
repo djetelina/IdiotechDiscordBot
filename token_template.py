@@ -27,3 +27,9 @@ Found here: https://console.developers.google.com/apis/library
 Create a new project, then on the API overviews go to YouTube Data API and enable it.
 Then go to Credentials and create an API Key there.
 """
+
+fc_key = ""
+"""
+Found here: https://developer.forecast.io/
+Register Account, then its found at the bottom of the page
+"""
