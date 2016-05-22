@@ -189,8 +189,6 @@ class General:
             for game in self.dates:
                 if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
                     days, hrs, mins = calc_until(self.dates[game])
-                    msg = "Error in command 'release', string 'msg' not changed."
-                    # ^^ if for some reason the below code doesnt set the message properly
                     if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
                         msg = "{} is out now!".format(game)
                     else:
