@@ -71,7 +71,7 @@ class General:
                 data = await resp.json()
 
                 msg1 = data["data"][0]["message"]
-                y,m,d, = date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
+                y, m, d, = date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
 
                 msg = "**Latest Facebook Post**\n" \
                     "**Posted:** {}{} of {}, {}.\n\n" \
@@ -89,7 +89,7 @@ class General:
             async with session.get('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0YagOInbZx'
                                    'j10gaWwb1Nag&maxResults=1&order=date&key={}'.format(t.yt_key)) as resp:
                 data = await resp.json()
-                channel = "https://www.youtube.com/c/idiotechgaming"
+                # channel = "https://www.youtube.com/c/idiotechgaming"
 
                 mo = "**"  # Modifier (e.g. * for italic, ** for bold, __ for underline and so on)
                 title = mo + "Latest Upload: " + mo\
@@ -101,11 +101,10 @@ class General:
                 month = calendar.month_name[int(month)]  # takes month number and returns word form (i.e. 05 = may)
 
                 uploaded = mo + "Uploaded: " + mo + "{} the {}{}, {}.".format(month, day, get_date_suf(day), year)
-                # link = "```https://youtu.be/" + data["items"][0]["id"]["videoId"] + "```"
+                link = "https://youtu.be/" + data["items"][0]["id"]["videoId"]
                 # uses ``` to stop video from being embed
 
-                await s.destructmsg(title + "\n" + uploaded + "\n\n"+channel, 30, self.bot)
-
+                await s.destructmsg(title + "\n" + uploaded + "\n\n"+link, 30, self.bot)
 
     @commands.command(description=desc.rules, brief=desc.rules)
     async def rules(self):
@@ -190,7 +189,12 @@ class General:
             for game in self.dates:
                 if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
                     days, hrs, mins = calc_until(self.dates[game])
-                    msg = "{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
+                    msg = "Error in command 'release', string 'msg' not changed."
+                    # ^^ if for some reason the below code doesnt set the message properly
+                    if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
+                        msg = "{} is out now!".format(game)
+                    else:
+                        msg = "{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
                     await s.destructmsg(msg, 30, self.bot)
 
                     break
@@ -206,12 +210,22 @@ class General:
             await s.destructmsg("```{}```".format(msg), 30, self.bot)
 
 
+def int_day(day):
+    """
+    Takes day as string ('3 days') and returns just the number as an integer
+    :param day:
+    :return:
+    """
+    day, word = day.split(" ")
+    return int(day)
+
+
 def get_date_suf(day):
     # Get the suffix to add to date ('st' for 1, 'nd' for 2 and so on) code from http://stackoverflow.com/a/5891598
     if 4 <= int(day) <= 20 or 24 <= int(day) <= 30:
         suffix = "th"
     else:
-        suffix = ["st", "nd", "rd"][day % 10 - 1]
+        suffix = ["st", "nd", "rd"][int(day) % 10 - 1]
     return suffix
 
 

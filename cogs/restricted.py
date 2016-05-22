@@ -40,7 +40,7 @@ class Restricted:
     @checks.mod_or_permissions(manage_messages=True)
     async def rtfh(self, ctx, target: str, cmd: str):
         """
-        RTFH stands for reat the F***ing help
+        RTFH stands for read the F***ing help
 
         Not using @commands.group because we want to have one command for both commands and subcommands
 
