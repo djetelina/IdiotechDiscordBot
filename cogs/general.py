@@ -18,7 +18,7 @@ class General:
         # Dates have to be in relation to UTC (so if release is 5am BST, it would be 4am UTC)
         self.dates = {
             "Overwatch": datetime(2016, 5, 23, 23, 0, 0),  # launches 12:00am bst, -1 because its in UTC time
-            "Total War: Warhammer": datetime(2016, 5, 24, 0, 0, 0),
+            "Total War: Warhammer": datetime(2016, 5, 24, 7, 0, 0),
             "Hearts of Iron 4": datetime(2016, 6, 6, 0, 0, 0),
             "No Man's Sky": datetime(2016, 6, 21, 0, 0, 0),
             "Deus Ex: Mankind Divided": datetime(2016, 8, 23, 0, 0, 0),
@@ -196,11 +196,13 @@ class General:
         if len(arg) > 0:
             for game in self.dates:
                 if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
+
                     days, hrs, mins = calc_until(self.dates[game])
+
                     if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
                         msg = "{} is out now!".format(game)
                     else:
-                        msg = "{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
+                        msg = "{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
                     await s.destructmsg(msg, 30, self.bot)
 
                     break
@@ -211,7 +213,7 @@ class General:
 
             for game, time in sorted(self.dates.items(), key=lambda x: x[1]):
                 days, hrs, mins = calc_until(self.dates[game])
-                msg += "\n{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
+                msg += "\n{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
 
             await s.destructmsg("```{}```".format(msg), 30, self.bot)
 
@@ -274,8 +276,15 @@ def calc_until(rd):
     tdelta = rd - datetime.utcnow()
     tstr = str(tdelta)
 
-    days, notdays = tstr.split(",")
-    hrs, mins, secs = notdays.split(":")
+    test_var = tstr.split(".")[0]
+    if len(test_var) == 8:  # if 8 characters long (meaning 0 days left):
+        days = "0 days"
+        hrs, mins, secs = test_var.split(":")
+    else:
+        days, notdays = tstr.split(",")
+        hrs, mins, secs = notdays.split(":")
+
+    hrs = hrs.strip()  # removes spaces in string
 
     return days, hrs, mins
 
