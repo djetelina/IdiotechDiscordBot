@@ -28,15 +28,18 @@ class General:
             }
 
     @commands.command(description=desc.reddit, brief=desc.reddit)
-    async def reddit(self):
+    async def reddit(self):  # returns link to sub-reddit
         await s.destructmsg("https://www.reddit.com/r/idiotechgaming/", 20, self.bot)
 
     @commands.command(description=desc.github, brief=desc.github)
-    async def github(self):
-        await s.destructmsg("https://github.com/iScrE4m/IdiotechDiscordBot", 20, self.bot)
+    async def github(self):  # returns link to github for this bot
+        await s.destructmsg("You can request features, contribute and report issues with the bot here:"
+                            "\nhttps://github.com/iScrE4m/IdiotechDiscordBot", 20, self.bot)
 
     @commands.command(description=desc.twitch, brief=desc.twitchb)
     async def twitch(self):
+        # finds status of Idiotech's twitch stream
+        # if live, it will return amount of viewers, current stream up-time and game being played
         with aiohttp.ClientSession() as session:
             async with session.get('https://api.twitch.tv/kraken/streams?channel=idiotechgaming')as resp:
                 data = await resp.json()
@@ -47,6 +50,7 @@ class General:
                     fmt = "%Y-%m-%dT%H:%M:%SZ"
                     hrs, mins, secs = calc_duration(datetime.strptime(data["streams"][0]["created_at"], fmt))
 
+                    # if one person is watching return 'person' instead of people
                     if views == 1:
                         peep = "person"
                     else:
@@ -60,11 +64,11 @@ class General:
         await s.destructmsg(reply, 20, self.bot)
 
     @commands.command(description=desc.twitter, brief=desc.twitter)
-    async def twitter(self):
+    async def twitter(self):  # returns link to Idiotech's twitter
         await s.destructmsg('https://twitter.com/idiotechgaming', 20, self.bot)
 
     @commands.command(description=desc.fb, brief=desc.fb)
-    async def facebook(self):
+    async def facebook(self):  # finds latest facebbok post and returns it, along with link to page
         with aiohttp.ClientSession() as session:
             async with session.get('https://graph.facebook.com/v2.6/idiotechgaming/posts'
                                    '?access_token={}'.format(t.fb_key)) as resp:
@@ -83,6 +87,9 @@ class General:
 
     @commands.command(description=desc.youtube, brief=desc.youtube)
     async def youtube(self):
+        # finds information on latest upload from Idiotech's youtube channel
+        #
+
         connector = aiohttp.TCPConnector(verify_ssl=False)
 
         with aiohttp.ClientSession(connector=connector) as session:
@@ -93,7 +100,8 @@ class General:
 
                 mo = "**"  # Modifier (e.g. * for italic, ** for bold, __ for underline and so on)
                 title = mo + "Latest Upload: " + mo\
-                        + data["items"][0]["snippet"]["title"]  # [::-1]  # msg + vid title, [::-1] reverses str
+                    + data["items"][0]["snippet"]["title"]  # [::-1]  # msg + vid title, [::-1] reverses str
+
                 uploaded = data["items"][0]["snippet"]["publishedAt"]  # datetime video was uploaded
                 date = str(uploaded).split('T')[0]  # just the date of upload
 

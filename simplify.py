@@ -2,7 +2,7 @@ import asyncio
 
 async def destructmsg(msg, seconds, bot):
     """
-    Send autodestructive message to channel of original message
+    Send an auto-destructive message to channel of original message
 
     :param msg:     String
     :param seconds: Integer of seconds after which to delete the message
@@ -15,7 +15,7 @@ async def destructmsg(msg, seconds, bot):
 
 async def whisper(user, msg, bot):
     """
-    Send private message to a user
+    Send a private message to a user
 
     :param user: User object
     :param msg:  String
