@@ -189,7 +189,12 @@ class General:
             for game in self.dates:
                 if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
                     days, hrs, mins = calc_until(self.dates[game])
-                    msg = "{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
+                    msg = "Error in command 'release', string 'msg' not changed."
+                    # ^^ if for some reason the below code doesnt set the message properly
+                    if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
+                        msg = "{} is out now!".format(game)
+                    else:
+                        msg = "{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
                     await s.destructmsg(msg, 30, self.bot)
 
                     break
@@ -203,6 +208,16 @@ class General:
                 msg += "\n{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
 
             await s.destructmsg("```{}```".format(msg), 30, self.bot)
+
+
+def int_day(day):
+    """
+    Takes day as string ('3 days') and returns just the number as an integer
+    :param day:
+    :return:
+    """
+    day, word = day.split(" ")
+    return int(day)
 
 
 def get_date_suf(day):
