@@ -103,7 +103,6 @@ class Swear:
         message_words = message.content.split()
         for bad_word in Swear.swears:
             bad_word = bad_word.strip()
-            print(bad_word)
             if bad_word[:1] == '*':
                 for message_word in message_words:
                     partial_match = bad_word[1:]
