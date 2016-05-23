@@ -4,7 +4,6 @@ import random
 import channels as chan
 from discord.ext import commands
 import checks
-import os
 import id_settings as id
 
 """
@@ -24,8 +23,8 @@ class Warns:
         self.points = 0
         
         if len(Warns.warnings) == 0:
-            file = open(os.path.join(os.getcwd(), "cogs/swears/warnings.txt"),'r')
-            Warns.warnings = file.readlines()
+            with open("cogs/swears/warnings.txt", "r") as f:
+                Warns.warnings = f.readlines()
 
         watchlist.update({self.user: self})
         self.new(points)
@@ -50,7 +49,7 @@ class Warns:
         self.point_check()
 
     def point_check(self):
-        if self.points >= 3:
+        if self.points >= 10:
             return True
 
         if self.points == 0:
@@ -71,21 +70,19 @@ class Swear:
     def __init__(self, bot):
         self.bot = bot
         if len(Swear.confusables) == 0:
-            file = open(os.path.join(os.getcwd(), "cogs/swears/confusables.txt"), encoding="utf-8-sig")
-            Swear.confusables = file.readlines()
-            file.close()
+            with open('cogs/swears/confusables.txt', 'r', encoding='utf-8-sig') as f:
+                Swear.confusables = f.readlines()
             Swear.confusables[:] = [confusable_line.strip() for confusable_line in Swear.confusables]
         if len(Swear.swears) == 0:
-            file = open(os.path.join(os.getcwd(), "cogs/swears/swears.txt"), encoding="utf-8-sig")
-            Swear.swears = file.readlines()
-            file.close()
+            with open('cogs/swears/swears.txt', 'r', encoding='utf-8-sig') as f:
+                Swear.swears = f.readlines()
             Swear.swears[:] = [self.stomp_confusables(bad_word.strip()) for bad_word in Swear.swears]
         self.ignore = id.bot_id
 
     async def message(self, message):
         if message.author.id is not self.ignore:
-            message.content = self.stomp_confusables(message.content.strip())
-            self.check_swears(message)
+            content = self.stomp_confusables(message.content.strip())
+            self.check_swears(message, content)
 
     def stomp_confusables(self, input_string):
         output_string = ""
@@ -97,9 +94,9 @@ class Swear:
             output_string += char
         return output_string
 
-    def check_swears(self, message):
+    def check_swears(self, message, content):
         swear_count = 0
-        message_words = message.content.split()
+        message_words = content.split()
         for bad_word in Swear.swears:
             bad_word = bad_word.strip()
             if bad_word[:1] == '*':
