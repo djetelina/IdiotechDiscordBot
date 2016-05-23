@@ -18,7 +18,7 @@ class General:
         # Dates have to be in relation to UTC (so if release is 5am BST, it would be 4am UTC)
         self.dates = {
             "Overwatch": datetime(2016, 5, 23, 23, 0, 0),  # launches 12:00am bst, -1 because its in UTC time
-            "Total War: Warhammer": datetime(2016, 5, 24, 0, 0, 0),
+            "Total War: Warhammer": datetime(2016, 5, 24, 7, 0, 0),
             "Hearts of Iron 4": datetime(2016, 6, 6, 0, 0, 0),
             "No Man's Sky": datetime(2016, 6, 21, 0, 0, 0),
             "Deus Ex: Mankind Divided": datetime(2016, 8, 23, 0, 0, 0),
@@ -28,15 +28,18 @@ class General:
             }
 
     @commands.command(description=desc.reddit, brief=desc.reddit)
-    async def reddit(self):
+    async def reddit(self):  # returns link to sub-reddit
         await s.destructmsg("https://www.reddit.com/r/idiotechgaming/", 20, self.bot)
 
     @commands.command(description=desc.github, brief=desc.github)
-    async def github(self):
-        await s.destructmsg("https://github.com/iScrE4m/IdiotechDiscordBot", 20, self.bot)
+    async def github(self):  # returns link to github for this bot
+        await s.destructmsg("You can request features, contribute and report issues with the bot here:"
+                            "\nhttps://github.com/iScrE4m/IdiotechDiscordBot", 20, self.bot)
 
     @commands.command(description=desc.twitch, brief=desc.twitchb)
     async def twitch(self):
+        # finds status of Idiotech's twitch stream
+        # if live, it will return amount of viewers, current stream up-time and game being played
         with aiohttp.ClientSession() as session:
             async with session.get('https://api.twitch.tv/kraken/streams?channel=idiotechgaming')as resp:
                 data = await resp.json()
@@ -47,6 +50,7 @@ class General:
                     fmt = "%Y-%m-%dT%H:%M:%SZ"
                     hrs, mins, secs = calc_duration(datetime.strptime(data["streams"][0]["created_at"], fmt))
 
+                    # if one person is watching return 'person' instead of people
                     if views == 1:
                         peep = "person"
                     else:
@@ -60,11 +64,11 @@ class General:
         await s.destructmsg(reply, 20, self.bot)
 
     @commands.command(description=desc.twitter, brief=desc.twitter)
-    async def twitter(self):
+    async def twitter(self):  # returns link to Idiotech's twitter
         await s.destructmsg('https://twitter.com/idiotechgaming', 20, self.bot)
 
     @commands.command(description=desc.fb, brief=desc.fb)
-    async def facebook(self):
+    async def facebook(self):  # finds latest facebbok post and returns it, along with link to page
         with aiohttp.ClientSession() as session:
             async with session.get('https://graph.facebook.com/v2.6/idiotechgaming/posts'
                                    '?access_token={}'.format(t.fb_key)) as resp:
@@ -83,6 +87,9 @@ class General:
 
     @commands.command(description=desc.youtube, brief=desc.youtube)
     async def youtube(self):
+        # finds information on latest upload from Idiotech's youtube channel
+        #
+
         connector = aiohttp.TCPConnector(verify_ssl=False)
 
         with aiohttp.ClientSession(connector=connector) as session:
@@ -93,7 +100,8 @@ class General:
 
                 mo = "**"  # Modifier (e.g. * for italic, ** for bold, __ for underline and so on)
                 title = mo + "Latest Upload: " + mo\
-                        + data["items"][0]["snippet"]["title"]  # [::-1]  # msg + vid title, [::-1] reverses str
+                    + data["items"][0]["snippet"]["title"]  # [::-1]  # msg + vid title, [::-1] reverses str
+
                 uploaded = data["items"][0]["snippet"]["publishedAt"]  # datetime video was uploaded
                 date = str(uploaded).split('T')[0]  # just the date of upload
 
@@ -188,13 +196,13 @@ class General:
         if len(arg) > 0:
             for game in self.dates:
                 if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
+
                     days, hrs, mins = calc_until(self.dates[game])
-                    msg = "Error in command 'release', string 'msg' not changed."
-                    # ^^ if for some reason the below code doesnt set the message properly
+
                     if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
                         msg = "{} is out now!".format(game)
                     else:
-                        msg = "{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
+                        msg = "{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
                     await s.destructmsg(msg, 30, self.bot)
 
                     break
@@ -205,7 +213,7 @@ class General:
 
             for game, time in sorted(self.dates.items(), key=lambda x: x[1]):
                 days, hrs, mins = calc_until(self.dates[game])
-                msg += "\n{} releases in {},{} hours and {} minutes.".format(game, days, hrs, mins)
+                msg += "\n{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
 
             await s.destructmsg("```{}```".format(msg), 30, self.bot)
 
@@ -268,8 +276,15 @@ def calc_until(rd):
     tdelta = rd - datetime.utcnow()
     tstr = str(tdelta)
 
-    days, notdays = tstr.split(",")
-    hrs, mins, secs = notdays.split(":")
+    test_var = tstr.split(".")[0]
+    if len(test_var) == 8:  # if 8 characters long (meaning 0 days left):
+        days = "0 days"
+        hrs, mins, secs = test_var.split(":")
+    else:
+        days, notdays = tstr.split(",")
+        hrs, mins, secs = notdays.split(":")
+
+    hrs = hrs.strip()  # removes spaces in string
 
     return days, hrs, mins
 

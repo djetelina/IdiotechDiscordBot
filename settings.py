@@ -10,7 +10,14 @@ Right now everything is still in it's place
 # Taken from main.py
 
 # Which extensions to load on startup
-extensions = ['cogs.giveaway', 'cogs.general', 'cogs.restricted', 'cogs.stats', ]
+extensions = [
+    'cogs.giveaway',
+    'cogs.general',
+    'cogs.restricted',
+    'cogs.stats',
+    'cogs.weather',
+    'cogs.swear',
+]
 # Status message for bot
 now_playing = "!help"
 

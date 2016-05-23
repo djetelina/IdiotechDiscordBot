@@ -1,6 +1,6 @@
 # Idiotech's Discord Bot
 
-Bot for Discord server of Idiotech
+Bot for [Idiotech's Discord Server](https://discord.gg/0z3KQXI6apyyeNOD)
 
 ## Rules for developing
 
