@@ -284,7 +284,7 @@ def calc_until(rd):
     """
 
     tdelta = rd - datetime.utcnow()
-    tstr = str(tdelta)  # print(tstr)
+    tstr = str(tdelta)
 
     test_var = tstr.split(".")[0]
     if len(test_var) == 7 or len(test_var) == 8:  # is there is still hours in the time left
