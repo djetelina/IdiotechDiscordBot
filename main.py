@@ -43,6 +43,26 @@ async def on_command(command, ctx):
     if stats is not None:
         await stats.on_command_p(command.name)
 
+@bot.command(hidden=True)
+@checks.is_scream()
+async def reload(*, module: str):
+    """
+    Reloads a module.
+
+    :param module: Module to be reloaded, cogs.general -> from cogs folder general module
+    """
+    module = module.strip()
+
+    try:
+        bot.unload_extension(module)
+        bot.load_extension(module)
+
+    except Exception as e:
+        await bot.say('\U0001f52b')
+        await bot.say('{}: {}'.format(type(e).__name__, e))
+
+    else:
+        await bot.say('\U0001f44c')
 
 @bot.command(hidden=True)
 @checks.is_scream()
