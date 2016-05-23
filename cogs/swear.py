@@ -52,13 +52,12 @@ class Warns:
         if self.points == 0:
             del watchlist[self.user]
 
-
     async def warn_user(self):
         await s.whisper(self.user, random.choice(self.warnings), self.bot)
         await self.bot.send_message(
             self.bot.get_channel(chan.channels['admin']),
             "User {} seems to be swearing a lot. He now has {} penalty points".format(
-            self.user.mention, self.points))
+                self.user.mention, self.points))
 
 
 class Swear:
