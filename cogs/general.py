@@ -277,7 +277,7 @@ def calc_until(rd):
     tstr = str(tdelta)
 
     test_var = tstr.split(".")[0]
-    if len(test_var) == 8:  # if 8 characters long (meaning 0 days left):
+    if len(test_var) <= 8:  # if 8 characters long (meaning 0 days left):
         days = "0 days"
         hrs, mins, secs = test_var.split(":")
     else:
