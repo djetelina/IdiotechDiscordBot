@@ -1,6 +1,6 @@
 from discord.ext import commands
 import discord.utils
-
+import id_settings as id
 
 def is_idiotech():
     """
@@ -34,7 +34,7 @@ DANNY'S PERMS
 
 
 def is_owner_check(message):
-    return message.author.id == '132577770046750720'
+    return message.author.id == id.owner_id
 
 
 def is_owner():
