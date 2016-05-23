@@ -4,23 +4,44 @@ import descriptions as desc
 import sqlite3
 import os
 
-
 class Stats:
     def __init__(self, bot):
         self.bot = bot
+        d = os.path.join(os.getcwd(), "cogs/db")
+        if not os.path.exists(d):
+            os.makedirs(d)
         self.db_path = os.path.join(os.getcwd(), "cogs/db/stats_active.db")
         self.database = sqlite3.connect(self.db_path, timeout=1)
         self.database.row_factory = sqlite3.Row
         self.db = self.database.cursor()
         self.sessioncmd = 0
         self.sessionga = 0
+        
+        query = """
+        CREATE TABLE IF NOT EXISTS "commands"
+        (
+            command TEXT NOT NULL,
+            used INT DEFAULT 1
+        )
+        """
+        self.db.execute(query)
+        
+        query = """
+        CREATE TABLE IF NOT EXISTS "giveaways"
+        (
+            game TEXT NOT NULL,
+            given INT DEFAULT 1
+        )
+        """
+        self.db.execute(query)
+        
+        self.database.commit()
 
     async def on_command_p(self, command: str):
         self.sessioncmd += 1
 
         if self.is_in_db("cmd", command):
             self.command_increase(command)
-
         else:
             self.new_entry("cmd", command)
 

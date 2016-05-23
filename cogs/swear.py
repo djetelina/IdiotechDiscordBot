@@ -4,6 +4,8 @@ import random
 import channels as chan
 from discord.ext import commands
 import checks
+import os
+import id_settings as id
 
 """
 DRAFT VERSION
@@ -14,20 +16,22 @@ loop = asyncio.get_event_loop()
 
 
 class Warns:
-    def __init__(self, user, bot):
+    warnings = []
+    
+    def __init__(self, user, bot, points):
         self.user = user
         self.bot = bot
         self.points = 0
-        self.warnings = ["Please don't swear!", "Don't swear, thanks!", 'Is there a need for suo much bad language?',
-                         "That's it, I'm reporting you to the authorities!", "I'm a child, watch your language.",
-                         "Did you know you already have at least 3 penalty points for swearing? Please stop",
-                         "I'm no GLaDOS, but I like science too. Your swears are not science.",
-                         "You know that you can express things without swears?", "Was that word necessary?"]
-        watchlist.update({self.user: self})
-        self.new()
+        
+        if len(Warns.warnings) == 0:
+            file = open(os.path.join(os.getcwd(), "cogs/swears/warnings.txt"),'r')
+            Warns.warnings = file.readlines()
 
-    def new(self):
-        self.points += 1
+        watchlist.update({self.user: self})
+        self.new(points)
+
+    def new(self, points):
+        self.points += points
         if self.point_check():
             loop.create_task(self.warn_user())
         loop.create_task(self.decay())
@@ -61,42 +65,65 @@ class Warns:
 
 
 class Swear:
+    confusables = []
+    swears = []
+    
     def __init__(self, bot):
         self.bot = bot
-        self.greylist = ["fuck", "shit", "cunt"]
-        self.blacklist = ["nigga", "nigger", "kys", "fuck you", "fuck u"]
-        self.ignore = "180842549873737728"
+        if len(Swear.confusables) == 0:
+            file = open(os.path.join(os.getcwd(), "cogs/swears/confusables.txt"), encoding="utf-8-sig")
+            Swear.confusables = file.readlines()
+            file.close()
+            Swear.confusables[:] = [confusable_line.strip() for confusable_line in Swear.confusables]
+        if len(Swear.swears) == 0:
+            file = open(os.path.join(os.getcwd(), "cogs/swears/swears.txt"), encoding="utf-8-sig")
+            Swear.swears = file.readlines()
+            file.close()
+            Swear.swears[:] = [self.stomp_confusables(bad_word.strip()) for bad_word in Swear.swears]
+        self.ignore = id.bot_id
 
     async def message(self, message):
         if message.author.id is not self.ignore:
-            self.check_grey(message)
-            self.check_black(message)
+            message.content = self.stomp_confusables(message.content.strip())
+            self.check_swears(message)
 
-    def check_grey(self, message):
-        for word in self.greylist:
-            if word in message.content:
-                self.trigger(message)
-                break
+    def stomp_confusables(self, input_string):
+        output_string = ""
+        for char in input_string:
+            for confusable_line in Swear.confusables:
+                if char in confusable_line:
+                    char = confusable_line[:1]
+                    break
+            output_string += char
+        return output_string
 
-    def check_black(self, message):
-        for word in self.blacklist:
-            if word in message.content:
-                self.trigger(message)
-                break
+    def check_swears(self, message):
+        swear_count = 0
+        message_words = message.content.split()
+        for bad_word in Swear.swears:
+            bad_word = bad_word.strip()
+            if bad_word[:1] == '*':
+                for message_word in message_words:
+                    partial_match = bad_word[1:]
+                    if partial_match in message_word.strip():
+                        swear_count += 1
+            else:
+                if bad_word in message_words:
+                    swear_count += 1
+        if swear_count > 0:
+            self.trigger(message, swear_count)
 
-    def trigger(self, message):
+    def trigger(self, message, points):
         if message.author in watchlist:
-            watchlist[message.author].new()
-
+            watchlist[message.author].new(points)
         else:
-            Warns(message.author, self.bot)
+            Warns(message.author, self.bot, points)
 
     @commands.command(hidden=True)
     @checks.mod_or_permissions(manage_messages=True)
     async def points(self, *, who: str):
         for user, instance in watchlist.items():
             if who.lower() in user.name.lower():
-                print("found")
                 await self.bot.say("{} has {} warning points.".format(instance.user.mention, instance.points))
                 return
             else:
