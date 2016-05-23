@@ -201,6 +201,8 @@ class General:
 
                     if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
                         msg = "{} is out now!".format(game)
+                    elif int_day(days) == 0 and int(hrs) == 0 and int(mins) == 0:
+                        msg = "{} releases within the next 60 seconds, HYPE!!!".format(game)
                     else:
                         msg = "{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
                     await s.destructmsg(msg, 30, self.bot)
@@ -213,7 +215,15 @@ class General:
 
             for game, time in sorted(self.dates.items(), key=lambda x: x[1]):
                 days, hrs, mins = calc_until(self.dates[game])
-                msg += "\n{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
+
+                if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
+                    msg += "\n{} is out now!".format(game)
+                elif int_day(days) == 0 and int(hrs) == 0 and int(mins) == 0:
+                    msg += "\n{} releases within the next 60 seconds, HYPE!!!".format(game)
+                else:
+                    msg += "\n{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
+
+                # msg += "\n{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
 
             await s.destructmsg("```{}```".format(msg), 30, self.bot)
 
@@ -274,12 +284,20 @@ def calc_until(rd):
     """
 
     tdelta = rd - datetime.utcnow()
-    tstr = str(tdelta)
+    tstr = str(tdelta)  # print(tstr)
 
     test_var = tstr.split(".")[0]
-    if len(test_var) <= 8:  # if 8 characters long (meaning 0 days left):
+    if len(test_var) == 7 or len(test_var) == 8:  # is there is still hours in the time left
         days = "0 days"
         hrs, mins, secs = test_var.split(":")
+    elif len(test_var) == 5 or len(test_var) == 4:  # if there is still minutes in the time left
+        days = "0 days"
+        hrs = "0"
+        mins, secs = test_var.split(":")
+    elif len(test_var) == 1 or len(test_var) == 2: # if there are still seconds remaining until launch
+        days = "0 days"
+        hrs = "0"
+        mins = "0"
     else:
         days, notdays = tstr.split(",")
         hrs, mins, secs = notdays.split(":")
