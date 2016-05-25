@@ -17,7 +17,6 @@ class General:
 
         # Dates have to be in relation to UTC (so if release is 5am BST, it would be 4am UTC)
         self.dates = {
-            "Overwatch": datetime(2016, 5, 23, 23, 0, 0),  # launches 12:00am bst, -1 because its in UTC time
             "Total War: Warhammer": datetime(2016, 5, 24, 7, 0, 0),
             "Hearts of Iron 4": datetime(2016, 6, 6, 0, 0, 0),
             "No Man's Sky": datetime(2016, 6, 21, 0, 0, 0),
@@ -25,6 +24,9 @@ class General:
             "Battlefield 1": datetime(2016, 10, 21, 0, 0, 0),
             "Civilization 6": datetime(2016, 10, 21, 0, 0, 0),
             "Dishonored 2": datetime(2016, 11, 11, 0, 0, 0),
+            "Mirror's Edge: Catalyst": datetime(2016, 6, 9, 0, 0, 0),
+            "Mafia III": datetime(2016, 10, 7, 0, 0, 0),
+            "Pokemon Sun and Moon": datetime(2016, 11, 23, 0, 0, 0),
             }
 
     @commands.command(description=desc.reddit, brief=desc.reddit)
@@ -190,21 +192,15 @@ class General:
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
         # We are using manual argument detection instead of @commands.group,
-        # because we want subcommands to be dynamic based on our self.dates dictionary
+        # because we want sub-commands to be dynamic based on our self.dates dictionary
 
         arg = " ".join(ctx.message.content.split()[1:])
         if len(arg) > 0:
             for game in self.dates:
                 if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
-
                     days, hrs, mins = calc_until(self.dates[game])
+                    msg = create_msg(game, days, hrs, mins)
 
-                    if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
-                        msg = "{} is out now!".format(game)
-                    elif int_day(days) == 0 and int(hrs) == 0 and int(mins) == 0:
-                        msg = "{} releases within the next 60 seconds, HYPE!!!".format(game)
-                    else:
-                        msg = "{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
                     await s.destructmsg(msg, 30, self.bot)
 
                     break
@@ -215,17 +211,20 @@ class General:
 
             for game, time in sorted(self.dates.items(), key=lambda x: x[1]):
                 days, hrs, mins = calc_until(self.dates[game])
-
-                if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
-                    msg += "\n{} is out now!".format(game)
-                elif int_day(days) == 0 and int(hrs) == 0 and int(mins) == 0:
-                    msg += "\n{} releases within the next 60 seconds, HYPE!!!".format(game)
-                else:
-                    msg += "\n{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
-
-                # msg += "\n{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
+                msg += create_msg(game, days, hrs, mins) + "\n"
 
             await s.destructmsg("```{}```".format(msg), 30, self.bot)
+
+
+def create_msg(game, days, hrs, mins):
+    if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
+        msg = "{} is out now!".format(game)
+    elif int_day(days) == 0 and int(hrs) == 0 and int(mins) == 0:
+        msg = "{} releases within the next 60 seconds, HYPE!!!".format(game)
+    else:
+        msg = "{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
+
+    return msg
 
 
 def int_day(day):
