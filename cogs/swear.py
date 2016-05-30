@@ -33,7 +33,8 @@ class Warns:
         self.points += points
         if self.point_check():
             loop.create_task(self.warn_user())
-        loop.create_task(self.decay())
+        for i in range(points):
+            loop.create_task(self.decay())
 
     async def decay(self):
         time = 120
