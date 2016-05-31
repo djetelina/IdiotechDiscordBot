@@ -9,7 +9,7 @@ import time
 # List with running giveaway instances
 giveawayslist = []
 # Channels where we are allowed to host giveaways
-whitechannels = ['private', 'code']
+whitechannels = ['private', 'code', 'test']
 loop = asyncio.get_event_loop()
 
 
@@ -121,7 +121,8 @@ class Giveaways:
             else:
                 reply = "No giveaway open"
 
-            await self.bot.say(reply)
+            await self.bot.delete_message(ctx.message)
+            await s.destructmsg(reply, 10, self.bot)  # left in just in case i break something
 
     @giveaway.command(name="open", pass_context=True, description=desc.openga, brief=desc.opengab)
     async def _open(self, ctx, channel: str, countdown: int, *, game: str):
@@ -246,9 +247,10 @@ def parsesecs(sec: int) -> str:
     :param sec: number of seconds
     :return:    string with time left
     """
-    if sec >= 60:
+    if sec >= 120:
         tleft = time.strftime("%M minutes left", time.gmtime(sec)).lstrip('0')
-
+    elif sec >= 60:
+        tleft = time.strftime("%M minute left", time.gmtime(sec)).lstrip('0')
     else:
         tleft = time.strftime("%S seconds left", time.gmtime(sec)).lstrip('0')
 
