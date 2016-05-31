@@ -60,7 +60,9 @@ class Giveaway:
                 if stats is not None:
                     await stats.on_giveaway(self.game)
 
+                random.seed()
                 winner = random.choice(self.enrolled)
+
                 await self.bot.send_message(self.channel, "{}'s giveaway winner of {} is: {}".format(
                     self.owner.mention, self.game, winner.mention))
                 await s.whisper(self.owner, "Winner of your giveaway for {}: {}".format(
