@@ -9,7 +9,7 @@ import time
 # List with running giveaway instances
 giveawayslist = []
 # Channels where we are allowed to host giveaways
-whitechannels = ['private', 'code', 'test']
+whitechannels = ['private', 'admin']
 loop = asyncio.get_event_loop()
 
 
