@@ -124,7 +124,7 @@ class Giveaways:
                 reply = "No giveaway open"
 
             await self.bot.delete_message(ctx.message)
-            await s.destructmsg(reply, 10, self.bot)  # left in just in case i break something
+            await s.destructmsg(reply, 10, self.bot)
 
     @giveaway.command(name="open", pass_context=True, description=desc.openga, brief=desc.opengab)
     async def _open(self, ctx, channel: str, countdown: int, *, game: str):
