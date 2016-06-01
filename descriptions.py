@@ -21,7 +21,7 @@ openga = """Open a giveaway for specified channel
 Available channels:
     private
 
-Example: !giveaway open private 60 Overwatch"""
+Example: !giveaway open private 30 Overwatch"""
 opengab = "Open a giveaway"
 
 cancelga = """Cancel your giveaway for a game

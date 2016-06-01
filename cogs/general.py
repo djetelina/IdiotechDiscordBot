@@ -19,7 +19,7 @@ class General:
         self.dates = {
             "Total War: Warhammer": datetime(2016, 5, 24, 7, 0, 0),
             "Hearts of Iron 4": datetime(2016, 6, 6, 0, 0, 0),
-            "No Man's Sky": datetime(2016, 6, 21, 0, 0, 0),
+            "No Man's Sky": datetime(2016, 8, 12, 0, 0, 0),
             "Deus Ex: Mankind Divided": datetime(2016, 8, 23, 0, 0, 0),
             "Battlefield 1": datetime(2016, 10, 21, 0, 0, 0),
             "Civilization 6": datetime(2016, 10, 21, 0, 0, 0),
