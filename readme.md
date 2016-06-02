@@ -17,6 +17,9 @@ To request a feature please use [issue tracker](https://github.com/iScrE4m/Idiot
 * Python 3.5+
 * [discord.py](https://github.com/Rapptz/discord.py)
 * Pycountry
+* bs4
+* requests
+* pytz
 
 ## Info
 

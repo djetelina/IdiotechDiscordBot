@@ -21,7 +21,7 @@ openga = """Open a giveaway for specified channel
 Available channels:
     private
 
-Example: !giveaway open private 60 Overwatch"""
+Example: !giveaway open private 30 Overwatch"""
 opengab = "Open a giveaway"
 
 cancelga = """Cancel your giveaway for a game
@@ -111,6 +111,12 @@ If you provide additional argument, it will look through list of games and find 
 Example: !release over"""
 release_datesb = "List of games and countdown until their releases"
 steam_status = "Check Status of Steam Servers"
+
+ow = """Find Overwatch Stats of a given battle tag in a given region
+
+Example: !overwatch eu ExtraRandom#2501
+"""
+owb = "Find Overwatch Stats for a battle tag"
 
 """
 STATS

@@ -1,3 +1,6 @@
 aiohttp
 git+https://github.com/Rapptz/discord.py@async
 pycountry
+bs4
+requests
+pytz
