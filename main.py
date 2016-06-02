@@ -13,6 +13,7 @@ extensions = [
     'cogs.stats',
     'cogs.weather',
     'cogs.swear',
+    'cogs.additional',
 ]
 
 

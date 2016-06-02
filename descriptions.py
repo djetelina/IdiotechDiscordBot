@@ -112,6 +112,12 @@ Example: !release over"""
 release_datesb = "List of games and countdown until their releases"
 steam_status = "Check Status of Steam Servers"
 
+ow = """Find Overwatch Stats of a given battle tag in a given region
+
+Example: !overwatch eu ExtraRandom#2501
+"""
+owb = "Find Overwatch Stats for a battle tag"
+
 """
 STATS
 """
