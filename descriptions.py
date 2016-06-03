@@ -16,12 +16,9 @@ For example: !help giveaway open"""
 GIVEAWAY RELATED
 """
 
-openga = """Open a giveaway for specified channel
+openga = """Open a giveaway
 
-Available channels:
-    private
-
-Example: !giveaway open private 30 Overwatch"""
+Example: !giveaway open 30 Overwatch"""
 opengab = "Open a giveaway"
 
 cancelga = """Cancel your giveaway for a game
@@ -36,16 +33,16 @@ enroll = """Enroll in a existing giveaway
 
 Example: !enroll Audiosurf 2
 """
-enrollb = "Enroll in a giveaway"
+enroll_brief = "Enroll in a giveaway"
 
 giveaway = """Check status of running giveaways
 
 Example: !giveaway"""
-giveawayb = "Check status of running giveaways"
+giveaway_brief = "Check status of running giveaways"
 
-linkga = "Provide a link for your prepared giveaway"
+link_ga = "Provide a link for your prepared giveaway"
 
-codega = """Provide a code for your prepared or running giveaway
+code_ga = """Provide a code for your prepared or running giveaway
 
 It will be sent to the winner after the giveaway is over in this format:
 `Your game code: <GAMECODE>`
@@ -55,11 +52,11 @@ Simply write anything before or after the code, your whole message after `!givea
 
 Example: !giveaway code 123-ABC-356 (STEAM)
 """
-codegab = "Provide a code for your prepared or running giveaway"
+code_ga_brief = "Provide a code for your prepared or running giveaway"
 
-descga = "Provide a description for your prepared giveaway"
+desc_ga = "Provide a description for your prepared giveaway"
 
-confirmga = "Start your prepared giveaway"
+confirm_ga = "Start your prepared giveaway"
 
 """
 HIDDEN COMMANDS (only used by some)
@@ -76,7 +73,6 @@ Example: !rtfh @Idiotech giveaway open
 """
 rtfhb = "Force a person to read !help for a command"
 
-
 """
 SIMPLE LINKS
 """
@@ -91,8 +87,6 @@ twitter = "Link to Idiotech's Twitter"
 youtube = "Link to Idiotech's Channel and Details of most recent upload"
 fb = "Link to Idiotech's Facebook, also shows latest post"
 rules = "READ THE RULES!"
-
-
 
 """
 Utility commands

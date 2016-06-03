@@ -111,7 +111,7 @@ class General:
                 month = calendar.month_name[int(month)]  # takes month number and returns word form (i.e. 05 = may)
 
                 uploaded = mo + "Uploaded: " + mo + "{} the {}{}, {}.".format(month, day, get_date_suf(day), year)
-                link = "https://youtu.be/" + data["items"][0]["id"]["videoId"]
+                link = "https://youtu.be/" + data["items"][0]["our_id"]["videoId"]
                 # uses ``` to stop video from being embed
 
                 await s.destructmsg(title + "\n" + uploaded + "\n\n"+link, 30, self.bot)
@@ -282,28 +282,28 @@ def calc_until(rd):
     :return:    three strings with time left
     """
 
-    tdelta = rd - datetime.utcnow()
-    tstr = str(tdelta)
+    t_delta = rd - datetime.utcnow()
+    t_str = str(t_delta)
 
-    test_var = tstr.split(".")[0]
-    if len(test_var) == 7 or len(test_var) == 8:  # is there is still hours in the time left
+    test_var = t_str.split(".")[0]
+    if len(test_var) == 7 or len(test_var) == 8:
         days = "0 days"
-        hrs, mins, secs = test_var.split(":")
-    elif len(test_var) == 5 or len(test_var) == 4:  # if there is still minutes in the time left
-        days = "0 days"
-        hrs = "0"
-        mins, secs = test_var.split(":")
-    elif len(test_var) == 1 or len(test_var) == 2: # if there are still seconds remaining until launch
+        hrs, minutes, secs = test_var.split(":")
+    elif len(test_var) == 5 or len(test_var) == 4:
         days = "0 days"
         hrs = "0"
-        mins = "0"
+        minutes, secs = test_var.split(":")
+    elif len(test_var) == 1 or len(test_var) == 2:
+        days = "0 days"
+        hrs = "0"
+        minutes = "0"
     else:
-        days, notdays = tstr.split(",")
-        hrs, mins, secs = notdays.split(":")
+        days, time = t_str.split(",")
+        hrs, minutes, secs = time.split(":")
 
     hrs = hrs.strip()  # removes spaces in string
 
-    return days, hrs, mins
+    return days, hrs, minutes
 
 
 def calc_duration(start):

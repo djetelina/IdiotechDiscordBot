@@ -4,6 +4,7 @@ import descriptions as desc
 import sqlite3
 import os
 
+
 class Stats:
     def __init__(self, bot):
         self.bot = bot

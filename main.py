@@ -13,7 +13,7 @@ extensions = [
     'cogs.stats',
     'cogs.weather',
     'cogs.swear',
-    'cogs.additional',
+    'cogs.overwatch',
 ]
 
 
@@ -44,6 +44,7 @@ async def on_command(command, ctx):
     if stats is not None:
         await stats.on_command_p(command.name)
 
+
 @bot.command(hidden=True)
 @checks.is_scream()
 async def reload(*, module: str):
@@ -64,6 +65,7 @@ async def reload(*, module: str):
 
     else:
         await bot.say('\U0001f44c')
+
 
 @bot.command(hidden=True)
 @checks.is_scream()
@@ -112,4 +114,3 @@ if __name__ == '__main__':
             print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
     bot.run(t.token)
-

@@ -3,6 +3,7 @@ import checks
 import descriptions as desc
 import channels as chan
 import discord
+import os
 
 
 class Restricted:
@@ -76,6 +77,7 @@ class Restricted:
         with open("log.txt", "rb") as logfile:
             await self.bot.send_file(admin, logfile, filename="log.txt",
                                      content="Log file for mentioned users from last 500 messages in public channel.")
+        os.remove("log.txt")
 
 
 def setup(bot):
