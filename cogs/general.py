@@ -1,11 +1,12 @@
-from discord.ext import commands
-import simplify as s
-import descriptions as desc
-import aiohttp
-from datetime import datetime
-from pytz import timezone
-import tokens as t
 import calendar
+from datetime import datetime
+
+import aiohttp
+from discord.ext import commands
+from pytz import timezone
+
+import helpers.tokens as t
+from helpers import descriptions as desc
 
 
 class General:
@@ -17,26 +18,25 @@ class General:
 
         # Dates have to be in relation to UTC (so if release is 5am BST, it would be 4am UTC)
         self.dates = {
-            "Total War: Warhammer": datetime(2016, 5, 24, 7, 0, 0),
             "Hearts of Iron 4": datetime(2016, 6, 6, 0, 0, 0),
-            "No Man's Sky": datetime(2016, 8, 12, 0, 0, 0),
+            "No Man''s Sky": datetime(2016, 8, 12, 0, 0, 0),
             "Deus Ex: Mankind Divided": datetime(2016, 8, 23, 0, 0, 0),
             "Battlefield 1": datetime(2016, 10, 21, 0, 0, 0),
             "Civilization 6": datetime(2016, 10, 21, 0, 0, 0),
             "Dishonored 2": datetime(2016, 11, 11, 0, 0, 0),
-            "Mirror's Edge: Catalyst": datetime(2016, 6, 9, 0, 0, 0),
+            "Mirror''s Edge: Catalyst": datetime(2016, 6, 9, 0, 0, 0),
             "Mafia III": datetime(2016, 10, 7, 0, 0, 0),
             "Pokemon Sun and Moon": datetime(2016, 11, 23, 0, 0, 0),
-            }
+        }
 
     @commands.command(description=desc.reddit, brief=desc.reddit)
     async def reddit(self):  # returns link to sub-reddit
-        await s.destructmsg("https://www.reddit.com/r/idiotechgaming/", 20, self.bot)
+        await self.bot.say("https://www.reddit.com/r/idiotechgaming/")
 
     @commands.command(description=desc.github, brief=desc.github)
     async def github(self):  # returns link to github for this bot
-        await s.destructmsg("You can request features, contribute and report issues with the bot here:"
-                            "\nhttps://github.com/iScrE4m/IdiotechDiscordBot", 20, self.bot)
+        await self.bot.say("You can request features, contribute and report issues with the bot here:"
+                           "\nhttps://github.com/iScrE4m/IdiotechDiscordBot")
 
     @commands.command(description=desc.twitch, brief=desc.twitchb)
     async def twitch(self):
@@ -63,11 +63,11 @@ class General:
                             "\nhttps://www.twitch.tv/idiotechgaming".format(game, views, peep, hrs, mins, secs)
                 else:
                     reply = "https://www.twitch.tv/idiotechgaming (OFFLINE)"
-        await s.destructmsg(reply, 20, self.bot)
+        await self.bot.say(reply)
 
     @commands.command(description=desc.twitter, brief=desc.twitter)
     async def twitter(self):  # returns link to Idiotech's twitter
-        await s.destructmsg('https://twitter.com/idiotechgaming', 20, self.bot)
+        await self.bot.say('https://twitter.com/idiotechgaming')
 
     @commands.command(description=desc.fb, brief=desc.fb)
     async def facebook(self):  # finds latest facebbok post and returns it, along with link to page
@@ -76,48 +76,44 @@ class General:
                                    '?access_token={}'.format(t.fb_key)) as resp:
                 data = await resp.json()
 
-                msg1 = data["data"][0]["message"]
+                fb_post = data["data"][0]["message"]
                 y, m, d, = date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
 
-                msg = "**Latest Facebook Post**\n" \
-                    "**Posted:** {}{} of {}, {}.\n\n" \
-                    "```{}```"  \
-                    "https://www.facebook.com/idiotechgaming/" \
-                    "".format(d, get_date_suf(d), calendar.month_name[int(m)], y, msg1)
+                # TODO Make date ago
+                msg = """**Latest Facebook Post**
+```{4}```
+{0}{1} of {2}, {3}
 
-                await s.destructmsg(msg, 30, self.bot)
+https://www.facebook.com/idiotechgaming/""".format(d, get_date_suf(d), calendar.month_name[int(m)], y, fb_post)
+                await self.bot.say(msg)
 
     @commands.command(description=desc.youtube, brief=desc.youtube)
     async def youtube(self):
-        # finds information on latest upload from Idiotech's youtube channel
-        #
-
         connector = aiohttp.TCPConnector(verify_ssl=False)
 
         with aiohttp.ClientSession(connector=connector) as session:
             async with session.get('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0YagOInbZx'
                                    'j10gaWwb1Nag&maxResults=1&order=date&key={}'.format(t.yt_key)) as resp:
                 data = await resp.json()
-                # channel = "https://www.youtube.com/c/idiotechgaming"
 
-                mo = "**"  # Modifier (e.g. * for italic, ** for bold, __ for underline and so on)
-                title = mo + "Latest Upload: " + mo\
-                    + data["items"][0]["snippet"]["title"]  # [::-1]  # msg + vid title, [::-1] reverses str
+                mo = "**"
+                title = "{0}Latest Upload:{0} {1}".format(mo, data["items"][0]["snippet"]["title"])
 
-                uploaded = data["items"][0]["snippet"]["publishedAt"]  # datetime video was uploaded
-                date = str(uploaded).split('T')[0]  # just the date of upload
+                uploaded = data["items"][0]["snippet"]["publishedAt"]
+                date = str(uploaded).split('T')[0]
 
                 year, month, day = date.split('-')
-                month = calendar.month_name[int(month)]  # takes month number and returns word form (i.e. 05 = may)
+                month = calendar.month_name[int(month)]
 
-                uploaded = mo + "Uploaded: " + mo + "{} the {}{}, {}.".format(month, day, get_date_suf(day), year)
-                link = "https://youtu.be/" + data["items"][0]["our_id"]["videoId"]
-                # uses ``` to stop video from being embed
+                # TODO Make Uploaded in ago format
+                uploaded = "{0} the {1}{2}, {3}".format(month, day, get_date_suf(day), year)
+                link = "https://youtu.be/{}".format(data["items"][0]["id"]["videoId"])
 
-                await s.destructmsg(title + "\n" + uploaded + "\n\n"+link, 30, self.bot)
+                await self.bot.say("{}\n{}\n\n{}".format(title, uploaded, link))
 
     @commands.command(description=desc.rules, brief=desc.rules)
     async def rules(self):
+        # TODO Get from settings
         await self.bot.say('Please read <#179965419728273408>')
 
     @commands.group(pass_context=True, description=desc.time, brief=desc.time)
@@ -128,43 +124,45 @@ class General:
 
         if ctx.invoked_subcommand is None:
             time = get_time()
-            await s.destructmsg("**San Francisco**: {} | **New York**: {} | **London**: {} | **Sydney** {}".format(
-                    time["sf"], time["ny"], time["london"], time["sydney"]), 30, self.bot)
+            await self.bot.say("**San Francisco**: {} | **New York**: {} | **London**: {} | **Sydney** {}".format(
+                time["sf"], time["ny"], time["london"], time["sydney"]))
+
+        # TODO Squish timezones into one command (here)
 
     @time.command(name='advanced', description=desc.time_advanced, brief=desc.time_advanced)
     async def _advanced(self):
         time = get_time()
-        await s.destructmsg(
+        await self.bot.say(
             "**San Francisco** {} (UTC-7) "
             "| **New York**: {} (UTC-4) "
             "| **London**: {} (UTC+1) "
             "| **Sydney**: {} (UTC+10) "
-            "".format(time["sf"], time["ny"], time["london"], time["sydney"]), 30, self.bot)
+            "".format(time["sf"], time["ny"], time["london"], time["sydney"]))
 
     @time.command(name='sydney', description=desc.time_sydney, brief=desc.time_sydney)
     async def _sydney(self):
         time = get_time()
-        await s.destructmsg("**Sydney**: {} (UTC+10)".format(time["sydney"]), 30, self.bot)
+        await self.bot.say("**Sydney**: {} (UTC+10)".format(time["sydney"]))
 
     @time.command(name='london', description=desc.time_london, brief=desc.time_london)
     async def _london(self):
         time = get_time()
-        await s.destructmsg("**London**: {} (UTC+1)".format(time["london"]), 30, self.bot)
+        await self.bot.say("**London**: {} (UTC+1)".format(time["london"]))
 
     @time.command(name='ny', description=desc.time_ny, brief=desc.time_ny)
     async def _ny(self):
         time = get_time()
-        await s.destructmsg("**New York**: {} (UTC-4)".format(time["ny"]), 30, self.bot)
+        await self.bot.say("**New York**: {} (UTC-4)".format(time["ny"]))
 
     @time.command(name='sf', description=desc.time_sf, brief=desc.time_sf)
     async def _sf(self):
         time = get_time()
-        await s.destructmsg("**San Francisco**: {} (UTC-7)".format(time["sf"]), 30, self.bot)
+        await self.bot.say("**San Francisco**: {} (UTC-7)".format(time["sf"]))
 
     @time.command(name='perth', description=desc.time_perth, brief=desc.time_perth)
     async def _perth(self):
         time = get_time()
-        await s.destructmsg("**Perth**: {} (UTC+8)".format(time["perth"]), 30, self.bot)
+        await self.bot.say("**Perth**: {} (UTC+8)".format(time["perth"]))
 
     @commands.command(description=desc.steam_status, brief=desc.steam_status)
     async def steam(self):
@@ -178,51 +176,61 @@ class General:
                     economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
                     # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
 
-                    reply = """__**Steam Status**__
+                    reply = """**Steam Server Status**
 
-                    **Login servers:** {}
-                    **Community servers:** {}
-                    **Economy servers:** {}""".format(login, community, economy)
+```Login          {}
+Community      {}
+Economy        {}```""".format(login, community, economy)
 
                 else:
                     reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
 
-        await s.destructmsg(reply, 30, self.bot)
+        await self.bot.say(reply)
 
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
         # We are using manual argument detection instead of @commands.group,
         # because we want sub-commands to be dynamic based on our self.dates dictionary
-
+        for game in self.dates:
+            maxlen = len(game)
+        else:
+            maxlen = 0
         arg = " ".join(ctx.message.content.split()[1:])
+
         if len(arg) > 0:
+            found = False
+            msg = "Found games starting with `{}`:\n\n```Ruby\n".format(arg.capitalize())
             for game in self.dates:
                 if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
                     days, hrs, mins = calc_until(self.dates[game])
-                    msg = create_msg(game, days, hrs, mins)
+                    msg += "{}\n".format(create_msg(game, days, hrs, mins, maxlen))
+                    found = True
 
-                    await s.destructmsg(msg, 30, self.bot)
+            if not found:
+                msg += ("No game in our release list found, that starts with {}".format(arg))
 
-                    break
-            else:
-                await s.destructmsg("No game in our release list found, that starts with {}".format(arg), 30, self.bot)
+            msg += "```"
+
         else:
-            msg = "Release Dates List - Times, Dates and Games are subject to change\n"
-
+            msg = "**Release Dates List**\n\n```Ruby\n"
             for game, time in sorted(self.dates.items(), key=lambda x: x[1]):
                 days, hrs, mins = calc_until(self.dates[game])
-                msg += create_msg(game, days, hrs, mins) + "\n"
+                msg += "{}\n".format(create_msg(game, days, hrs, mins, maxlen))
+            msg += "```"
 
-            await s.destructmsg("```{}```".format(msg), 30, self.bot)
+        await self.bot.say(msg)
 
 
-def create_msg(game, days, hrs, mins):
+def create_msg(game, days, hrs, mins, maxlen):
+    spaces = maxlen - len(game) + 30
+    for _ in range(spaces):
+        game = game + " "
     if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
         msg = "{} is out now!".format(game)
     elif int_day(days) == 0 and int(hrs) == 0 and int(mins) == 0:
         msg = "{} releases within the next 60 seconds, HYPE!!!".format(game)
     else:
-        msg = "{} releases in {}, {} hours and {} minutes.".format(game, days, hrs, mins)
+        msg = "{} {}, {} hours {} minutes".format(game, days, hrs, mins)
 
     return msg
 

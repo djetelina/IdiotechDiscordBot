@@ -1,10 +1,10 @@
 import asyncio
-import simplify as s
 import random
-import channels as chan
+
 from discord.ext import commands
-import checks
-import id_settings as our_id
+
+import helpers.simplify as s
+from helpers import checks, settings
 
 """
 DRAFT VERSION
@@ -59,7 +59,7 @@ class Warns:
     async def warn_user(self):
         await s.whisper(self.user, random.choice(self.warnings), self.bot)
         await self.bot.send_message(
-            self.bot.get_channel(chan.channels['admin']),
+            self.bot.get_channel(settings.channels['admin']),
             "User {} seems to be swearing a lot. He now has {} penalty points".format(
                 self.user.mention, self.points))
 
@@ -78,7 +78,7 @@ class Swear:
             with open('cogs/swears/swears.txt', 'r', encoding='utf-8-sig') as f:
                 Swear.swears = f.readlines()
             Swear.swears[:] = [stomp_confusables(bad_word.strip()) for bad_word in Swear.swears]
-        self.ignore = our_id.bot_id
+        self.ignore = settings.bot_id
 
     async def message(self, message):
         if message.author.id is not self.ignore:

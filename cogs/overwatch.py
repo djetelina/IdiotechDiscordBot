@@ -1,8 +1,10 @@
-from discord.ext import commands
-import descriptions as desc
+import asyncio
+
 import bs4
 import requests
-import asyncio
+from discord.ext import commands
+
+from helpers import descriptions as desc
 
 
 class Overwatch:

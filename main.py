@@ -1,27 +1,19 @@
-import discord
-from discord.ext import commands
-import descriptions as desc
-import checks
-import tokens as t
 from datetime import datetime
 
+import discord
+from discord.ext import commands
+
+import helpers.tokens as t
+from helpers import descriptions as desc, checks, settings
+
 bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
-extensions = [
-    'cogs.giveaway',
-    'cogs.general',
-    'cogs.restricted',
-    'cogs.stats',
-    'cogs.weather',
-    'cogs.swear',
-    'cogs.overwatch',
-]
 
 
 @bot.event
 async def on_ready():
     """After logging in"""
     print(bot.user.name + ' logged in at ' + str(datetime.now()))
-    await bot.change_status(game=discord.Game(name='!help'))
+    await bot.change_status(game=discord.Game(name=settings.now_playing))
 
 
 @bot.event
@@ -106,7 +98,7 @@ async def unload(*, module: str):
 
 
 if __name__ == '__main__':
-    for extension in extensions:
+    for extension in settings.extensions:
         try:
             bot.load_extension(extension)
 

@@ -1,8 +1,9 @@
-from discord.ext import commands
-import simplify as s
-import descriptions as desc
-import sqlite3
 import os
+import sqlite3
+
+from discord.ext import commands
+
+from helpers import descriptions as desc
 
 
 class Stats:
@@ -58,14 +59,14 @@ class Stats:
     @commands.group(pass_context=True, descirption=desc.stats, brief=desc.stats)
     async def stats(self, ctx):
         if ctx.invoked_subcommand is None:
-            await s.destructmsg(
+            await self.bot.say(
                 "I have served you {} commands in my lifetime and {} since I was last restarted".format(
-                    self.get_total("cmd"), self.sessioncmd), 30, self.bot)
+                    self.get_total("cmd"), self.sessioncmd))
 
     @stats.command(name="giveaways", description=desc.statsga, brief=desc.statsga)
     async def _giveaways(self):
-        await s.destructmsg("I have helped give out {} games and {} since I was last restarted".format(
-            self.get_total("ga"), self.sessionga), 30, self.bot)
+        await self.bot.say("I have helped give out {} games and {} since I was last restarted".format(
+            self.get_total("ga"), self.sessionga))
 
     def is_in_db(self, table, check):
         if table is "ga":

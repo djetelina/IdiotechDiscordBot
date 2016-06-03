@@ -18,15 +18,12 @@ GIVEAWAY RELATED
 
 openga = """Open a giveaway
 
+Maximum is 30 minutes (if you provide higher countdown, it will launch with 30 minutes.
+
 Example: !giveaway open 30 Overwatch"""
 opengab = "Open a giveaway"
 
-cancelga = """Cancel your giveaway for a game
-
-Arguments: Game name (only one)
-
-Example: !giveaway cancel Doom
-"""
+cancelga = "Cancel your giveaway for a game"
 cancelgab = "Cancel a giveaway"
 
 enroll = """Enroll in a existing giveaway
@@ -40,7 +37,9 @@ giveaway = """Check status of running giveaways
 Example: !giveaway"""
 giveaway_brief = "Check status of running giveaways"
 
-link_ga = "Provide a link for your prepared giveaway"
+link_ga = """If you want to add a link to the game's page (like steam url) please use:
+This message will show once after you open the giveaway:"""
+link_ga_brief = "Provide a link for your prepared giveaway. This is NOT "
 
 code_ga = """Provide a code for your prepared or running giveaway
 
@@ -49,12 +48,13 @@ It will be sent to the winner after the giveaway is over in this format:
 
 You can also specify if your game code is Steam, origin, etc. or add any note.
 Simply write anything before or after the code, your whole message after `!giveaway code` will be sent
-
-Example: !giveaway code 123-ABC-356 (STEAM)
 """
 code_ga_brief = "Provide a code for your prepared or running giveaway"
 
-desc_ga = "Provide a description for your prepared giveaway"
+desc_ga_brief = "Provide a description for your prepared giveaway"
+desc_ga = """If you want to say more about the game or a giveaway, like where is it redeemable, if you are also giving away DLC with it etc.
+You can also include url here instead of using the previous command
+This message will show once after you open the giveaway:"""
 
 confirm_ga = "Start your prepared giveaway"
 
@@ -80,8 +80,8 @@ SIMPLE LINKS
 reddit = "Link to Idiotech's subreddit"
 github = "Link to this bot's source code"
 twitch = """Status of Idiotech's Twitch
-If Idiotech is live, viewer count and the
-game he is playing will be shown."""
+
+If Idiotech is live, viewer count and the game he is playing will be shown."""
 twitchb = "Status of Idiotech's Twitch"
 twitter = "Link to Idiotech's Twitter"
 youtube = "Link to Idiotech's Channel and Details of most recent upload"
@@ -100,9 +100,9 @@ time_ny = "Checks local time in New York and it's UTC position"
 time_sf = "Checks local time in San Francisco and it's UTC position"
 time_perth = "Checks local time in Perth and its UTC position"
 release_dates = """List of games and countdown until their releases
-If you provide additional argument, it will look through list of games and find those starting with provided argument
 
-Example: !release over"""
+If you provide additional argument, it will look through list of games and find those starting with provided argument
+"""
 release_datesb = "List of games and countdown until their releases"
 steam_status = "Check Status of Steam Servers"
 
