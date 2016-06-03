@@ -1,15 +1,14 @@
-from discord.ext import commands
-import descriptions as desc
-import simplify as s
-import channels as chan
-import random
 import asyncio
+import random
 import time
+
+from discord.ext import commands
+
+import helpers.simplify as s
+from helpers import descriptions as desc, settings
 
 # List with running giveaway instances
 giveawayslist = []
-# Channels where we are allowed to host giveaways
-whitechannels = ['private', 'admin']
 loop = asyncio.get_event_loop()
 
 
@@ -91,7 +90,6 @@ class Giveaway:
             !enroll cancel
             Remove somebody from giveaway and permit them from entering
                 Would need to add blacklist function
-                    This is okay with #public not being whitelisted
         """
         self.enrolled.remove(user)
 
@@ -110,84 +108,83 @@ class Giveaways:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(pass_context=True, description=desc.giveaway, brief=desc.giveawayb)
+    @commands.group(pass_context=True, description=desc.giveaway, brief=desc.giveaway_brief)
     async def giveaway(self, ctx):
         if ctx.invoked_subcommand is None:
             if len(giveawayslist) > 0:
-                reply = "\nCurrently opened giveaways:\n=========="
+                reply = "Currently opened giveaways:\n=========="
                 for ga in giveawayslist:
-                    reply += "\n**{}** in {} by {} ({}, {} people enrolled)".format(
-                        ga.game, ga.channel.mention, ga.owner.mention, parsesecs(ga.time), len(ga.enrolled))
+                    reply += "\n**{}** by {} ({}, {} people enrolled)".format(
+                        ga.game, ga.owner.mention, parsesecs(ga.time), len(ga.enrolled))
                 reply += "\n==========\nEnter giveaway with !enroll **GameName**"
 
             else:
                 reply = "No giveaway open"
 
-            await self.bot.delete_message(ctx.message)
-            await s.destructmsg(reply, 10, self.bot)
+            await self.bot.say(reply)
+            try:
+                await self.bot.delete_message(ctx.message)
+            except Exception as e:
+                print(e, ctx.message.channel.name)
 
     @giveaway.command(name="open", pass_context=True, description=desc.openga, brief=desc.opengab)
-    async def _open(self, ctx, channel: str, countdown: int, *, game: str):
+    async def _open(self, ctx, countdown: int, *, game: str):
         has_opened = False
         for giveaway in giveawayslist:
             if ctx.message.author == giveaway.owner:
                 has_opened = True
 
         if not has_opened:
-            try:
-                destination = self.bot.get_channel(chan.channels[channel])
-                if channel in whitechannels:
-                    Giveaway(game, countdown, destination, ctx.message.author, self.bot)
-                    await s.whisper(ctx.message.author, """I have prepared the giveaway.
+            Giveaway(game, countdown, self.bot.get_channel(settings.channels['giveaways']), ctx.message.author, self.bot)
+            await s.whisper(ctx.message.author, """I have prepared the giveaway.
 
-                    If you want me to automatically PM the winner the code please use:
-                    `!giveaway code <CODE>`
+            If you want me to automatically PM the winner the code please use:
+            `!giveaway code <CODE>`
 
-                    If you want to add a link to the game's page (like steam url) please use:
-                    This message will show once after you open the giveaway:
-                    `!giveaway link <URL>`
+            If you want to add a link to the game's page (like steam url) please use:
+            This message will show once after you open the giveaway:
+            `!giveaway link <URL>`
 
-                    If you want to say more about the game or a giveaway, like where is it redeemable,
-                    if you are also giving away DLC with it etc.
-                    You can also include url here instead of using the previous command
-                    This message will show once after you open the giveaway:
-                    `!giveaway description <DESCRIPTION>`
+            If you want to say more about the game or a giveaway, like where is it redeemable,
+            if you are also giving away DLC with it etc.
+            You can also include url here instead of using the previous command
+            This message will show once after you open the giveaway:
+            `!giveaway description <DESCRIPTION>`
 
-                    I will open the enrollments to your giveaway after you send me `!giveaway confirm`
-                    """, self.bot)
-
-                else:
-                    await s.whisper(
-                        ctx.message.author, "I'm sorry, but you can't open a giveaway in this channel.", self.bot)
-
-            except KeyError:
-                await s.whisper(ctx.message.author, "I don't know channel *{}*".format(channel), self.bot)
+            I will open the enrollments to your giveaway after you send me `!giveaway confirm`
+            """, self.bot)
 
         else:
             await s.whisper(ctx.message.author, "You already have one giveaway open", self.bot)
 
-    @giveaway.command(name="link", pass_context=True, description=desc.linkga, brief=desc.linkga)
+    @giveaway.command(name="link", pass_context=True, description=desc.link_ga, brief=desc.link_ga_brief)
     async def _link(self, ctx, url: str):
         for giveaway in giveawayslist:
             if ctx.message.author == giveaway.owner:
                 giveaway.url = url
                 await s.whisper(giveaway.owner, "Link accepted", self.bot)
 
-    @giveaway.command(name="code", pass_context=True, description=desc.codega, brief=desc.codegab)
+    @giveaway.command(name="code", pass_context=True, description=desc.code_ga, brief=desc.code_ga_brief)
     async def _code(self, ctx, *, code: str):
+        """
+        Example: !giveaway code 123-ABC-356 (STEAM)
+
+        Will PM the winner with:
+        Your game code: 123-ABC-356 (STEAM)
+        """
         for giveaway in giveawayslist:
             if ctx.message.author == giveaway.owner:
                 giveaway.code = code
                 await s.whisper(giveaway.owner, "Code accepted", self.bot)
 
-    @giveaway.command(name="description", pass_context=True, description=desc.descga, brief=desc.descga)
+    @giveaway.command(name="description", pass_context=True, description=desc.desc_ga, brief=desc.desc_ga_brief)
     async def _description(self, ctx, *, description: str):
         for giveaway in giveawayslist:
             if ctx.message.author == giveaway.owner:
                 giveaway.description = description
                 await s.whisper(giveaway.owner, "Description accepted", self.bot)
 
-    @giveaway.command(name="confirm", pass_context=True, description=desc.confirmga, brief=desc.confirmga)
+    @giveaway.command(name="confirm", pass_context=True, description=desc.confirm_ga, brief=desc.confirm_ga)
     async def _confirm(self, ctx):
         for giveaway in giveawayslist:
             if ctx.message.author == giveaway.owner:
@@ -210,7 +207,7 @@ class Giveaways:
                 await ga.cancel()
                 await s.whisper(ga.owner, "Giveaway canceled", self.bot)
 
-    @commands.command(pass_context=True, description=desc.enroll, brief=desc.enrollb)
+    @commands.command(pass_context=True, description=desc.enroll, brief=desc.enroll_brief)
     async def enroll(self, ctx, *, game: str):
         user = ctx.message.author
         found = 0
@@ -238,7 +235,10 @@ class Giveaways:
         if not found:
             await s.whisper(user, "Giveaway for the game you mentioned not found", self.bot)
 
-        await self.bot.delete_message(ctx.message)
+        try:
+            await self.bot.delete_message(ctx.message)
+        except Exception as e:
+            print(e)
 
 
 def parsesecs(sec: int) -> str:

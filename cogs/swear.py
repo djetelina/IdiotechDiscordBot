@@ -1,10 +1,10 @@
 import asyncio
-import simplify as s
 import random
-import channels as chan
+
 from discord.ext import commands
-import checks
-import id_settings as id
+
+import helpers.simplify as s
+from helpers import checks, settings
 
 """
 DRAFT VERSION
@@ -59,7 +59,7 @@ class Warns:
     async def warn_user(self):
         await s.whisper(self.user, random.choice(self.warnings), self.bot)
         await self.bot.send_message(
-            self.bot.get_channel(chan.channels['admin']),
+            self.bot.get_channel(settings.channels['admin']),
             "User {} seems to be swearing a lot. He now has {} penalty points".format(
                 self.user.mention, self.points))
 
@@ -77,23 +77,13 @@ class Swear:
         if len(Swear.swears) == 0:
             with open('cogs/swears/swears.txt', 'r', encoding='utf-8-sig') as f:
                 Swear.swears = f.readlines()
-            Swear.swears[:] = [self.stomp_confusables(bad_word.strip()) for bad_word in Swear.swears]
-        self.ignore = id.bot_id
+            Swear.swears[:] = [stomp_confusables(bad_word.strip()) for bad_word in Swear.swears]
+        self.ignore = settings.bot_id
 
     async def message(self, message):
         if message.author.id is not self.ignore:
-            content = self.stomp_confusables(message.content.strip())
+            content = stomp_confusables(message.content.strip())
             self.check_swears(message, content)
-
-    def stomp_confusables(self, input_string):
-        output_string = ""
-        for char in input_string:
-            for confusable_line in Swear.confusables:
-                if char in confusable_line:
-                    char = confusable_line[:1]
-                    break
-            output_string += char
-        return output_string
 
     def check_swears(self, message, content):
         swear_count = 0
@@ -126,6 +116,17 @@ class Swear:
                 return
             else:
                 await self.bot.say("User {} not found in watchlist".format(who))
+
+
+def stomp_confusables(input_string):
+    output_string = ""
+    for char in input_string:
+        for confusable_line in Swear.confusables:
+            if char in confusable_line:
+                char = confusable_line[:1]
+                break
+        output_string += char
+    return output_string
 
 
 def setup(bot):

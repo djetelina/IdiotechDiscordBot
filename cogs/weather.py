@@ -1,25 +1,24 @@
-from discord.ext import commands
-import simplify as s
 import aiohttp
-import tokens as t
 import pycountry
+from discord.ext import commands
+
+from helpers import tokens as t
 
 
 class Weather:
     def __init__(self, bot):
         self.bot = bot
 
-        self.key = t.weather_key  # gets key from tokens.py
-        self.base_url = "http://api.openweathermap.org/data/2.5/weather?q="  # base url (before query and key)
-        self.a_url = "&appid="  # additional url (comes after query and before key)
+        self.key = t.weather_key
+        self.base_url = "http://api.openweathermap.org/data/2.5/weather?q="
+        self.a_url = "&appid="
 
     @commands.command(passcontext=True, description="Get Weather Status in <loc> (a given city name)",
                       brief="Finds Weather Status for input city")
-    async def weather(self,  *, loc: str):  # loc = location
-        spaces = ' ' in loc  # checks if there is spaces in given text - False = No Spaces
+    async def weather(self,  *, loc: str):
+        spaces = ' ' in loc
         if not spaces:
-            await s.destructmsg("***Getting Weather Status for {}. This may take a while.***".format(loc), 15, self.bot)
-            # seems to take around 15 seconds to find weather information
+            msg = await self.bot.say("***Getting Weather Status for {}. This may take a while.***".format(loc))
 
             weather_api = self.base_url + loc + self.a_url + self.key
 
@@ -27,27 +26,26 @@ class Weather:
                 async with session.get(weather_api)as resp:
                     data = await resp.json()
 
-                    temp = data["main"]["temp"]  # temperature in kelvin, converted later in code
-                    brief = data["weather"][0]["main"]  # ie cloudy
-                    desc = data["weather"][0]["description"]  # ie very cloudy/ overcast clouds and so on
-                    name = data["name"]  # will return name without '_' and with capitalised words, saves effort
-                    cloud = str(data["clouds"]["all"])  # gets cloud percentage
+                    temp = data["main"]["temp"]
+                    brief = data["weather"][0]["main"]
+                    desc = data["weather"][0]["description"]
+                    name = data["name"]
+                    cloud = str(data["clouds"]["all"])
                     country = pycountry.countries.get(alpha2=data["sys"]["country"])
-                    # gets country name from country code returned by api
 
-                    desc = capital_everything(desc)  # returns description with capitals on all words
-                    cel = to_1dp(str(kel_to_cel(temp)))  # converts temp from kelvin to celsius
-                    fah = to_1dp(str(cel_to_fah(cel)))  # converts cel temp from celsius to fahrenheit
+                    desc = capital_everything(desc)
+                    cel = to_1dp(str(kel_to_cel(temp)))
+                    fah = to_1dp(str(cel_to_fah(cel)))
 
-                    await s.destructmsg("__**{}, {} - Weather Status**__\n"
+                    await self.bot.edit_message(msg, "__**{}, {} - Weather Status**__\n"
                                         "**Temperature:** {}c  -  {}f\n"
                                         "**Weather:** {} - {}\n"
                                         "**Cloudiness:** {} percent".format(name, country.name, cel, fah,
-                                                                            brief, desc, cloud), 50, self.bot)
+                                                                            brief, desc, cloud))
 
         else:
-            await s.destructmsg("**Error:** City cannot contains spaces, use underscores instead of spaces.\n"
-                                "E.g. 'New_York' instead of 'New York'", 30, self.bot)
+            await self.bot.say("**Error:** City cannot contains spaces, use underscores instead of spaces.\n"
+                                "E.g. 'New_York' instead of 'New York'")
 
 
 def setup(bot):
@@ -61,7 +59,7 @@ def kel_to_cel(kelvin):
     :param kelvin:
     :return: Celsius:
     """
-    result = float(kelvin) - 273.15  # the conversion of kelvin to celsius
+    result = float(kelvin) - 273.15
     return result
 
 
@@ -72,7 +70,7 @@ def cel_to_fah(cels):
     :param cels: Celsius
     :return: Fahrenheit:
     """
-    result = (float(cels)*1.8) + 32  # the conversion of celsius to fahrenheit
+    result = (float(cels)*1.8) + 32
     return result
 
 
@@ -84,12 +82,12 @@ def capital_everything(string):
     :param string:
     :return: The capitalized words in a string:
     """
-    listy = string.split()  # () is same as " "
-    new_list = []  # new list to put strings from old list into once capitalised
-    for word in listy:  # for each word, capitalise then add to list
+    listy = string.split()
+    new_list = []
+    for word in listy:
         thing = word.capitalize()
         new_list.append(thing)
-    result = ' '.join(new_list)  # merge list into one string
+    result = ' '.join(new_list)
     return result
 
 
@@ -101,6 +99,6 @@ def to_1dp(value):
     :return: string of number to 1 decimal point
     """
     before, after = str(value).split(".")
-    after = after[0:1]  # returns characters 1 and 2 of string (counts from 0 so character 1 is 0 and 2 is 1 etc)
-    result = before + "." + after  # visually turn back into a decimal number
+    after = after[0:1]
+    result = before + "." + after
     return result
