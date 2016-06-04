@@ -5,6 +5,7 @@ Bot for [Idiotech's Discord Server](https://discord.gg/0z3KQXI6apyyeNOD)
 ## Rules for developing
 
 * Don't collect any user information (not even chat logs)
+    * Our logger is in 'w' filemode, no long term collecting!
 * Make your code readable by humans
 * Document if you can
 
@@ -18,13 +19,12 @@ run ```pip install -r requirements.txt```
 
 * Python 3.5+
 * [discord.py](https://github.com/Rapptz/discord.py)
-* Pycountry
 * bs4
 * requests
 * pytz
+* Pycountry
 
 ## Info
 
 * [Server Invite](https://discord.gg/0z3KQXI6apyyeNOD)
 * [Idiotech's YouTube](https://www.youtube.com/channel/UC0YagOInbZxj10gaWwb1Nag)
-

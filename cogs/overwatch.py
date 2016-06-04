@@ -7,8 +7,7 @@ from discord.ext import commands
 
 from helpers import descriptions as desc
 
-log = logging.getLogger('__main__').setLevel(logging.INFO)
-
+log = logging.getLogger(__name__)
 
 class Overwatch:
     def __init__(self, bot):
@@ -51,9 +50,9 @@ class Overwatch:
         try:
             res.raise_for_status()
         except Exception as e:
-            await self.bot.edit_message(msg, "**Error with request. Please check for mistakes before trying again.**")
-            log.exception("Error with request: {}".format(e))
-
+            await self.bot.edit_message(msg, "**Error with request. Please check for mistakes before trying again.**"
+                                             ".\nError: "+str(e))
+            log.exception("Error with request")
             return
 
         doc = bs4.BeautifulSoup(res.text, "html.parser")
@@ -70,7 +69,7 @@ class Overwatch:
                     try:
                         stats = page[count].select('div')[0].select('td')
 
-                        for stat in stats:
+                        for _ in stats:
                             if stats[stat_count].getText() == "Games Won":
                                 games_won = int(stats[stat_count + 1].getText())
                             if stats[stat_count].getText() == "Games Played":
@@ -80,10 +79,10 @@ class Overwatch:
                             stat_count += 1
 
                     except Exception as e:
-                        log.exception("Error with stats: {}".format(e))
+                        log.exception("Parsing HTML")
 
             except Exception:
-                pass
+                log.exception("ExtraRandom overwatch exception")
 
             count += 1
 

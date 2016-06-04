@@ -63,6 +63,7 @@ class Giveaway:
 
                 random.seed()
                 winner = random.choice(self.enrolled)
+                log.info("Giveaway for {} is {}".format(self.game, winner.name))
 
                 await self.bot.send_message(self.channel, "{}'s giveaway winner of {} is: {}".format(
                     self.owner.mention, self.game, winner.mention))
@@ -74,6 +75,7 @@ class Giveaway:
                 if self.code:
                     await s.whisper(winner, "Your game code: {}".format(self.code), self.bot)
                     await s.whisper(self.owner, "I have sent them the code you provided.", self.bot)
+                    log.info("Code sent to winner")
 
             except IndexError:
                 await self.bot.send_message(
@@ -98,6 +100,7 @@ class Giveaway:
     async def cancel(self):
         await self.bot.send_message(self.channel,
                                     "{} canceled their giveaway for {}".format(self.owner.mention, self.game))
+        log.info("{} canceled their giveaway".format(self.owner.name))
         self.status = 0
         giveawayslist.remove(self)
 
@@ -161,6 +164,7 @@ class Giveaways:
             if ctx.message.author == giveaway.owner:
                 giveaway.url = url
                 await s.whisper(giveaway.owner, "Link accepted", self.bot)
+                log.info("Link for giveaway by {} provided".format(giveaway.owner.name))
 
     @giveaway.command(name="code", pass_context=True, description=desc.code_ga, brief=desc.code_ga_brief)
     async def _code(self, ctx, *, code: str):
@@ -174,6 +178,7 @@ class Giveaways:
             if ctx.message.author == giveaway.owner:
                 giveaway.code = code
                 await s.whisper(giveaway.owner, "Code accepted", self.bot)
+                log.info("Code for giveaway by {} provided".format(giveaway.owner.name))
 
     @giveaway.command(name="description", pass_context=True, description=desc.desc_ga, brief=desc.desc_ga_brief)
     async def _description(self, ctx, *, description: str):
@@ -181,6 +186,7 @@ class Giveaways:
             if ctx.message.author == giveaway.owner:
                 giveaway.description = description
                 await s.whisper(giveaway.owner, "Description accepted", self.bot)
+                log.info("Description for giveaway by {} provided".format(giveaway.owner.name))
 
     @giveaway.command(name="confirm", pass_context=True, description=desc.confirm_ga, brief=desc.confirm_ga)
     async def _confirm(self, ctx):
@@ -191,6 +197,7 @@ class Giveaways:
                 await self.bot.send_message(
                     giveaway.channel, "@here {0} just opened a giveaway for {1}. Type '!enroll {1}' to enroll".format(
                         giveaway.owner.mention, giveaway.game))
+                await self.changetopic()
 
                 if giveaway.desc:
                     await self.bot.send_message(giveaway.channel, "Description: {}".format(giveaway.description))
@@ -204,6 +211,7 @@ class Giveaways:
             if ctx.message.author == ga.owner:
                 await ga.cancel()
                 await s.whisper(ga.owner, "Giveaway canceled", self.bot)
+                await self.changetopic()
 
     @commands.command(pass_context=True, description=desc.enroll, brief=desc.enroll_brief)
     async def enroll(self, ctx, *, game: str):
@@ -237,6 +245,18 @@ class Giveaways:
             await self.bot.delete_message(ctx.message)
         except Exception as e:
             log.exception("Couldn't delete enroll message")
+
+        await self.changetopic()
+
+    async def changetopic(self):
+        new_topic = "Giveaways running: {0} | Total enrolled: {1}".format(
+            len(giveawayslist), sum(len(giveaway.enrolled) for giveaway in giveawayslist))
+        log.info("New topic in giveaways: {}".format(new_topic))
+        try:
+            await self.bot.edit_channel(self.bot.get_channel(settings.channels['giveaways']), topic = new_topic)
+            log.info("Topic updated in giveaways")
+        except Exception as e:
+            log.exception("Couldn't change topic in giveaways")
 
 
 def parsesecs(sec: int) -> str:

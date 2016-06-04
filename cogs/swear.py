@@ -1,5 +1,6 @@
 import asyncio
 import random
+import logging
 
 from discord.ext import commands
 
@@ -12,6 +13,7 @@ DRAFT VERSION
 
 watchlist = {}
 loop = asyncio.get_event_loop()
+log = logging.getLogger(__name__)
 
 
 class Warns:
@@ -35,6 +37,7 @@ class Warns:
             loop.create_task(self.warn_user())
         for i in range(points):
             loop.create_task(self.decay())
+        log.debug("{0} Swear warning points added for {1}".format(points, self.user.name))
 
     async def decay(self):
         time = 120
@@ -49,6 +52,7 @@ class Warns:
         self.points -= 1
         self.point_check()
 
+
     def point_check(self):
         if self.points >= 10:
             return True
@@ -62,6 +66,7 @@ class Warns:
             self.bot.get_channel(settings.channels['admin']),
             "User {} seems to be swearing a lot. He now has {} penalty points".format(
                 self.user.mention, self.points))
+        log.info("{0} has been warned for swearing".format(self.user.name))
 
 
 class Swear:

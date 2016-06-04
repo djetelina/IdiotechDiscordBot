@@ -1,9 +1,12 @@
 import os
+import logging
 
 import discord
 from discord.ext import commands
 
 from helpers import descriptions as desc, checks, settings
+
+log = logging.getLogger(__name__)
 
 
 class Restricted:
@@ -24,15 +27,17 @@ class Restricted:
                 image_bytes = bytearray(f)
                 await self.bot.edit_profile(avatar=image_bytes)
                 await self.bot.say("New avatar uploaded, how do you like me now?")
+                log.info("Avatar updated")
 
         except Exception as e:
-            await self.bot.say("Error: {}".format(e))
+            log.exception("Couldn't change avatar")
 
     @commands.command(hidden=True, description="not for you")
     @checks.is_scream()
     async def play(self, *, playing: str):
         await self.bot.change_status(game=discord.Game(name=playing))
         await self.bot.say("I'm now playing {}".format(playing))
+        log.info("Now playing updated")
 
     @commands.command(pass_context=True, hidden=True, description="not for you")
     @checks.is_scream()
@@ -40,8 +45,9 @@ class Restricted:
         try:
             await self.bot.change_nickname(ctx.message.server.me, nick)
             await self.bot.say("I might have an identity crysis. New name accepted")
-        except:
-            await self.bot.say("I don't have permissions to change my own name")
+            log.info("New name updated")
+        except Exception as e:
+            log.exception("Couldn't change display name")
 
     @commands.command(hidden=True, pass_context=True, description=desc.rtfh, brief=desc.rtfhb)
     @checks.mod_or_permissions(manage_messages=True)
@@ -82,6 +88,7 @@ class Restricted:
             await self.bot.send_file(admin, logfile, filename="log.txt",
                                      content="Log file for mentioned users from last 500 messages in public channel.")
         os.remove("log.txt")
+        log.info("Log file sent to admins for review")
 
 
 def setup(bot):
