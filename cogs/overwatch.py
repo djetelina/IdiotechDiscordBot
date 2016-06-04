@@ -16,6 +16,12 @@ class Overwatch:
 
     @commands.command(description=desc.ow, brief=desc.owb)
     async def overwatch(self, region: str, battletag: str):
+        games_played = 0
+        games_won = 0
+        time_played = 0
+        count = 0
+        stat_count = 0
+
         msg = await self.bot.say("Fetching Stats for {}".format(battletag))
 
         user = battletag.replace("#", "-")
@@ -48,13 +54,40 @@ class Overwatch:
 
         doc = bs4.BeautifulSoup(res.text, "html.parser")
         page = doc.select('div')
+
+        # eof = len(page) - 1   # eof = end of file - left in as you could use it for the for loop "stuff in page" maybe
+
         most_played = page[82].select('div')[2].getText()
         most_games = page[82].select('div')[3].getText()
-        game_swon = int(page[1111].select('div')[0].select('td')[1].getText())
-        games_played = int(page[1111].select('div')[0].select('td')[3].getText())
-        time_played = page[1111].select('div')[0].select('td')[11].getText()
-        games_lost = games_played - game_swon
-        won_lost = "{}/{}".format(game_swon, games_lost)
+
+
+
+        for stuff in page:
+            try:
+                if str(page[count].select('div')[0].select('td')[0].getText()) == "Games Won":
+                    try:
+                        stats = page[count].select('div')[0].select('td')
+
+
+                        for stat in stats:
+                            if stats[stat_count].getText() == "Games Won":
+                                games_won = int(stats[stat_count + 1].getText())
+                            if stats[stat_count].getText() == "Games Played":
+                                games_played = int(stats[stat_count + 1].getText())
+                            elif stats[stat_count].getText() == "Time Played":
+                                time_played = stats[stat_count + 1].getText()
+                            stat_count += 1
+
+                    except Exception as e:
+                        print("Error: {}".format(e))
+
+            except Exception as ex:
+                print("Error: {}".format(ex))
+
+            count += 1
+
+        games_lost = int(games_played) - int(games_won)
+        won_lost = "{}/{}".format(games_won, games_lost)
 
         await self.bot.edit_message(msg, "**Overwatch Stats for {} - {}**\n\n"
                                          "Time Played:              *{}*\n"
