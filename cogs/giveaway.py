@@ -1,6 +1,7 @@
 import asyncio
 import random
 import time
+import logging
 
 from discord.ext import commands
 
@@ -10,7 +11,7 @@ from helpers import descriptions as desc, settings
 # List with running giveaway instances
 giveawayslist = []
 loop = asyncio.get_event_loop()
-
+log = logging.getLogger(__name__)
 
 class Giveaway:
     """
@@ -41,6 +42,7 @@ class Giveaway:
         self.status = 1
         self.bot = bot
         giveawayslist.append(self)
+        log.info("Giveaway for {} is being started by {}".format(self.game, self.owner.name))
 
     async def countdown(self):
         """
@@ -122,10 +124,6 @@ class Giveaways:
                 reply = "No giveaway open"
 
             await self.bot.say(reply)
-            try:
-                await self.bot.delete_message(ctx.message)
-            except Exception as e:
-                print(e, ctx.message.channel.name)
 
     @giveaway.command(name="open", pass_context=True, description=desc.openga, brief=desc.opengab)
     async def _open(self, ctx, countdown: int, *, game: str):
@@ -238,7 +236,7 @@ class Giveaways:
         try:
             await self.bot.delete_message(ctx.message)
         except Exception as e:
-            print(e)
+            log.exception("Couldn't delete enroll message")
 
 
 def parsesecs(sec: int) -> str:

@@ -40,8 +40,6 @@ class General:
 
     @commands.command(description=desc.twitch, brief=desc.twitchb)
     async def twitch(self):
-        # finds status of Idiotech's twitch stream
-        # if live, it will return amount of viewers, current stream up-time and game being played
         with aiohttp.ClientSession() as session:
             async with session.get('https://api.twitch.tv/kraken/streams?channel=idiotechgaming')as resp:
                 data = await resp.json()

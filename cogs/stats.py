@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import logging
 
 from discord.ext import commands
 
@@ -78,7 +79,7 @@ class Stats:
             column = "command"
 
         else:
-            print("DB error is_in_db")
+            logging.warning("DB error is_in_db")
             return
 
         query = """
@@ -102,7 +103,7 @@ class Stats:
             column = "command"
 
         else:
-            print("DB error new_entry")
+            logging.warning("DB error new_entry")
             return
 
         query = """
@@ -146,7 +147,7 @@ class Stats:
             column = "used"
 
         else:
-            print("DB error get_total")
+            logging.warning("DB error get_total")
             return
 
         query = """
