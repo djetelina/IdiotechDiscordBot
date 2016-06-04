@@ -1,4 +1,4 @@
-from datetime import datetime
+import logging
 
 import discord
 from discord.ext import commands
@@ -11,8 +11,7 @@ bot = commands.Bot(command_prefix='!', description=desc.main, pm_help=True)
 
 @bot.event
 async def on_ready():
-    """After logging in"""
-    print(bot.user.name + ' logged in at ' + str(datetime.now()))
+    log.info(bot.user.name + ' logged in')
     await bot.change_status(game=discord.Game(name=settings.now_playing))
 
 
@@ -31,8 +30,12 @@ async def on_message(message):
 
 @bot.event
 async def on_command(command, ctx):
-    stats = bot.get_cog('Stats')
+    try:
+        log.info("#{2}:{1} called {0}".format(command.name, ctx.message.author.name, ctx.message.channel.name))
+    except AttributeError:
+        log.info("PM:{1} called {0}".format(command.name, ctx.message.author.name))
 
+    stats = bot.get_cog('Stats')
     if stats is not None:
         await stats.on_command_p(command.name)
 
@@ -98,11 +101,27 @@ async def unload(*, module: str):
 
 
 if __name__ == '__main__':
+    log = logging.getLogger()
+    log.setLevel(logging.INFO)
+    console = logging.StreamHandler()
+    log_file = logging.FileHandler('log.log', 'w', 'utf-8')
+
+    console.setLevel(logging.INFO)
+    log_file.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', "%d.%m.%Y %H:%M:%S")
+    console.setFormatter(formatter)
+    log_file.setFormatter(formatter)
+
+    log.addHandler(log_file)
+    log.addHandler(console)
+
     for extension in settings.extensions:
         try:
             bot.load_extension(extension)
+            log.info('{} loaded'.format(extension))
 
         except Exception as e:
-            print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
+            log.warning('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
     bot.run(t.token)

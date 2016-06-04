@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import bs4
 import requests
@@ -6,6 +7,7 @@ from discord.ext import commands
 
 from helpers import descriptions as desc
 
+log = logging.getLogger('__main__').setLevel(logging.INFO)
 
 class Overwatch:
     def __init__(self, bot):
@@ -44,6 +46,7 @@ class Overwatch:
         except Exception as e:
             await self.bot.edit_message(msg, "**Error with request. Please check for mistakes before trying again.**"
                                              ".\nError: "+str(e))
+            log.exception("Error with request")
             return
 
         doc = bs4.BeautifulSoup(res.text, "html.parser")
@@ -67,4 +70,3 @@ class Overwatch:
 
 def setup(bot):
     bot.add_cog(Overwatch(bot))
-
