@@ -63,14 +63,11 @@ class Overwatch:
         most_played = page[82].select('div')[2].getText()
         most_games = page[82].select('div')[3].getText()
 
-
-
         for stuff in page:
             try:
                 if str(page[count].select('div')[0].select('td')[0].getText()) == "Games Won":
                     try:
                         stats = page[count].select('div')[0].select('td')
-
 
                         for stat in stats:
                             if stats[stat_count].getText() == "Games Won":
@@ -84,8 +81,8 @@ class Overwatch:
                     except Exception as e:
                         print("Error: {}".format(e))
 
-            except Exception as ex:
-                print("Error: {}".format(ex))
+            except Exception:
+                pass
 
             count += 1
 
