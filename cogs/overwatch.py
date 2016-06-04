@@ -69,7 +69,7 @@ class Overwatch:
                     try:
                         stats = page[count].select('div')[0].select('td')
 
-                        for _ in stats:
+                        for stat in stats:
                             if stats[stat_count].getText() == "Games Won":
                                 games_won = int(stats[stat_count + 1].getText())
                             if stats[stat_count].getText() == "Games Played":
@@ -82,7 +82,7 @@ class Overwatch:
                         log.exception("Parsing HTML")
 
             except Exception:
-                log.exception("ExtraRandom overwatch exception")
+                pass  # This will print a lot of errors if we log it
 
             count += 1
 
