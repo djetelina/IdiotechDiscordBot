@@ -15,6 +15,7 @@ extensions = [
     'cogs.weather',
     'cogs.swear',
     'cogs.overwatch',
+    'cogs.versioning',
 ]
 
 # Status message for bot
@@ -34,5 +35,5 @@ channels = {
     "tabletop": "188081332834926592",
     "technology": "188085243478147074",
     "programming": "188083195470807040",
-    "giveaways": "188087131070005248"
+    "giveaways": "188087131070005248",
 }

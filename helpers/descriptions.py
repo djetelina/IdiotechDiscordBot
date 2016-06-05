@@ -2,7 +2,13 @@
 Description strings
 """
 
-main = """Bot for Idiotech's Discord
+try:
+    with open('cogs/versioning/version.txt', 'r') as v:
+        version = " (v{})".format(v.readline())
+except:
+    version = ""
+
+main = """Bot for Idiotech's Discord{}
 
 Owner: iScrE4m
 Contributors: Extra_Random, Otter
@@ -10,7 +16,7 @@ Source code: https://github.com/iScrE4m/IdiotechDiscordBot
 Request a feature: https://github.com/iScrE4m/IdiotechDiscordBot/issues
 
 Commands can have subcommands, you can type !help for those too
-For example: !help giveaway open"""
+For example: !help giveaway open""".format(version)
 
 """
 GIVEAWAY RELATED
@@ -118,3 +124,10 @@ STATS
 
 stats = "I'll show you how much you need me!"
 statsga = "I'll show you how much giveaways I helped you organize"
+
+"""
+VERSIONING
+"""
+
+v_command = "My version number"
+changelog = "My latest changes"
