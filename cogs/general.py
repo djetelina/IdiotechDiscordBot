@@ -18,7 +18,6 @@ class General:
 
         # Dates have to be in relation to UTC (so if release is 5am BST, it would be 4am UTC)
         self.dates = {
-            "Hearts of Iron 4": datetime(2016, 6, 6, 0, 0, 0),
             "No Man''s Sky": datetime(2016, 8, 12, 0, 0, 0),
             "Deus Ex: Mankind Divided": datetime(2016, 8, 23, 0, 0, 0),
             "Battlefield 1": datetime(2016, 10, 21, 0, 0, 0),
@@ -27,6 +26,8 @@ class General:
             "Mirror''s Edge: Catalyst": datetime(2016, 6, 9, 0, 0, 0),
             "Mafia III": datetime(2016, 10, 7, 0, 0, 0),
             "Pokemon Sun and Moon": datetime(2016, 11, 23, 0, 0, 0),
+            "World of Warcraft: Legion": datetime(2016, 8, 30, 0, 0, 0),
+            "Mighty No. 9": datetime(2016, 6, 21, 0, 0, 0),
         }
 
     @commands.command(description=desc.reddit, brief=desc.reddit)
