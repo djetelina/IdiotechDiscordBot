@@ -7,11 +7,13 @@ from discord.ext import commands
 
 import helpers.simplify as s
 from helpers import descriptions as desc, settings
+import helpers.time_calculations as tc
 
 # List with running giveaway instances
 giveawayslist = []
 loop = asyncio.get_event_loop()
 log = logging.getLogger(__name__)
+
 
 class Giveaway:
     """
@@ -120,7 +122,7 @@ class Giveaways:
                 reply = "Currently opened giveaways:\n=========="
                 for ga in giveawayslist:
                     reply += "\n**{}** by {} ({}, {} people enrolled)".format(
-                        ga.game, ga.owner.mention, parsesecs(ga.time), len(ga.enrolled))
+                        ga.game, ga.owner.mention, tc.parsesecs(ga.time), len(ga.enrolled))
                 reply += "\n==========\nEnter giveaway with !enroll **GameName**"
 
             else:
@@ -256,25 +258,9 @@ class Giveaways:
             await self.bot.edit_channel(self.bot.get_channel(settings.channels['giveaways']), topic = new_topic)
             log.info("Topic updated in giveaways")
         except Exception as e:
-            log.exception("Couldn't change topic in giveaways")
+            log.exception("Couldn't change topic in giveaways - Error: {}".format(e))
 
 
-def parsesecs(sec: int) -> str:
-    """
-    Parses seconds into time left format
-    This is to be used only for giveaway which have limit of 30 minutes
-
-    :param sec: number of seconds
-    :return:    string with time left
-    """
-    if sec >= 120:
-        tleft = time.strftime("%M minutes left", time.gmtime(sec)).lstrip('0')
-    elif sec >= 60:
-        tleft = time.strftime("%M minute left", time.gmtime(sec)).lstrip('0')
-    else:
-        tleft = time.strftime("%S seconds left", time.gmtime(sec)).lstrip('0')
-
-    return tleft
 
 
 def setup(bot):
