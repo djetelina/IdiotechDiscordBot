@@ -66,30 +66,6 @@ class Games:
             "Mighty No. 9": datetime(2016, 6, 21, 0, 0, 0),
         }
 
-    @commands.command(description=desc.steam_status, brief=desc.steam_status)
-    async def steam(self):
-        steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
-        with aiohttp.ClientSession() as session:
-            async with session.get(steam_api)as resp:
-                data = await resp.json()
-                if str(data["result"]["success"]) == "True":
-                    login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
-                    community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
-                    economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
-                    # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
-
-                    reply = """**Steam Server Status**
-
-```xl
-Login          {}
-Community      {}
-Economy        {}```""".format(login, community, economy)
-
-                else:
-                    reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
-
-        await self.bot.say(reply)
-
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
         # We are using manual argument detection instead of @commands.group,
@@ -297,6 +273,62 @@ Economy        {}```""".format(login, community, economy)
     # TODO http://csgo-stats.com/extrarandom/
         # Look into adding a !csgo command for get csgo profile stats
         # Looks like it should be pretty to do
+
+    @commands.group(pass_context=True, description=desc.steam, brief=desc.steam)
+    async def steam(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await self.bot.say("Available Subcommands: bestsellers, status\n"
+                               "Usage: !steam <subcommand>")
+
+    @steam.command(name="bestsellers", description=desc.steam_bs, brief=desc.steam_bs)
+    async def _bs(self):
+        future = loop.run_in_executor(
+            None, requests.get, "http://store.steampowered.com/search/?filter=topsellers&os=win")
+        res = await future
+
+        try:
+            res.raise_for_status()
+        except Exception as e:
+            await self.bot.say("**Error with request.\nError: {}".format(str(e)))
+            log.exception("Error with request (games.py)")
+            return
+
+        doc = bs4.BeautifulSoup(res.text, "html.parser")
+        title = doc.select('span[class="title"]')
+
+        msg = """**Best Selling Steam Games**
+
+ 1) {}
+2) {}
+3) {}
+4) {}
+5) {}
+""".format(title[0].getText(), title[1].getText(), title[2].getText(), title[3].getText(), title[4].getText())
+        await self.bot.say(msg)
+
+    @steam.command(name="status", description=desc.steam_status, brief=desc.steam_status)
+    async def _status(self):
+        steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
+        with aiohttp.ClientSession() as session:
+            async with session.get(steam_api)as resp:
+                data = await resp.json()
+                if str(data["result"]["success"]) == "True":
+                    login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
+                    community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
+                    economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
+                    # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
+
+                    reply = """**Steam Server Status**
+
+```xl
+Login          {}
+Community      {}
+Economy        {}```""".format(login, community, economy)
+
+                else:
+                    reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
+
+        await self.bot.say(reply)
 
 
 def find_value(stats, name):

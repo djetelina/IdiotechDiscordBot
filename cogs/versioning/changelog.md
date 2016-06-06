@@ -4,6 +4,8 @@ Changelog
 1.0.2.1
 =======
 * Made a few visual changes
+* Added [!steam][bestsellers] which returns top 5 best selling games on Steam
+* Moved what was [!steam] to [!steam][status]
 
 
 1.0.2
