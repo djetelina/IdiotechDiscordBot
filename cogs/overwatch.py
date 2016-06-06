@@ -12,9 +12,6 @@ log = logging.getLogger(__name__)
 
 class Overwatch:
     def __init__(self, bot):
-        """
-        Edit self.dates with releases we want to track
-        """
         self.bot = bot
 
     @commands.command(description=desc.ow, brief=desc.owb)
@@ -46,7 +43,7 @@ class Overwatch:
             res.raise_for_status()
         except Exception as e:
             await self.bot.edit_message(msg, "**Error with request. Please check for mistakes before trying again.**"
-                                             ".\nError: "+str(e))
+                                             ".\nError: {}".format(str(e)))
             log.exception("Error with request")
             return
 
@@ -66,13 +63,15 @@ class Overwatch:
         games_lost = int(games_played) - int(games_won)
         won_lost = "{}/{}".format(games_won, games_lost)
 
-        await self.bot.edit_message(msg, "**Overwatch Stats for {} - {}**\n\n"
-                                         "Time Played:              *{}*\n"
-                                         "Total Games:             *{}*\n"
-                                         "Games Won/Lost:   *{}*\n"
-                                         "Most Played Hero:   *{}, {} played*"
+        win_percent = round(((games_won / games_played) * 100), 1)
+
+        await self.bot.edit_message(msg, "**Overwatch Stats for {0} - {1}**\n\n"
+                                         "Time Played:              *{2}*\n"
+                                         "Total Games:             *{3}*\n"
+                                         "Games Won/Lost:   *{4}* ({7}% win rate)\n"
+                                         "Most Played Hero:   *{5}, {6} played*"
                                          "".format(battletag, reg.upper(), time_played, games_played,
-                                                   won_lost, most_played, most_games))
+                                                   won_lost, most_played, most_games, win_percent))
 
 
 def find_value(stats, name):
