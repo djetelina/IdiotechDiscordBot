@@ -99,8 +99,7 @@ class Giveaway:
         self.enrolled.remove(user)
 
     async def cancel(self):
-        await self.bot.send_message(self.channel,
-                                    "{} canceled their giveaway for {}".format(self.owner.mention, self.game))
+        await self.bot.say("{} canceled their giveaway for {}".format(self.owner.mention, self.game))
         log.info("{} canceled their giveaway".format(self.owner.name))
         self.status = 0
         giveawayslist.remove(self)
@@ -118,11 +117,11 @@ class Giveaways:
     async def giveaway(self, ctx):
         if ctx.invoked_subcommand is None:
             if len(giveawayslist) > 0:
-                reply = "Currently opened giveaways:\n=========="
+                reply = "Currently opened giveaways:\n"
                 for ga in giveawayslist:
                     reply += "\n**{}** by {} ({}, {} people enrolled)".format(
                         ga.game, ga.owner.mention, tc.parsesecs(ga.time), len(ga.enrolled))
-                reply += "\n==========\nEnter giveaway with !enroll **GameName**"
+                reply += "\n\nEnter giveaway with !enroll **GameName**"
 
             else:
                 reply = "No giveaway open"

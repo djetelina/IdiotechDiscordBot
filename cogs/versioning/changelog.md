@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.0.2.1
+=======
+* Made a few visual changes
+
+
 1.0.2
 =====
 

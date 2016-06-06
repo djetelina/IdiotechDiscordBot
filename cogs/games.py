@@ -21,7 +21,7 @@ class Game:
         self.game = game
         self.owner = owner
         self.bot = bot
-        self.players = [owner]
+        self.players = [owner, ]
         self.description = 0
         games.update({self.game: self})
 
@@ -212,6 +212,7 @@ Economy        {}```""".format(login, community, economy)
                 if game_name.lower() == game.lower():
                     found = 1
                     reply = "{0} joined {1}".format(user.name, running_game.game)
+                    running_game.players.append(user)
                     if running_game.description:
                         await s.whisper(user, "You joined {}, here's information by {}: {}".format(
                             game_name, running_game.owner.name, running_game.description), self.bot)
@@ -292,6 +293,10 @@ Economy        {}```""".format(login, community, economy)
                                          "Most Played Hero:   *{5}, {6} played*"
                                          "".format(battletag, reg.upper(), time_played, games_played,
                                                    won_lost, most_played, most_games, win_percent))
+
+    # TODO http://csgo-stats.com/extrarandom/
+        # Look into adding a !csgo command for get csgo profile stats
+        # Looks like it should be pretty to do
 
 
 def find_value(stats, name):
