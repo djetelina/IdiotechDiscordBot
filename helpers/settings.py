@@ -16,6 +16,7 @@ extensions = [
     'cogs.swear',
     'cogs.overwatch',
     'cogs.versioning',
+    'cogs.games',
 ]
 
 # Status message for bot
@@ -35,5 +36,6 @@ channels = {
     "tabletop": "188081332834926592",
     "technology": "188085243478147074",
     "programming": "188083195470807040",
+    # "giveaways": "181233418099490826",  # for the testing server
     "giveaways": "188087131070005248",
 }

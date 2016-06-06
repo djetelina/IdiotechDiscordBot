@@ -31,9 +31,9 @@ async def on_message(message):
 @bot.event
 async def on_command(command, ctx):
     try:
-        log.info("#{2}:{1} called {0}".format(command.name, ctx.message.author.name, ctx.message.channel.name))
+        log.info("#{2}: {1} called {0}".format(command.name, ctx.message.author.name, ctx.message.channel.name))
     except AttributeError:
-        log.info("PM:{1} called {0}".format(command.name, ctx.message.author.name))
+        log.info("PM: {1} called {0}".format(command.name, ctx.message.author.name))
 
     stats = bot.get_cog('Stats')
     if stats is not None:
