@@ -49,7 +49,7 @@ class Restricted:
         except Exception as e:
             log.exception("Couldn't change display name")
 
-    @commands.command(description=desc.iscream)
+    @commands.command(hidden=True, description=desc.iscream)
     @checks.is_scream()
     async def update(self):
         version = self.bot.get_cog('Versioning')

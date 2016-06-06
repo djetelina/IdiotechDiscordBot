@@ -129,7 +129,7 @@ Economy        {}```""".format(login, community, economy)
             if len(games) > 0:
                 reply = "People are playing:\n"
                 for game_name, game in games.items():
-                    reply += "\n**{}** ({} player/s, managed by {})".format(
+                    reply += "\n**{}** ({} player(s), managed by {})".format(
                         game_name, len(game.players), game.owner.name)
                 reply += "\n\nJoin them by typing !game join **Game**"
 
@@ -185,8 +185,9 @@ Economy        {}```""".format(login, community, economy)
     async def _close(self, ctx):
         for game_name, running_game in games.items():
             if ctx.message.author == running_game.owner:
-                running_game.cancel()
+                to_close = running_game.cancel()
                 await self.bot.say("Session for {0} is now closed!".format(running_game.game))
+                break
 
     @play.command(name="join", pass_context=True, description=desc.game_join, brief=desc.game_join)
     async def _join(self, ctx, *, game: str):
@@ -211,7 +212,7 @@ Economy        {}```""".format(login, community, economy)
             for game_name, running_game in games.items():
                 if game_name.lower() == game.lower():
                     found = 1
-                    reply = "{0} joined {1}".format(user.name, running_game.game)
+                    reply = running_game.join(user)
                     if running_game.description:
                         await s.whisper(user, "You joined {}, here's information by {}: {}".format(
                             game_name, running_game.owner.name, running_game.description), self.bot)
