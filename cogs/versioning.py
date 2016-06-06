@@ -34,6 +34,7 @@ class Versioning:
     async def chlog(self, ctx):
         # Test that your markdown looks pretty in ```md``` tag in Discord
         # Split minor versions (major.minor.patch.bugfixes) with '** **'
+        # Always split the latest changes with '_____' (and remove it from previous position
         chlog = "```md\n{0}```".format(Versioning.changelog.split("** **")[0])
         await s.whisper(ctx.message.author, chlog, self.bot)
 

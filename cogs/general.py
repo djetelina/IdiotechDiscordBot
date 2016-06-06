@@ -6,7 +6,7 @@ from discord.ext import commands
 from pytz import timezone
 
 import helpers.tokens as t
-from helpers import descriptions as desc
+from helpers import descriptions as desc, time_calculations as tc
 
 
 class General:
@@ -35,7 +35,7 @@ class General:
                     views = data["streams"][0]["viewers"]
 
                     fmt = "%Y-%m-%dT%H:%M:%SZ"
-                    hrs, mins, secs = calc_duration(datetime.strptime(data["streams"][0]["created_at"], fmt))
+                    hrs, mins, secs = tc.calc_duration(datetime.strptime(data["streams"][0]["created_at"], fmt))
 
                     # if one person is watching return 'person' instead of people
                     if views == 1:
@@ -62,14 +62,14 @@ class General:
                 data = await resp.json()
 
                 fb_post = data["data"][0]["message"]
-                y, m, d, = date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
+                y, m, d, = tc.date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
 
                 # TODO Make date ago
                 msg = """**Latest Facebook Post**
 ```{4}```
 {0}{1} of {2}, {3}
 
-https://www.facebook.com/idiotechgaming/""".format(d, get_date_suf(d), calendar.month_name[int(m)], y, fb_post)
+https://www.facebook.com/idiotechgaming/""".format(d, tc.get_date_suf(d), calendar.month_name[int(m)], y, fb_post)
                 await self.bot.say(msg)
 
     @commands.command(description=desc.youtube, brief=desc.youtube)
@@ -91,7 +91,7 @@ https://www.facebook.com/idiotechgaming/""".format(d, get_date_suf(d), calendar.
                 month = calendar.month_name[int(month)]
 
                 # TODO Make Uploaded in ago format
-                uploaded = "{0} the {1}{2}, {3}".format(month, day, get_date_suf(day), year)
+                uploaded = "{0} the {1}{2}, {3}".format(month, day, tc.get_date_suf(day), year)
                 link = "https://youtu.be/{}".format(data["items"][0]["id"]["videoId"])
 
                 await self.bot.say("{}\n{}\n\n{}".format(title, uploaded, link))

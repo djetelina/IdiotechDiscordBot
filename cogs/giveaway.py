@@ -1,6 +1,5 @@
 import asyncio
 import random
-import time
 import logging
 
 from discord.ext import commands
@@ -138,7 +137,8 @@ class Giveaways:
                 has_opened = True
 
         if not has_opened:
-            Giveaway(game, countdown, self.bot.get_channel(settings.channels['giveaways']), ctx.message.author, self.bot)
+            Giveaway(game, countdown, self.bot.get_channel(settings.channels['giveaways']), ctx.message.author,
+                     self.bot)
             await s.whisper(ctx.message.author, """I have prepared the giveaway.
 
             If you want me to automatically PM the winner the code please use:
@@ -230,15 +230,18 @@ class Giveaways:
                     opened.enroll(user)
                     found = 1
                     await s.whisper(user, "You enrolled for {}".format(game), self.bot)
+                    break
 
                 elif user in opened.enrolled:
                     found = 1
                     await s.whisper(user, "You are already enrolled for this game", self.bot)
+                    break
 
                 else:
                     found = 1
                     await s.whisper(user, "You tried to enter a giveaway from  wrong channel, sorry can't do that",
                                     self.bot)
+                    break
 
         if not found:
             await s.whisper(user, "Giveaway for the game you mentioned not found", self.bot)
@@ -255,12 +258,10 @@ class Giveaways:
             len(giveawayslist), sum(len(giveaway.enrolled) for giveaway in giveawayslist))
         log.info("New topic in giveaways: {}".format(new_topic))
         try:
-            await self.bot.edit_channel(self.bot.get_channel(settings.channels['giveaways']), topic = new_topic)
+            await self.bot.edit_channel(self.bot.get_channel(settings.channels['giveaways']), topic=new_topic)
             log.info("Topic updated in giveaways")
         except Exception as e:
-            log.exception("Couldn't change topic in giveaways - Error: {}".format(e))
-
-
+            log.exception("Couldn't change topic in giveaways")
 
 
 def setup(bot):

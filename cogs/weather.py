@@ -15,7 +15,7 @@ class Weather:
 
     @commands.command(passcontext=True, description="Get Weather Status in <loc> (a given city name)",
                       brief="Finds Weather Status for input city")
-    async def weather(self,  *, loc: str):
+    async def weather(self, *, loc: str):
         spaces = ' ' in loc
         if not spaces:
             msg = await self.bot.say("***Getting Weather Status for {}. This may take a while.***".format(loc))
@@ -38,14 +38,14 @@ class Weather:
                     fah = to_1dp(str(cel_to_fah(cel)))
 
                     await self.bot.edit_message(msg, "__**{}, {} - Weather Status**__\n"
-                                        "**Temperature:** {}c  -  {}f\n"
-                                        "**Weather:** {} - {}\n"
-                                        "**Cloudiness:** {} percent".format(name, country.name, cel, fah,
-                                                                            brief, desc, cloud))
+                                                     "**Temperature:** {}c  -  {}f\n"
+                                                     "**Weather:** {} - {}\n"
+                                                     "**Cloudiness:** {} percent".format(name, country.name, cel, fah,
+                                                                                         brief, desc, cloud))
 
         else:
             await self.bot.say("**Error:** City cannot contains spaces, use underscores instead of spaces.\n"
-                                "E.g. 'New_York' instead of 'New York'")
+                               "E.g. 'New_York' instead of 'New York'")
 
 
 def setup(bot):
@@ -70,7 +70,7 @@ def cel_to_fah(cels):
     :param cels: Celsius
     :return: Fahrenheit:
     """
-    result = (float(cels)*1.8) + 32
+    result = (float(cels) * 1.8) + 32
     return result
 
 

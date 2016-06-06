@@ -58,6 +58,7 @@ Simply write anything before or after the code, your whole message after `!givea
 code_ga_brief = "Provide a code for your prepared or running giveaway"
 
 desc_ga_brief = "Provide a description for your prepared giveaway"
+# noinspection PyPep8
 desc_ga = """If you want to say more about the game or a giveaway, like where is it redeemable, if you are also giving away DLC with it etc.
 You can also include url here instead of using the previous command
 This message will show once after you open the giveaway:"""
@@ -109,6 +110,11 @@ release_dates = """List of games and countdown until their releases
 
 If you provide additional argument, it will look through list of games and find those starting with provided argument
 """
+
+"""
+GAMES
+"""
+
 release_datesb = "List of games and countdown until their releases"
 steam_status = "Check Status of Steam Servers"
 
@@ -117,6 +123,17 @@ ow = """Find Overwatch Stats of a given battle tag in a given region
 Example: !overwatch eu ExtraRandom#2501
 """
 owb = "Find Overwatch Stats for a battle tag"
+
+game = "Lists people currently plying games within the community"
+open_game = "Open a game for community to play with you"
+game_desc = """Provide a description for your community game
+
+This is useful for telling people how to join you, where are you playing, who to add on steam/battle.net etc.
+"""
+game_desc_b = "Provide a description for your community game"
+game_close = "Close your community game"
+game_join = "Join a community game"
+game_leave = "Leave a community game"
 
 """
 STATS

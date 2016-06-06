@@ -5,7 +5,7 @@ import time
 def create_msg(game, days, hrs, mins, maxlen):
     spaces = maxlen - len(game) + 30
     for _ in range(spaces):
-        game = game + " "
+        game += " "
     if int_day(days) < 0:  # if hours is a minus (i.e. game is released)
         msg = "{} is out now!".format(game)
     elif int_day(days) == 0 and int(hrs) == 0 and int(mins) == 0:
@@ -57,7 +57,7 @@ def date_now():
     """
 
     now = datetime.utcnow()
-    date, time = str(now).split(' ')
+    date, no_date = str(now).split(' ')
     year, month, day = date.split('-')
 
     return year, month, day
@@ -87,8 +87,8 @@ def calc_until(rd):
         hrs = "0"
         minutes = "0"
     else:
-        days, time = t_str.split(",")
-        hrs, minutes, secs = time.split(":")
+        days, no_days = t_str.split(",")
+        hrs, minutes, secs = no_days.split(":")
 
     hrs = hrs.strip()  # removes spaces in string
 

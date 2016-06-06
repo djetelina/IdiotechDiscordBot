@@ -18,12 +18,12 @@ log = logging.getLogger(__name__)
 
 class Warns:
     warnings = []
-    
+
     def __init__(self, user, bot, points):
         self.user = user
         self.bot = bot
         self.points = 0
-        
+
         if len(Warns.warnings) == 0:
             with open("cogs/swears/warnings.txt", "r") as f:
                 Warns.warnings = f.readlines()
@@ -52,7 +52,6 @@ class Warns:
         self.points -= 1
         self.point_check()
 
-
     def point_check(self):
         if self.points >= 10:
             return True
@@ -72,7 +71,7 @@ class Warns:
 class Swear:
     confusables = []
     swears = []
-    
+
     def __init__(self, bot):
         self.bot = bot
         if len(Swear.confusables) == 0:

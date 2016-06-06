@@ -32,14 +32,14 @@ class Restricted:
         except Exception as e:
             log.exception("Couldn't change avatar")
 
-    @commands.command(hidden=True, description="not for you")
+    @commands.command(hidden=True, description=desc.iscream)
     @checks.is_scream()
     async def play(self, *, playing: str):
         await self.bot.change_status(game=discord.Game(name=playing))
         await self.bot.say("I'm now playing {}".format(playing))
         log.info("Now playing updated")
 
-    @commands.command(pass_context=True, hidden=True, description="not for you")
+    @commands.command(pass_context=True, hidden=True, description=desc.iscream)
     @checks.is_scream()
     async def nick(self, ctx, *, nick: str):
         try:
@@ -48,6 +48,15 @@ class Restricted:
             log.info("New name updated")
         except Exception as e:
             log.exception("Couldn't change display name")
+
+    @commands.command(description=desc.iscream)
+    @checks.is_scream()
+    async def update(self):
+        version = self.bot.get_cog('Versioning')
+        if version is not None:
+            msg = "I have been updated! New version: {}\n\n```md\n{}```".format(
+                version.version, version.changelog.split("_____")[0])
+            await self.bot.send_message(self.bot.get_channel(settings.channels['programming']), msg)
 
     @commands.command(hidden=True, pass_context=True, description=desc.rtfh, brief=desc.rtfhb)
     @checks.mod_or_permissions(manage_messages=True)
