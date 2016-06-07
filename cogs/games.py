@@ -21,7 +21,7 @@ class Game:
         self.game = game
         self.owner = owner
         self.bot = bot
-        self.players = [owner, ]
+        self.players = [owner]
         self.description = 0
         games.update({self.game: self})
 
@@ -66,6 +66,30 @@ class Games:
             "Mighty No. 9": datetime(2016, 6, 21, 0, 0, 0),
         }
 
+    @commands.command(description=desc.steam_status, brief=desc.steam_status)
+    async def steam(self):
+        steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
+        with aiohttp.ClientSession() as session:
+            async with session.get(steam_api)as resp:
+                data = await resp.json()
+                if str(data["result"]["success"]) == "True":
+                    login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
+                    community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
+                    economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
+                    # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
+
+                    reply = """**Steam Server Status**
+
+```xl
+Login          {}
+Community      {}
+Economy        {}```""".format(login, community, economy)
+
+                else:
+                    reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
+
+        await self.bot.say(reply)
+
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
         # We are using manual argument detection instead of @commands.group,
@@ -105,7 +129,7 @@ class Games:
             if len(games) > 0:
                 reply = "People are playing:\n"
                 for game_name, game in games.items():
-                    reply += "\n**{}** ({} player/s, managed by {})".format(
+                    reply += "\n**{}** ({} player(s), managed by {})".format(
                         game_name, len(game.players), game.owner.name)
                 reply += "\n\nJoin them by typing !game join **Game**"
 
@@ -161,8 +185,9 @@ class Games:
     async def _close(self, ctx):
         for game_name, running_game in games.items():
             if ctx.message.author == running_game.owner:
-                running_game.cancel()
+                to_close = running_game.cancel()
                 await self.bot.say("Session for {0} is now closed!".format(running_game.game))
+                break
 
     @play.command(name="join", pass_context=True, description=desc.game_join, brief=desc.game_join)
     async def _join(self, ctx, *, game: str):
@@ -187,8 +212,7 @@ class Games:
             for game_name, running_game in games.items():
                 if game_name.lower() == game.lower():
                     found = 1
-                    reply = "{0} joined {1}".format(user.name, running_game.game)
-                    running_game.players.append(user)
+                    reply = running_game.join(user)
                     if running_game.description:
                         await s.whisper(user, "You joined {}, here's information by {}: {}".format(
                             game_name, running_game.owner.name, running_game.description), self.bot)
@@ -269,66 +293,6 @@ class Games:
                                          "Most Played Hero:   *{5}, {6} played*"
                                          "".format(battletag, reg.upper(), time_played, games_played,
                                                    won_lost, most_played, most_games, win_percent))
-
-    # TODO http://csgo-stats.com/extrarandom/
-        # Look into adding a !csgo command for get csgo profile stats
-        # Looks like it should be pretty to do
-
-    @commands.group(pass_context=True, description=desc.steam, brief=desc.steam)
-    async def steam(self, ctx):
-        if ctx.invoked_subcommand is None:
-            await self.bot.say("Available Subcommands: bestsellers, status\n"
-                               "Usage: !steam <subcommand>")
-
-    @steam.command(name="bestsellers", description=desc.steam_bs, brief=desc.steam_bs)
-    async def _bs(self):
-        future = loop.run_in_executor(
-            None, requests.get, "http://store.steampowered.com/search/?filter=topsellers&os=win")
-        res = await future
-
-        try:
-            res.raise_for_status()
-        except Exception as e:
-            await self.bot.say("**Error with request.\nError: {}".format(str(e)))
-            log.exception("Error with request (games.py)")
-            return
-
-        doc = bs4.BeautifulSoup(res.text, "html.parser")
-        title = doc.select('span[class="title"]')
-
-        msg = """**Best Selling Steam Games**
-
- 1) {}
-2) {}
-3) {}
-4) {}
-5) {}
-""".format(title[0].getText(), title[1].getText(), title[2].getText(), title[3].getText(), title[4].getText())
-        await self.bot.say(msg)
-
-    @steam.command(name="status", description=desc.steam_status, brief=desc.steam_status)
-    async def _status(self):
-        steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
-        with aiohttp.ClientSession() as session:
-            async with session.get(steam_api)as resp:
-                data = await resp.json()
-                if str(data["result"]["success"]) == "True":
-                    login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
-                    community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
-                    economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
-                    # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
-
-                    reply = """**Steam Server Status**
-
-```xl
-Login          {}
-Community      {}
-Economy        {}```""".format(login, community, economy)
-
-                else:
-                    reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
-
-        await self.bot.say(reply)
 
 
 def find_value(stats, name):
