@@ -41,7 +41,7 @@ async def on_command(command, ctx):
 
 
 @bot.command(hidden=True)
-@checks.is_scream()
+@checks.is_dev()
 async def reload(*, module: str):
     """
     Reloads a module.
@@ -63,7 +63,7 @@ async def reload(*, module: str):
 
 
 @bot.command(hidden=True)
-@checks.is_scream()
+@checks.is_dev()
 async def load(*, module: str):
     """
     Loads a module.
@@ -84,7 +84,7 @@ async def load(*, module: str):
 
 
 @bot.command(hidden=True)
-@checks.is_scream()
+@checks.is_dev()
 async def unload(*, module: str):
     """Unloads a module."""
     module = module.strip()

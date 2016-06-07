@@ -84,6 +84,7 @@ class Giveaway:
                 await s.whisper(self.owner, "Nobody enrolled for your giveaway of {}".format(self.game), self.bot)
 
             giveawayslist.remove(self)
+            await changetopic(self)
 
     def enroll(self, user):
         self.enrolled.append(user)
@@ -99,8 +100,7 @@ class Giveaway:
         self.enrolled.remove(user)
 
     async def cancel(self):
-        await self.bot.send_message(self.channel,
-                                    "{} canceled their giveaway for {}".format(self.owner.mention, self.game))
+        await self.bot.say("{} canceled their giveaway for {}".format(self.owner.mention, self.game))
         log.info("{} canceled their giveaway".format(self.owner.name))
         self.status = 0
         giveawayslist.remove(self)
@@ -118,11 +118,11 @@ class Giveaways:
     async def giveaway(self, ctx):
         if ctx.invoked_subcommand is None:
             if len(giveawayslist) > 0:
-                reply = "Currently opened giveaways:\n=========="
+                reply = "Currently opened giveaways:\n"
                 for ga in giveawayslist:
                     reply += "\n**{}** by {} ({}, {} people enrolled)".format(
                         ga.game, ga.owner.mention, tc.parsesecs(ga.time), len(ga.enrolled))
-                reply += "\n==========\nEnter giveaway with !enroll **GameName**"
+                reply += "\n\nEnter giveaway with !enroll **GameName**"
 
             else:
                 reply = "No giveaway open"
@@ -199,7 +199,7 @@ class Giveaways:
                 await self.bot.send_message(
                     giveaway.channel, "@here {0} just opened a giveaway for {1}. Type '!enroll {1}' to enroll".format(
                         giveaway.owner.mention, giveaway.game))
-                await self.changetopic()
+                await changetopic(self)
 
                 if giveaway.desc:
                     await self.bot.send_message(giveaway.channel, "Description: {}".format(giveaway.description))
@@ -213,7 +213,7 @@ class Giveaways:
             if ctx.message.author == ga.owner:
                 await ga.cancel()
                 await s.whisper(ga.owner, "Giveaway canceled", self.bot)
-                await self.changetopic()
+                await changetopic(self)
 
     @commands.command(pass_context=True, description=desc.enroll, brief=desc.enroll_brief)
     async def enroll(self, ctx, *, game: str):
@@ -251,9 +251,9 @@ class Giveaways:
         except Exception as e:
             log.exception("Couldn't delete enroll message")
 
-        await self.changetopic()
+        await changetopic(self)
 
-    async def changetopic(self):
+async def changetopic(self):
         new_topic = "Giveaways running: {0} | Total enrolled: {1}".format(
             len(giveawayslist), sum(len(giveaway.enrolled) for giveaway in giveawayslist))
         log.info("New topic in giveaways: {}".format(new_topic))
