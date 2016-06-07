@@ -45,9 +45,10 @@ class General:
                         else:
                             peep = "people"
 
-                        reply = "**Idiotech** is live streaming **{}** with **{}** {} watching! " \
+                        reply = "**{}** is live streaming **{}** with **{}** {} watching! " \
                                 "\nCurrent Uptime: {} hours, {} minutes and {} seconds." \
-                                "\nhttps://www.twitch.tv/idiotechgaming".format(game, views, peep, hrs, mins, secs)
+                                "\nhttps://www.twitch.tv/{}".format(settings.server_owner,
+                                                                    game, views, peep, hrs, mins, secs, settings.twitch)
                     else:
                         reply = "https://www.twitch.tv/idiotechgaming (OFFLINE)"
             await self.bot.say(reply)
