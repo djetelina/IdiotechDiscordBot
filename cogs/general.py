@@ -152,36 +152,19 @@ https://www.facebook.com/idiotechgaming/""".format(d, tc.get_date_suf(d), calend
 
 def get_time() -> dict:
     """
-    Function to get local time in cities
-
-    :return: Dictionary with {"city":"%H:%M"}
-    """
-    fmt = '%H:%M'
-
+   Function to get local time in cities
+   :return: Dictionary with {"city":"%H:%M"}
+   """
+    places = {'sf': 'US/Pacific', 'london': 'Europe/London', 'sydney': 'Australia/Sydney', 'perth': 'Australia/Perth', 'ny': 'US/Eastern'}
+    output = {}
     now_utc = datetime.now(timezone('UTC'))
-
-    now_pacific = now_utc.astimezone(timezone('US/Pacific'))
-    sf = now_pacific.strftime(fmt)
-
-    now_london = now_utc.astimezone(timezone('Europe/London'))
-    london = now_london.strftime(fmt)
-
-    now_sydney = now_utc.astimezone(timezone('Australia/Sydney'))
-    sydney = now_sydney.strftime(fmt)
-
-    now_perth = now_utc.astimezone(timezone('Australia/Perth'))
-    perth = now_perth.strftime(fmt)
-
-    now_ny = now_utc.astimezone(timezone('US/Eastern'))
-    ny = now_ny.strftime(fmt)
-
-    return {
-        "sydney": sydney,
-        "london": london,
-        "ny": ny,
-        "sf": sf,
-        "perth": perth
-    }
+ 
+    for i in places:
+        time = now_utc.astimezone(timezone(places[i]))
+        fmttime = time.strftime('%H:%M')
+        output[i] = fmttime
+ 
+    return output
 
 
 def setup(bot):
