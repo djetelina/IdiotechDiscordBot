@@ -66,29 +66,41 @@ class Games:
             "Mighty No. 9": datetime(2016, 6, 21, 0, 0, 0),
         }
 
-    @commands.command(description=desc.steam_status, brief=desc.steam_status)
-    async def steam(self):
-        steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
-        with aiohttp.ClientSession() as session:
-            async with session.get(steam_api)as resp:
-                data = await resp.json()
-                if str(data["result"]["success"]) == "True":
-                    login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
-                    community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
-                    economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
-                    # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
+    @commands.group(pass_context=True, description=desc.steam_status, brief=desc.steam_status)
+    async def steam(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await self.bot.say(await get_status("short"))
 
-                    reply = """**Steam Server Status**
+    @steam.command(name="status", description=desc.steam_status, brief=desc.steam_status)
+    async def _status(self):
+        await self.bot.say(await get_status("long"))
 
-```xl
-Login          {}
-Community      {}
-Economy        {}```""".format(login, community, economy)
+    @steam.command(name="bestsellers", description=desc.steam_bs, brief=desc.steam_bs)
+    async def _bs(self):
+        future = loop.run_in_executor(None, requests.get,
+                                      "http://store.steampowered.com/search/?filter=topsellers&os=win")
+        res = await future
 
-                else:
-                    reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
+        try:
+            res.raise_for_status()
+        except Exception as e:
+            await self.bot.say("**Error with request.\nError: {}".format(str(e)))
+            log.exception("Error with request (games.py)")
+            return
 
-        await self.bot.say(reply)
+        doc = bs4.BeautifulSoup(res.text, "html.parser")
+        title = doc.select('span[class="title"]')
+
+        msg = """**Best Selling Steam Games**
+
+ 1) {}
+2) {}
+4) {}
+3) {}
+5) {}
+""".format(title[0].getText(), title[1].getText(), title[2].getText(), title[3].getText(), title[4].getText())
+
+        await self.bot.say(msg)
 
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
@@ -293,6 +305,38 @@ Economy        {}```""".format(login, community, economy)
                                          "Most Played Hero:   *{5}, {6} played*"
                                          "".format(battletag, reg.upper(), time_played, games_played,
                                                    won_lost, most_played, most_games, win_percent))
+
+async def get_status(fmt):
+    steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
+    with aiohttp.ClientSession() as session:
+        async with session.get(steam_api)as resp:
+            data = await resp.json()
+            if str(data["result"]["success"]) == "True":
+                login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
+                community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
+                economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
+                # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
+                if fmt == "long":
+                    reply = """**Steam Server Status**
+    ```xl
+    Login          {}
+    Community      {}
+    Economy        {}```""".format(login, community, economy)
+                elif fmt == "short":
+                    if str(login) != "Normal" and str(community) != "Normal" and str(economy) != "Normal":
+                        reply = "Steam might be having some issues, use `!steam status! for more info."
+                    # elif login is "normal" and community is "normal" and economy is "normal":
+                    #    reply = "Steam is running fine - no issues detected, use `!steam status! for more info."
+                    else:
+                        reply = "Steam appears to be running fine."
+                else:  # if wrong format
+                    log.error("Wrong format given for get_status().")
+                    reply = "This error has occurred because you entered an incorrect format for get_status()."
+
+            else:
+                reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
+
+    return reply
 
 
 def find_value(stats, name):
