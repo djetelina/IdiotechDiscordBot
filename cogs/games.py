@@ -92,24 +92,34 @@ class Games:
         # We are using manual argument detection instead of @commands.group,
         # because we want sub-commands to be dynamic based on our self.dates dictionary
         with aiohttp.ClientSession() as session:
-            async with session.get('https://raw.githubusercontent.com/ExtraRandom/Test/master/dates-test') as resp:
-                # TODO (Extra_Random) Rename depository used ^ to get dates to something smarter
-                data = await resp.text()
+            url = await get_url()
+            async with session.get(url) as resp:
+                data = await resp.json()
 
-                date = data.split(",")
+                game_list = data["games"]
                 dates = {}
 
-                for release_date in range(0, len(date) - 1):
-                    # print(date[release_date])
-                    if not date[release_date].startswith("#"):
-                        name, day, month, year, hour, minute, second = date[release_date].split("-")
-                        name = name.replace("\n", "")
-                        dates.update({name: datetime(int(year), int(month), int(day),
-                                                     int(hour), int(minute), int(second))})
-                    #else:
-                    #    log.info("Updating Release Dates - Found Comment: {}".format((date[release_date])))
+                # print(game_list)
 
-                    # TODO store locally and have the command check whether the stored dates should be updated when used
+                for release_date in game_list:
+                    name = release_date
+
+                    hour = 0
+                    minute = 0
+                    second = 0
+
+                    day = game_list[release_date]["day"]
+                    month = game_list[release_date]["month"]
+                    year = game_list[release_date]["year"]
+
+                    if "hour" in game_list[release_date]:
+                        hour = game_list[release_date]["hour"]
+                    if "minute" in game_list[release_date]:
+                        minute = game_list[release_date]["minute"]
+                    if "second" in game_list[release_date]:
+                        second = game_list[release_date]["second"]
+
+                    dates.update({name: datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))})
 
         for game in dates:
             maxlen = len(game)
@@ -342,6 +352,39 @@ async def get_status(fmt):
                 reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
 
     return reply
+
+async def get_url():
+    """
+    This function is for automatically getting a link to the latest commits version of dates.json
+    in here - https://github.com/ExtraRandom/IdioBot-OnlineSettings
+    The reason for this being the default raw link takes a while to update, where as the latest commit tends to be
+    instant.
+
+    :return: url for latest version of dates.json
+    """
+
+    fallback_url = "https://raw.githubusercontent.com/ExtraRandom/IdioBot-OnlineSettings/master/dates.json"
+    link = "https://github.com/ExtraRandom/IdioBot-OnlineSettings/blob/master/dates.json"
+    url = "https://raw.githubusercontent.com"
+    future = loop.run_in_executor(None, requests.get, link)
+    res = await future
+
+    try:
+        res.raise_for_status()
+    except Exception as e:
+        log.exception("Error with request (games.py)")
+        return fallback_url
+
+    doc = bs4.BeautifulSoup(res.text, "html.parser")
+    new_link = str(doc.select('a[class="commit-tease-sha"]')).split('"')
+    for element in new_link:
+        if element.startswith("/ExtraRandom"):
+            url += (element.replace("/commit", "") + "/dates.json")
+
+    if url == "https://raw.githubusercontent.com":
+        return fallback_url
+    else:
+        return url
 
 
 def find_value(stats, name):
