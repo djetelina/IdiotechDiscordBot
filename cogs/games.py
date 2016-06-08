@@ -51,21 +51,6 @@ class Games:
 
         self.bot = bot
 
-        # Dates have to be in relation to UTC (so if release is 5am BST, it would be 4am UTC)
-        # Preferably use the latest release time for a game with different release times for different regions
-        self.dates = {
-            "No Man''s Sky": datetime(2016, 8, 12, 0, 0, 0),
-            "Deus Ex: Mankind Divided": datetime(2016, 8, 23, 0, 0, 0),
-            "Battlefield 1": datetime(2016, 10, 21, 0, 0, 0),
-            "Civilization 6": datetime(2016, 10, 21, 0, 0, 0),
-            "Dishonored 2": datetime(2016, 11, 11, 0, 0, 0),
-            "Mirror''s Edge: Catalyst": datetime(2016, 6, 9, 0, 0, 0),
-            "Mafia III": datetime(2016, 10, 7, 0, 0, 0),
-            "Pokemon Sun and Moon": datetime(2016, 11, 23, 0, 0, 0),
-            "World of Warcraft: Legion": datetime(2016, 8, 30, 0, 0, 0),
-            "Mighty No. 9": datetime(2016, 6, 21, 0, 0, 0),
-        }
-
     @commands.group(pass_context=True, description=desc.steam_status, brief=desc.steam_status)
     async def steam(self, ctx):
         if ctx.invoked_subcommand is None:
@@ -106,7 +91,27 @@ class Games:
     async def release(self, ctx):
         # We are using manual argument detection instead of @commands.group,
         # because we want sub-commands to be dynamic based on our self.dates dictionary
-        for game in self.dates:
+        with aiohttp.ClientSession() as session:
+            async with session.get('https://raw.githubusercontent.com/ExtraRandom/Test/master/dates-test') as resp:
+                # TODO (Extra_Random) Rename depository used ^ to get dates to something smarter
+                data = await resp.text()
+
+                date = data.split(",")
+                dates = {}
+
+                for release_date in range(0, len(date) - 1):
+                    # print(date[release_date])
+                    if not date[release_date].startswith("#"):
+                        name, day, month, year, hour, minute, second = date[release_date].split("-")
+                        name = name.replace("\n", "")
+                        dates.update({name: datetime(int(year), int(month), int(day),
+                                                     int(hour), int(minute), int(second))})
+                    #else:
+                    #    log.info("Updating Release Dates - Found Comment: {}".format((date[release_date])))
+
+                    # TODO store locally and have the command check whether the stored dates should be updated when used
+
+        for game in dates:
             maxlen = len(game)
         else:
             maxlen = 0
@@ -115,9 +120,9 @@ class Games:
         if len(arg) > 0:
             found = False
             msg = "Found games starting with `{}`:\n\n```Ruby\n".format(arg.capitalize())
-            for game in self.dates:
+            for game in dates:
                 if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
-                    days, hrs, mins = tc.calc_until(self.dates[game])
+                    days, hrs, mins = tc.calc_until(dates[game])
                     msg += "{}\n".format(tc.create_msg(game, days, hrs, mins, maxlen))
                     found = True
 
@@ -128,8 +133,8 @@ class Games:
 
         else:
             msg = "**Release Dates List**\n\n```Ruby\n"
-            for game, time in sorted(self.dates.items(), key=lambda x: x[1]):
-                days, hrs, mins = tc.calc_until(self.dates[game])
+            for game, time in sorted(dates.items(), key=lambda x: x[1]):
+                days, hrs, mins = tc.calc_until(dates[game])
                 msg += "{}\n".format(tc.create_msg(game, days, hrs, mins, maxlen))
             msg += "```"
 
