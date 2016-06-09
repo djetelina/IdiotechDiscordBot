@@ -3,8 +3,6 @@ import logging
 import bs4
 import requests
 
-import unicodedata
-
 from helpers import descriptions as desc, time_calculations as tc, simplify as s
 
 from datetime import datetime
@@ -52,6 +50,13 @@ class Games:
     def __init__(self, bot):
 
         self.bot = bot
+
+    # TODO - After E3 remove this command
+    @commands.command(pass_context=True, description="E3 Timetable", brief="E3 Timetable")
+    async def e3(self, ctx):
+        to = ctx.message.channel#.name
+        file = open('cogs/temp/e3.jpg', 'rb')
+        await self.bot.send_file(to, file)
 
     @commands.group(pass_context=True, description=desc.steam_status, brief=desc.steam_status)
     async def steam(self, ctx):
@@ -220,6 +225,7 @@ class Games:
         for game_name, running_game in games.items():
             if ctx.message.author == running_game.owner:
                 to_close = running_game.cancel()
+                # TODO - fix the error this causes (removes the game fine but causes runtime error)
                 await self.bot.say("Session for {0} is now closed!".format(running_game.game))
                 break
 
