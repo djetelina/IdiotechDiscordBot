@@ -87,16 +87,34 @@ class Games:
 
         await self.bot.say(msg)
 
+    @steam.command(name="sales", description=desc.steam_sales, brief=desc.steam_sales)
+    async def _deals(self):
+        future = loop.run_in_executor(None, requests.get, "https://steamdb.info/sales/?cc=us")
+
+        res = await future
+
+        try:
+            res.raise_for_status()
+        except Exception as e:
+            await self.bot.say("**Error with request.\nError: {}".format(str(e)))
+            log.exception("Error with request (games.py)")
+            return
+
+        doc = bs4.BeautifulSoup(res.text, "html.parser")
+        title = doc.select('a[target="_blank"]')
+        print(title)
+
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
         # We are using manual argument detection instead of @commands.group,
         # because we want sub-commands to be dynamic based on our self.dates dictionary
         with aiohttp.ClientSession() as session:
-            url = await get_url()
+            ip = "86.166.148.99"  # TODO add a system to accommodate for this changing
+            url = "http://{}:5000/dates".format(ip)
             async with session.get(url) as resp:
                 data = await resp.json()
 
-                game_list = data["games"]
+                game_list = data["results"]["games"]
                 dates = {}
 
                 # print(game_list)
@@ -352,39 +370,6 @@ async def get_status(fmt):
                 reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
 
     return reply
-
-async def get_url():
-    """
-    This function is for automatically getting a link to the latest commits version of dates.json
-    in here - https://github.com/ExtraRandom/IdioBot-OnlineSettings
-    The reason for this being the default raw link takes a while to update, where as the latest commit tends to be
-    instant.
-
-    :return: url for latest version of dates.json
-    """
-
-    fallback_url = "https://raw.githubusercontent.com/ExtraRandom/IdioBot-OnlineSettings/master/dates.json"
-    link = "https://github.com/ExtraRandom/IdioBot-OnlineSettings/blob/master/dates.json"
-    url = "https://raw.githubusercontent.com"
-    future = loop.run_in_executor(None, requests.get, link)
-    res = await future
-
-    try:
-        res.raise_for_status()
-    except Exception as e:
-        log.exception("Error with request (games.py)")
-        return fallback_url
-
-    doc = bs4.BeautifulSoup(res.text, "html.parser")
-    new_link = str(doc.select('a[class="commit-tease-sha"]')).split('"')
-    for element in new_link:
-        if element.startswith("/ExtraRandom"):
-            url += (element.replace("/commit", "") + "/dates.json")
-
-    if url == "https://raw.githubusercontent.com":
-        return fallback_url
-    else:
-        return url
 
 
 def find_value(stats, name):
