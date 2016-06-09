@@ -98,7 +98,7 @@ class Games:
         # We are using manual argument detection instead of @commands.group,
         # because we want sub-commands to be dynamic based on our self.dates dictionary
         with aiohttp.ClientSession() as session:
-            ip = "http://extrarandom-test.ddns.net/" 
+            ip = "http://extrarandom-test.ddns.net/"
             url = "http://{}:5000/dates".format(ip)
             async with session.get(url) as resp:
                 data = await resp.json()
