@@ -3,6 +3,8 @@ import logging
 import bs4
 import requests
 
+import unicodedata
+
 from helpers import descriptions as desc, time_calculations as tc, simplify as s
 
 from datetime import datetime
@@ -89,27 +91,14 @@ class Games:
 
     @steam.command(name="sales", description=desc.steam_sales, brief=desc.steam_sales)
     async def _deals(self):
-        future = loop.run_in_executor(None, requests.get, "https://steamdb.info/sales/?cc=us")
-
-        res = await future
-
-        try:
-            res.raise_for_status()
-        except Exception as e:
-            await self.bot.say("**Error with request.\nError: {}".format(str(e)))
-            log.exception("Error with request (games.py)")
-            return
-
-        doc = bs4.BeautifulSoup(res.text, "html.parser")
-        title = doc.select('a[target="_blank"]')
-        print(title)
+        await self.bot.say("https://steamdb.info/sales/")
 
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
         # We are using manual argument detection instead of @commands.group,
         # because we want sub-commands to be dynamic based on our self.dates dictionary
         with aiohttp.ClientSession() as session:
-            ip = "86.166.148.99"  # TODO add a system to accommodate for this changing
+            ip = "http://extrarandom-test.ddns.net/" 
             url = "http://{}:5000/dates".format(ip)
             async with session.get(url) as resp:
                 data = await resp.json()
