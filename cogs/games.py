@@ -54,11 +54,9 @@ class Games:
         self.bot = bot
 
     # TODO - After E3 remove this command
-    @commands.command(pass_context=True, description="E3 Timetable", brief="E3 Timetable")
-    async def e3(self, ctx):
-        to = ctx.message.channel#.name
-        file = open('cogs/temp/e3.jpg', 'rb')
-        await self.bot.send_file(to, file)
+    @commands.command(description="E3 Timetable", brief="E3 Timetable")
+    async def e3(self):
+        self.bot.say("http://i.imgur.com/Z7MUDfU.jpg")
 
     @commands.group(pass_context=True, description=desc.steam_status, brief=desc.steam_status)
     async def steam(self, ctx):

@@ -3,14 +3,14 @@ Changelog
 
 1.0.2.2
 -------
-* Added !e3 which returns an E3 timetable
-* Added [!steam][deals] - returns link to webpage will list of sales on
-* Fixed giveaway topic not updating after a giveaway was closed (bug)
+* [!e3] which returns an E3 timetable
+* [!steam][sales] - returns link to webpage will list of sales on
+* Fixed giveaway topic not updating after a giveaway was closed
 
 1.0.2.1
 -------
 * Made a few visual changes
-* Added [!steam][bestsellers] which returns top 5 best selling games on Steam
+* [!steam][bestsellers] which returns top 5 best selling games on Steam
 * Moved what was [!steam] to [!steam][status]
 _____
 
