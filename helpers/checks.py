@@ -3,7 +3,7 @@ import discord.utils
 from helpers import settings
 
 
-def is_idiotech():
+def is_server_owner():
     """
     Checks if user requesting a command is Idiotech, if not command will not execute
 
@@ -11,12 +11,12 @@ def is_idiotech():
     """
 
     def predicate(ctx):
-        return ctx.message.author.id == "176291669254209539"
+        return ctx.message.author.id == settings.owner_id
 
     return commands.check(predicate)
 
 
-def is_scream():
+def is_dev():
     """
     Checks if user requesting a command is iScrE4m, if not command will not execute
 
@@ -24,7 +24,7 @@ def is_scream():
     """
 
     def predicate(ctx):
-        return ctx.message.author.id == "132577770046750720"
+        return ctx.message.author.id == settings.dev_id
 
     return commands.check(predicate)
 

@@ -116,7 +116,10 @@ GAMES
 """
 
 release_datesb = "List of games and countdown until their releases"
+steam = "Commands related to steam"
 steam_status = "Check Status of Steam Servers"
+steam_bs = "List of Top 5 Best selling steam games"
+steam_sales = "PM's you a list of games currently on sale on Steam"
 
 ow = """Find Overwatch Stats of a given battle tag in a given region
 

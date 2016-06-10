@@ -6,7 +6,7 @@ from discord.ext import commands
 from pytz import timezone
 
 import helpers.tokens as t
-from helpers import descriptions as desc, time_calculations as tc
+from helpers import descriptions as desc, time_calculations as tc, settings
 
 
 class General:
@@ -18,7 +18,7 @@ class General:
 
     @commands.command(description=desc.reddit, brief=desc.reddit)
     async def reddit(self):  # returns link to sub-reddit
-        await self.bot.say("https://www.reddit.com/r/idiotechgaming/")
+        await self.bot.say("https://www.reddit.com/r/{}".format(settings.reddit))
 
     @commands.command(description=desc.github, brief=desc.github)
     async def github(self):  # returns link to github for this bot
@@ -28,42 +28,39 @@ class General:
     @commands.command(description=desc.twitch, brief=desc.twitchb)
     async def twitch(self):
         with aiohttp.ClientSession() as session:
-            async with session.get('https://api.twitch.tv/kraken/streams?channel=idiotechgaming')as resp:
+            async with session.get('https://api.twitch.tv/kraken/streams?channel={}'.format(settings.twitch))as resp:
                 data = await resp.json()
                 if len(data["streams"]) > 0:
                     game = data["streams"][0]["game"]
                     views = data["streams"][0]["viewers"]
-
                     fmt = "%Y-%m-%dT%H:%M:%SZ"
                     hrs, mins, secs = tc.calc_duration(datetime.strptime(data["streams"][0]["created_at"], fmt))
-
                     # if one person is watching return 'person' instead of people
                     if views == 1:
                         peep = "person"
                     else:
                         peep = "people"
-
-                    reply = "**Idiotech** is live streaming **{}** with **{}** {} watching! " \
+                    reply = "**{}** is live streaming **{}** with **{}** {} watching! " \
                             "\nCurrent Uptime: {} hours, {} minutes and {} seconds." \
-                            "\nhttps://www.twitch.tv/idiotechgaming".format(game, views, peep, hrs, mins, secs)
+                            "\nhttps://www.twitch.tv/{}".format(settings.server_owner,
+                                                                game, views, peep, hrs, mins, secs, settings.twitch)
                 else:
                     reply = "https://www.twitch.tv/idiotechgaming (OFFLINE)"
         await self.bot.say(reply)
 
     @commands.command(description=desc.twitter, brief=desc.twitter)
     async def twitter(self):  # returns link to Idiotech's twitter
-        await self.bot.say('https://twitter.com/idiotechgaming')
+        await self.bot.say('https://twitter.com/{}'.format(settings.twitter_handle))
 
     @commands.command(description=desc.fb, brief=desc.fb)
     async def facebook(self):  # finds latest facebbok post and returns it, along with link to page
-        with aiohttp.ClientSession() as session:
-            async with session.get('https://graph.facebook.com/v2.6/idiotechgaming/posts'
-                                   '?access_token={}'.format(t.fb_key)) as resp:
-                data = await resp.json()
 
+        with aiohttp.ClientSession() as session:
+            async with session.get('https://graph.facebook.com/v2.6/{}/posts'
+                                   '?access_token={}'.format(settings.facebook, t.fb_key)) as resp:
+                data = await resp.json()
                 fb_post = data["data"][0]["message"]
                 y, m, d, = tc.date_split(data["data"][0]["created_time"])  # y = year, m = month, d = day
-
                 # TODO Make date ago
                 msg = """**Latest Facebook Post**
 ```{4}```
@@ -77,8 +74,8 @@ https://www.facebook.com/idiotechgaming/""".format(d, tc.get_date_suf(d), calend
         connector = aiohttp.TCPConnector(verify_ssl=False)
 
         with aiohttp.ClientSession(connector=connector) as session:
-            async with session.get('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=UC0YagOInbZx'
-                                   'j10gaWwb1Nag&maxResults=1&order=date&key={}'.format(t.yt_key)) as resp:
+            async with session.get('https://www.googleapis.com/youtube/v3/search?part=snippet&channelId={}'
+                                   '&maxResults=1&order=date&key={}'.format(settings.yt_channel, t.yt_key)) as resp:
                 data = await resp.json()
 
                 mo = "**"
@@ -98,8 +95,7 @@ https://www.facebook.com/idiotechgaming/""".format(d, tc.get_date_suf(d), calend
 
     @commands.command(description=desc.rules, brief=desc.rules)
     async def rules(self):
-        # TODO Get from settings
-        await self.bot.say('Please read <#179965419728273408>')
+        await self.bot.say('Please read <#{}>'.format(settings.channels['rules']))
 
     @commands.group(pass_context=True, description=desc.time, brief=desc.time)
     async def time(self, ctx):
@@ -155,15 +151,17 @@ def get_time() -> dict:
    Function to get local time in cities
    :return: Dictionary with {"city":"%H:%M"}
    """
-    places = {'sf': 'US/Pacific', 'london': 'Europe/London', 'sydney': 'Australia/Sydney', 'perth': 'Australia/Perth', 'ny': 'US/Eastern'}
+    places = {'sf': 'US/Pacific', 'london': 'Europe/London', 'sydney': 'Australia/Sydney', 'perth': 'Australia/Perth',
+              'ny': 'US/Eastern'}
     output = {}
+
     now_utc = datetime.now(timezone('UTC'))
- 
+
     for i in places:
         time = now_utc.astimezone(timezone(places[i]))
         fmttime = time.strftime('%H:%M')
         output[i] = fmttime
- 
+
     return output
 
 

@@ -14,12 +14,12 @@ class Restricted:
         self.bot = bot
 
     @commands.command(hidden=True, description=desc.iscream)
-    @checks.is_scream()
+    @checks.is_dev()
     async def develop(self):
         await self.bot.say('iScrE4m is streaming my development over at http://twitch.tv/iScrE4m - come watch!')
 
     @commands.command(hidden=True, description="not for you")
-    @checks.is_scream()
+    @checks.is_dev()
     async def avatar(self, image: str):
         try:
             with open("cogs/avatar/" + image, "rb") as avatar:
@@ -33,14 +33,14 @@ class Restricted:
             log.exception("Couldn't change avatar")
 
     @commands.command(hidden=True, description=desc.iscream)
-    @checks.is_scream()
+    @checks.is_dev()
     async def play(self, *, playing: str):
         await self.bot.change_status(game=discord.Game(name=playing))
         await self.bot.say("I'm now playing {}".format(playing))
         log.info("Now playing updated")
 
     @commands.command(pass_context=True, hidden=True, description=desc.iscream)
-    @checks.is_scream()
+    @checks.is_dev()
     async def nick(self, ctx, *, nick: str):
         try:
             await self.bot.change_nickname(ctx.message.server.me, nick)
@@ -50,7 +50,7 @@ class Restricted:
             log.exception("Couldn't change display name")
 
     @commands.command(hidden=True, description=desc.iscream)
-    @checks.is_scream()
+    @checks.is_dev()
     async def update(self):
         version = self.bot.get_cog('Versioning')
         if version is not None:
@@ -76,12 +76,12 @@ class Restricted:
             await commands.bot._default_help_command(ctx, cmd)
 
     @commands.command(hidden=True, description=desc.idiotech)
-    @checks.is_idiotech()
+    @checks.is_server_owner()
     async def dance(self):
         await self.bot.say('Moves like Jagger I tell you')
 
     @commands.command(hidden=True, description=desc.idiotech)
-    @checks.is_idiotech()
+    @checks.is_server_owner()
     async def log(self, users: str):
         # TODO Discuss what to do with this comand, it's not being used much
         users = users.split(';')

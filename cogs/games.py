@@ -2,6 +2,7 @@ import asyncio
 import logging
 import bs4
 import requests
+import json
 
 from helpers import descriptions as desc, time_calculations as tc, simplify as s
 
@@ -44,6 +45,7 @@ class Game:
             if v == self:
                 del games[k]
                 log.info("{} canceled their game".format(self.owner.name))
+                break
 
 
 class Games:
@@ -51,50 +53,95 @@ class Games:
 
         self.bot = bot
 
-        # Dates have to be in relation to UTC (so if release is 5am BST, it would be 4am UTC)
-        # Preferably use the latest release time for a game with different release times for different regions
-        self.dates = {
-            "No Man''s Sky": datetime(2016, 8, 12, 0, 0, 0),
-            "Deus Ex: Mankind Divided": datetime(2016, 8, 23, 0, 0, 0),
-            "Battlefield 1": datetime(2016, 10, 21, 0, 0, 0),
-            "Civilization 6": datetime(2016, 10, 21, 0, 0, 0),
-            "Dishonored 2": datetime(2016, 11, 11, 0, 0, 0),
-            "Mirror''s Edge: Catalyst": datetime(2016, 6, 9, 0, 0, 0),
-            "Mafia III": datetime(2016, 10, 7, 0, 0, 0),
-            "Pokemon Sun and Moon": datetime(2016, 11, 23, 0, 0, 0),
-            "World of Warcraft: Legion": datetime(2016, 8, 30, 0, 0, 0),
-            "Mighty No. 9": datetime(2016, 6, 21, 0, 0, 0),
-        }
+    # TODO - After E3 remove this command
+    @commands.command(pass_context=True, description="E3 Timetable", brief="E3 Timetable")
+    async def e3(self, ctx):
+        to = ctx.message.channel#.name
+        file = open('cogs/temp/e3.jpg', 'rb')
+        await self.bot.send_file(to, file)
 
-    @commands.command(description=desc.steam_status, brief=desc.steam_status)
-    async def steam(self):
-        steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
-        with aiohttp.ClientSession() as session:
-            async with session.get(steam_api)as resp:
-                data = await resp.json()
-                if str(data["result"]["success"]) == "True":
-                    login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
-                    community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
-                    economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
-                    # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
+    @commands.group(pass_context=True, description=desc.steam_status, brief=desc.steam_status)
+    async def steam(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await self.bot.say(await get_status("short"))
 
-                    reply = """**Steam Server Status**
+    @steam.command(name="status", description=desc.steam_status, brief=desc.steam_status)
+    async def _status(self):
+        await self.bot.say(await get_status("long"))
 
-```xl
-Login          {}
-Community      {}
-Economy        {}```""".format(login, community, economy)
+    @steam.command(name="bestsellers", description=desc.steam_bs, brief=desc.steam_bs)
+    async def _bs(self):
+        future = loop.run_in_executor(None, requests.get,
+                                      "http://store.steampowered.com/search/?filter=topsellers&os=win")
+        res = await future
 
-                else:
-                    reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
+        try:
+            res.raise_for_status()
+        except Exception as e:
+            await self.bot.say("**Error with request.\nError: {}".format(str(e)))
+            log.exception("Error with request (games.py)")
+            return
 
-        await self.bot.say(reply)
+        doc = bs4.BeautifulSoup(res.text, "html.parser")
+        title = doc.select('span[class="title"]')
+
+        msg = """**Best Selling Steam Games**
+
+ 1) {}
+2) {}
+4) {}
+3) {}
+5) {}
+""".format(title[0].getText(), title[1].getText(), title[2].getText(), title[3].getText(), title[4].getText())
+
+        await self.bot.say(msg)
+
+    @steam.command(name="sales", description=desc.steam_sales, brief=desc.steam_sales)
+    async def _deals(self):
+        await self.bot.say("https://steamdb.info/sales/")
 
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
         # We are using manual argument detection instead of @commands.group,
         # because we want sub-commands to be dynamic based on our self.dates dictionary
-        for game in self.dates:
+        with aiohttp.ClientSession() as session:
+            url = "http://extrarandom-test.ddns.net:5000/dates"
+            # url = "http://localhost:5000/dates"
+            async with session.get(url) as resp:
+                try:
+                    data = await resp.json()
+
+                    data = data["results"]
+                    game_list = data["games"]
+
+                    dates = {}
+
+                    for release_date in game_list:
+                        name = release_date
+
+                        hour = 0
+                        minute = 0
+                        second = 0
+
+                        day = game_list[release_date]["day"]
+                        month = game_list[release_date]["month"]
+                        year = game_list[release_date]["year"]
+
+                        if "hour" in game_list[release_date]:
+                            hour = game_list[release_date]["hour"]
+                        if "minute" in game_list[release_date]:
+                            minute = game_list[release_date]["minute"]
+                        if "second" in game_list[release_date]:
+                            second = game_list[release_date]["second"]
+
+                        dates.update({name: datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))})
+                except json.decoder.JSONDecodeError:
+                    await self.bot.say("Error getting dates from server - Try again later")
+                    log.info("Couldn't get dates.json from server. Check http://extrarandom-test.ddns.net:5000/test is "
+                             "online.")
+                    return
+
+        for game in dates:
             maxlen = len(game)
         else:
             maxlen = 0
@@ -103,9 +150,9 @@ Economy        {}```""".format(login, community, economy)
         if len(arg) > 0:
             found = False
             msg = "Found games starting with `{}`:\n\n```Ruby\n".format(arg.capitalize())
-            for game in self.dates:
+            for game in dates:
                 if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
-                    days, hrs, mins = tc.calc_until(self.dates[game])
+                    days, hrs, mins = tc.calc_until(dates[game])
                     msg += "{}\n".format(tc.create_msg(game, days, hrs, mins, maxlen))
                     found = True
 
@@ -116,8 +163,8 @@ Economy        {}```""".format(login, community, economy)
 
         else:
             msg = "**Release Dates List**\n\n```Ruby\n"
-            for game, time in sorted(self.dates.items(), key=lambda x: x[1]):
-                days, hrs, mins = tc.calc_until(self.dates[game])
+            for game, time in sorted(dates.items(), key=lambda x: x[1]):
+                days, hrs, mins = tc.calc_until(dates[game])
                 msg += "{}\n".format(tc.create_msg(game, days, hrs, mins, maxlen))
             msg += "```"
 
@@ -293,6 +340,38 @@ Economy        {}```""".format(login, community, economy)
                                          "Most Played Hero:   *{5}, {6} played*"
                                          "".format(battletag, reg.upper(), time_played, games_played,
                                                    won_lost, most_played, most_games, win_percent))
+
+async def get_status(fmt):
+    steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'
+    with aiohttp.ClientSession() as session:
+        async with session.get(steam_api)as resp:
+            data = await resp.json()
+            if str(data["result"]["success"]) == "True":
+                login = (data["result"]["SteamStatus"]["services"]["SessionsLogon"]).capitalize()
+                community = (data["result"]["SteamStatus"]["services"]["SteamCommunity"]).capitalize()
+                economy = (data["result"]["SteamStatus"]["services"]["IEconItems"]).capitalize()
+                # leaderboards = (data["result"]["SteamStatus"]["services"]["LeaderBoards"]).capitalize()
+                if fmt == "long":
+                    reply = """**Steam Server Status**
+    ```xl
+    Login          {}
+    Community      {}
+    Economy        {}```""".format(login, community, economy)
+                elif fmt == "short":
+                    if str(login) != "Normal" and str(community) != "Normal" and str(economy) != "Normal":
+                        reply = "Steam might be having some issues, use `!steam status! for more info."
+                    # elif login is "normal" and community is "normal" and economy is "normal":
+                    #    reply = "Steam is running fine - no issues detected, use `!steam status! for more info."
+                    else:
+                        reply = "Steam appears to be running fine."
+                else:  # if wrong format
+                    log.error("Wrong format given for get_status().")
+                    reply = "This error has occurred because you entered an incorrect format for get_status()."
+
+            else:
+                reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
+
+    return reply
 
 
 def find_value(stats, name):
