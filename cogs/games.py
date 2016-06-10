@@ -56,7 +56,7 @@ class Games:
     # TODO - After E3 remove this command
     @commands.command(description="E3 Timetable", brief="E3 Timetable")
     async def e3(self):
-        self.bot.say("http://i.imgur.com/Z7MUDfU.jpg")
+        await self.bot.say("http://i.imgur.com/Z7MUDfU.jpg")
 
     @commands.group(pass_context=True, description=desc.steam_status, brief=desc.steam_status)
     async def steam(self, ctx):
