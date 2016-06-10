@@ -44,6 +44,7 @@ class Game:
             if v == self:
                 del games[k]
                 log.info("{} canceled their game".format(self.owner.name))
+                break
 
 
 class Games:
@@ -109,9 +110,11 @@ class Games:
                 data = await resp.json()
 
                 game_list = data["results"]["games"]
-                dates = {}
 
-                # print(game_list)
+                if "no_dates" in game_list:
+                    no_dates = data["results"]["no_dates"]
+
+                dates = {}
 
                 for release_date in game_list:
                     name = release_date
@@ -132,6 +135,10 @@ class Games:
                         second = game_list[release_date]["second"]
 
                     dates.update({name: datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))})
+
+                if no_dates:
+                    for game in no_dates:
+                        print(game)
 
         for game in dates:
             maxlen = len(game)
@@ -158,6 +165,7 @@ class Games:
             for game, time in sorted(dates.items(), key=lambda x: x[1]):
                 days, hrs, mins = tc.calc_until(dates[game])
                 msg += "{}\n".format(tc.create_msg(game, days, hrs, mins, maxlen))
+            # for game in
             msg += "```"
 
         await self.bot.say(msg)
@@ -225,7 +233,6 @@ class Games:
         for game_name, running_game in games.items():
             if ctx.message.author == running_game.owner:
                 to_close = running_game.cancel()
-                # TODO - fix the error this causes (removes the game fine but causes runtime error)
                 await self.bot.say("Session for {0} is now closed!".format(running_game.game))
                 break
 
