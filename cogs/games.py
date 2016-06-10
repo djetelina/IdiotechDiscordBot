@@ -2,6 +2,7 @@ import asyncio
 import logging
 import bs4
 import requests
+import json
 
 from helpers import descriptions as desc, time_calculations as tc, simplify as s
 
@@ -104,41 +105,41 @@ class Games:
         # We are using manual argument detection instead of @commands.group,
         # because we want sub-commands to be dynamic based on our self.dates dictionary
         with aiohttp.ClientSession() as session:
-            ip = "http://extrarandom-test.ddns.net/"
-            url = "http://{}:5000/dates".format(ip)
+            url = "http://extrarandom-test.ddns.net:5000/dates"
+            # url = "http://localhost:5000/dates"
             async with session.get(url) as resp:
-                data = await resp.json()
+                try:
+                    data = await resp.json()
 
-                game_list = data["results"]["games"]
+                    data = data["results"]
+                    game_list = data["games"]
 
-                if "no_dates" in game_list:
-                    no_dates = data["results"]["no_dates"]
+                    dates = {}
 
-                dates = {}
+                    for release_date in game_list:
+                        name = release_date
 
-                for release_date in game_list:
-                    name = release_date
+                        hour = 0
+                        minute = 0
+                        second = 0
 
-                    hour = 0
-                    minute = 0
-                    second = 0
+                        day = game_list[release_date]["day"]
+                        month = game_list[release_date]["month"]
+                        year = game_list[release_date]["year"]
 
-                    day = game_list[release_date]["day"]
-                    month = game_list[release_date]["month"]
-                    year = game_list[release_date]["year"]
+                        if "hour" in game_list[release_date]:
+                            hour = game_list[release_date]["hour"]
+                        if "minute" in game_list[release_date]:
+                            minute = game_list[release_date]["minute"]
+                        if "second" in game_list[release_date]:
+                            second = game_list[release_date]["second"]
 
-                    if "hour" in game_list[release_date]:
-                        hour = game_list[release_date]["hour"]
-                    if "minute" in game_list[release_date]:
-                        minute = game_list[release_date]["minute"]
-                    if "second" in game_list[release_date]:
-                        second = game_list[release_date]["second"]
-
-                    dates.update({name: datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))})
-
-                if no_dates:
-                    for game in no_dates:
-                        print(game)
+                        dates.update({name: datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))})
+                except json.decoder.JSONDecodeError:
+                    await self.bot.say("Error getting dates from server - Try again later")
+                    log.info("Couldn't get dates.json from server. Check http://extrarandom-test.ddns.net:5000/test is "
+                             "online.")
+                    return
 
         for game in dates:
             maxlen = len(game)
@@ -165,7 +166,6 @@ class Games:
             for game, time in sorted(dates.items(), key=lambda x: x[1]):
                 days, hrs, mins = tc.calc_until(dates[game])
                 msg += "{}\n".format(tc.create_msg(game, days, hrs, mins, maxlen))
-            # for game in
             msg += "```"
 
         await self.bot.say(msg)
