@@ -84,7 +84,7 @@ class Giveaway:
                 await s.whisper(self.owner, "Nobody enrolled for your giveaway of {}".format(self.game), self.bot)
 
             giveawayslist.remove(self)
-            await changetopic(self)
+            await changetopic(self.bot)
 
     def enroll(self, user):
         self.enrolled.append(user)
@@ -199,7 +199,7 @@ class Giveaways:
                 await self.bot.send_message(
                     giveaway.channel, "@here {0} just opened a giveaway for {1}. Type '!enroll {1}' to enroll".format(
                         giveaway.owner.mention, giveaway.game))
-                await changetopic(self)
+                await changetopic(self.bot)
 
                 if giveaway.desc:
                     await self.bot.send_message(giveaway.channel, "Description: {}".format(giveaway.description))
@@ -213,7 +213,7 @@ class Giveaways:
             if ctx.message.author == ga.owner:
                 await ga.cancel()
                 await s.whisper(ga.owner, "Giveaway canceled", self.bot)
-                await changetopic(self)
+                await changetopic(self.bot)
 
     @commands.command(pass_context=True, description=desc.enroll, brief=desc.enroll_brief)
     async def enroll(self, ctx, *, game: str):
@@ -251,14 +251,15 @@ class Giveaways:
         except Exception as e:
             log.exception("Couldn't delete enroll message")
 
-        await changetopic(self)
+        await changetopic(self.bot)
 
-async def changetopic(self):
+# TODO eventually test if this indeed is broken in the class, for some reason ER says he thinks it was
+async def changetopic(bot):
         new_topic = "Giveaways running: {0} | Total enrolled: {1}".format(
             len(giveawayslist), sum(len(giveaway.enrolled) for giveaway in giveawayslist))
         log.info("New topic in giveaways: {}".format(new_topic))
         try:
-            await self.bot.edit_channel(self.bot.get_channel(settings.channels['giveaways']), topic=new_topic)
+            await bot.edit_channel(bot.get_channel(settings.channels['giveaways']), topic=new_topic)
             log.info("Topic updated in giveaways")
         except Exception as e:
             log.exception("Couldn't change topic in giveaways")
