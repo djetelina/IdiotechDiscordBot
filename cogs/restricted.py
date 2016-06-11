@@ -81,23 +81,25 @@ class Restricted:
         await self.bot.say('Moves like Jagger I tell you')
 
     @commands.command(hidden=True, description=desc.idiotech)
-    @checks.is_server_owner()
-    async def log(self, users: str):
+    #@checks.is_server_owner()
+    async def log(self, channel: str, users: str):
         # TODO Discuss what to do with this comand, it's not being used much
         users = users.split(';')
-        public = self.bot.get_channel(settings.channels['general'])
-        admin = self.bot.get_channel(settings.channels['admin'])
-        with open("log.txt", "w", encoding='utf-8') as logfile:
-            async for msg in self.bot.logs_from(public, limit=500):
-                if msg.author.name in users:
-                    string = "[{}] {}: {}\n".format(msg.timestamp, msg.author.name, msg.clean_content)
-                    logfile.write(string)
+        if channel in settings.channels:
+            admin = self.bot.get_channel(settings.channels['admin'])
+            with open("log.txt", "w", encoding='utf-8') as logfile:
+                async for msg in self.bot.logs_from(channel, limit=500):
+                    if msg.author.name in users:
+                        string = "[{}] {}: {}\n".format(msg.timestamp, msg.author.name, msg.clean_content)
+                        logfile.write(string)
 
-        with open("log.txt", "rb") as logfile:
-            await self.bot.send_file(admin, logfile, filename="log.txt",
-                                     content="Log file for mentioned users from last 500 messages in public channel.")
-        os.remove("log.txt")
-        log.info("Log file sent to admins for review")
+            with open("log.txt", "rb") as logfile:
+                await self.bot.send_file(admin, logfile, filename="log.txt",
+                                         content="Log file for mentioned users from last 500 messages in public channel.")
+            os.remove("log.txt")
+            log.info("Log file sent to admins for review")
+        else:
+            print("Not found")
 
 
 def setup(bot):
