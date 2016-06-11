@@ -85,7 +85,7 @@ class Restricted:
     async def log(self, users: str):
         users = users.split(';')
         messages = []
-        admin = self.bot.get_channel(settings.channels['admintest'])
+        admin = self.bot.get_channel(settings.channels['admin'])
 
         for channel in settings.channels:
             chan = self.bot.get_channel(settings.channels[channel])
