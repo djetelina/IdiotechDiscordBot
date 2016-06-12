@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.0.2.3
+-------
+* Added very simple spamfilter
+_____
+
 1.0.2.2
 -------
 * [!e3] which returns an E3 timetable
@@ -12,7 +17,6 @@ Changelog
 * Made a few visual changes
 * [!steam][bestsellers] which returns top 5 best selling games on Steam
 * Moved what was [!steam] to [!steam][status]
-_____
 
 1.0.2
 =====

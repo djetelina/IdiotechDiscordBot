@@ -21,9 +21,12 @@ async def on_message(message):
         return
 
     swear = bot.get_cog('Swear')
+    spam = bot.get_cog('SpamFilter')
 
     if swear is not None:
         await swear.message(message)
+    if spam is not None:
+        await spam.message(message)
 
     await bot.process_commands(message)
 
