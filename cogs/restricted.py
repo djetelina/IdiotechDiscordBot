@@ -83,21 +83,36 @@ class Restricted:
     @commands.command(hidden=True, description=desc.idiotech)
     @checks.is_server_owner()
     async def log(self, users: str):
-        # TODO Discuss what to do with this comand, it's not being used much
         users = users.split(';')
-        public = self.bot.get_channel(settings.channels['general'])
+        messages = []
         admin = self.bot.get_channel(settings.channels['admin'])
-        with open("log.txt", "w", encoding='utf-8') as logfile:
-            async for msg in self.bot.logs_from(public, limit=500):
+
+        for channel in settings.channels:
+            chan = self.bot.get_channel(settings.channels[channel])
+            messages.append("======================\n")
+            messages.append("MESSAGES FROM {}\n".format(channel))
+            messages.append("======================\n")
+            for_reversing = []
+            async for msg in self.bot.logs_from(chan, limit=500):
                 if msg.author.name in users:
-                    string = "[{}] {}: {}\n".format(msg.timestamp, msg.author.name, msg.clean_content)
-                    logfile.write(string)
+                    for_reversing.append("[{}] {}: {}\n".format(msg.timestamp, msg.author.name, msg.clean_content))
+
+            for msg in reversed(for_reversing):
+                messages.append(msg)
+
+        messages.append("======================\n")
+        messages.append("     END OF FILE")
+
+        w_log = open("log.txt", "w", encoding='utf-8')
+        w_log.writelines(messages)
+        w_log.close()
 
         with open("log.txt", "rb") as logfile:
             await self.bot.send_file(admin, logfile, filename="log.txt",
-                                     content="Log file for mentioned users from last 500 messages in public channel.")
+                                     content="Log file for mentioned users from last 500 messages in each channel.")
+
         os.remove("log.txt")
-        log.info("Log file sent to admins for review")
+        log.info("Logging Finished - File sent to admins for review")
 
 
 def setup(bot):
