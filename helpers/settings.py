@@ -27,16 +27,16 @@ facebook = "idiotechgaming"
 yt_channel = "UC0YagOInbZxj10gaWwb1Nag"
 reddit = "idiotechgaming"
 
-
+# Make sure to changes these if there are any new channels created/ removed
 channels = {
+    "rules": "179965419728273408",
     "admin": "176304607172100097",
     "mods": "188172983699767296",
-    "news": "179963038781276160",
     "general": "176293292865093632",
-    "rules": "179965419728273408",
     "gaming": "179945195280924673",
     "tabletop": "188081332834926592",
-    "technology": "188085243478147074",
+    "hardware": "188085243478147074",
     "programming": "188083195470807040",
     "giveaways": "188087131070005248",
+    "prison": "190355062118285312",
 }
