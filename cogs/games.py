@@ -53,11 +53,6 @@ class Games:
 
         self.bot = bot
 
-    # TODO - After E3 remove this command
-    @commands.command(description="E3 Timetable", brief="E3 Timetable")
-    async def e3(self):
-        await self.bot.say("http://www.e3countdown.com/")
-
     @commands.group(pass_context=True, description=desc.steam_status, brief=desc.steam_status)
     async def steam(self, ctx):
         if ctx.invoked_subcommand is None:
