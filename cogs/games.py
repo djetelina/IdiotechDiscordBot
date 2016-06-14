@@ -308,8 +308,8 @@ class Games:
         doc = bs4.BeautifulSoup(res.text, "html.parser")
         page = doc.select('div')
 
-        most_played = page[82].select('div')[2].getText()
-        most_games = page[82].select('div')[3].getText()
+        most_played = page[82].select('div[class="title"]')[0].getText()
+        most_games = page[82].select('div[class="description"]')[0].getText()
 
         stats = doc.find_all('td')
         # print(stats)
