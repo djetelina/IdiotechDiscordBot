@@ -17,11 +17,25 @@ class General:
         self.bot = bot
 
     @commands.command(description=desc.reddit, brief=desc.reddit)
-    async def reddit(self):  # returns link to sub-reddit
+    async def reddit(self):
         await self.bot.say("https://www.reddit.com/r/{}".format(settings.reddit))
 
+    @commands.command(description=desc.patreon, brief=desc.patreon)
+    async def patreon(self):
+        with aiohttp.ClientSession() as session:
+            async with session.get('http://api.patreon.com/user/{}'.format(settings.patreon_user)) as resp:
+                data = await resp.json()
+                if len(data["linked"]) > 0:
+                    patrons = str(data["linked"][0]["patron_count"])
+                    pledge = str(data["linked"][0]["pledge_sum"])[:-2]
+                else:
+                    patrons = "N/A"
+                    pledge = "N/A"
+        await self.bot.say("{0} patrons, ${1} per month. Become a patron: https://www.patreon.com/{2}".format(
+            patrons, pledge,settings.patreon))
+
     @commands.command(description=desc.github, brief=desc.github)
-    async def github(self):  # returns link to github for this bot
+    async def github(self):
         await self.bot.say("You can request features, contribute and report issues with the bot here:"
                            "\nhttps://github.com/iScrE4m/IdiotechDiscordBot")
 

@@ -64,7 +64,7 @@ class Giveaway:
 
                 random.seed()
                 winner = random.choice(self.enrolled)
-                log.info("Giveaway for {} is {}".format(self.game, winner.name))
+                log.info("{1} won {0}".format(self.game, winner.name))
 
                 await self.bot.send_message(self.channel, "{}'s giveaway winner of {} is: {}".format(
                     self.owner.mention, self.game, winner.mention))
@@ -257,10 +257,10 @@ class Giveaways:
 async def changetopic(bot):
         new_topic = "Giveaways running: {0} | Total enrolled: {1}".format(
             len(giveawayslist), sum(len(giveaway.enrolled) for giveaway in giveawayslist))
-        log.info("New topic in giveaways: {}".format(new_topic))
+        log.debug("New topic in giveaways: {}".format(new_topic))
         try:
             await bot.edit_channel(bot.get_channel(settings.channels['giveaways']), topic=new_topic)
-            log.info("Topic updated in giveaways")
+            log.debug("Topic updated in giveaways")
         except Exception as e:
             log.exception("Couldn't change topic in giveaways")
 

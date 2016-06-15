@@ -5,7 +5,6 @@ extensions = [
     'cogs.restricted',
     'cogs.stats',
     'cogs.weather',
-    'cogs.swear',
     'cogs.versioning',
     'cogs.games',
     'cogs.spamfilter',
@@ -27,6 +26,8 @@ twitter_handle = "idiotechgaming"
 facebook = "idiotechgaming"
 yt_channel = "UC0YagOInbZxj10gaWwb1Nag"
 reddit = "idiotechgaming"
+patreon = "IdiotechGaming"
+patreon_user = "3494381"
 
 # Make sure to changes these if there are any new channels created/ removed
 channels = {

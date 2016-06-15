@@ -94,6 +94,7 @@ twitter = "Link to Idiotech's Twitter"
 youtube = "Link to Idiotech's Channel and Details of most recent upload"
 fb = "Link to Idiotech's Facebook, also shows latest post"
 rules = "READ THE RULES!"
+patreon = "Information about Idiotech's Patreon"
 
 """
 Utility commands
