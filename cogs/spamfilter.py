@@ -13,12 +13,11 @@ class SpamFilter():
         if not message.channel.is_private:
             if len(message.author.roles) == 1:
                 if linkcheck(message.content):
-                    log.info("Suspicious (spam) message from {0.author.name} indetified, deleting".format(message))
+                    log.info("Suspicious (spam) message from {0.author.name} identified, deleting".format(message))
                     try:
                         await self.bot.delete_message(message)
                     except Exception as e:
                         log.exception("Can't delete the message")
-
 
 
 def linkcheck(msg):

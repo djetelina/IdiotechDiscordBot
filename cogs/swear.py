@@ -63,7 +63,7 @@ class Warns:
         await s.whisper(self.user, random.choice(self.warnings), self.bot)
         await self.bot.send_message(
             self.bot.get_channel(settings.channels['admin']),
-            "User {} seems to be swearing a lot. He now has {} penalty points".format(
+            "User {} seems to be swearing a lot. They now have {} penalty points".format(
                 self.user.mention, self.points))
         log.info("{0} has been warned for swearing".format(self.user.name))
 

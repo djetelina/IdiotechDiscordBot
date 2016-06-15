@@ -18,7 +18,7 @@ class Restricted:
     async def develop(self):
         await self.bot.say('iScrE4m is streaming my development over at http://twitch.tv/iScrE4m - come watch!')
 
-    @commands.command(hidden=True, description="not for you")
+    @commands.command(hidden=True, description=desc.iscream)
     @checks.is_dev()
     async def avatar(self, image: str):
         try:
@@ -44,7 +44,7 @@ class Restricted:
     async def nick(self, ctx, *, nick: str):
         try:
             await self.bot.change_nickname(ctx.message.server.me, nick)
-            await self.bot.say("I might have an identity crysis. New name accepted")
+            await self.bot.say("I might being having an identity crisis. New name accepted")
             log.info("New name updated")
         except Exception as e:
             log.exception("Couldn't change display name")

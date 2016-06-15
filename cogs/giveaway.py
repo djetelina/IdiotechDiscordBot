@@ -66,11 +66,11 @@ class Giveaway:
                 winner = random.choice(self.enrolled)
                 log.info("{1} won {0}".format(self.game, winner.name))
 
-                await self.bot.send_message(self.channel, "{}'s giveaway winner of {} is: {}".format(
+                await self.bot.send_message(self.channel, "{}'s giveaway of {} has been won by {}".format(
                     self.owner.mention, self.game, winner.mention))
                 await s.whisper(self.owner, "Winner of your giveaway for {}: {}".format(
                     self.game, winner.mention), self.bot)
-                await s.whisper(winner, "You won a giveaway for **{}** by {}".format(
+                await s.whisper(winner, "You won a giveaway for **{}**, don't forget to thank {}!".format(
                     self.game, self.owner.mention), self.bot)
 
                 if self.code:
@@ -81,7 +81,7 @@ class Giveaway:
             except IndexError:
                 await self.bot.send_message(
                     self.channel, "Nobody enrolled for {} and the giveaway has concluded".format(self.game))
-                await s.whisper(self.owner, "Nobody enrolled for your giveaway of {}".format(self.game), self.bot)
+                await s.whisper(self.owner, "Nobody enrolled for your giveaway for {}".format(self.game), self.bot)
 
             giveawayslist.remove(self)
             await changetopic(self.bot)
@@ -158,7 +158,7 @@ class Giveaways:
             """, self.bot)
 
         else:
-            await s.whisper(ctx.message.author, "You already have one giveaway open", self.bot)
+            await s.whisper(ctx.message.author, "You already have a giveaway open", self.bot)
 
     @giveaway.command(name="link", pass_context=True, description=desc.link_ga, brief=desc.link_ga_brief)
     async def _link(self, ctx, url: str):
@@ -221,7 +221,7 @@ class Giveaways:
         found = 0
 
         if len(giveawayslist) == 0:
-            await s.whisper(user, "There are no giveaway opened", self.bot)
+            await s.whisper(user, "There are no giveaways open to enter!", self.bot)
             return
 
         for opened in giveawayslist:
@@ -229,22 +229,23 @@ class Giveaways:
                 if ctx.message.channel == opened.channel and user not in opened.enrolled:
                     opened.enroll(user)
                     found = 1
-                    await s.whisper(user, "You enrolled for {}".format(game), self.bot)
+                    await s.whisper(user, "You enrolled for {}, good luck!".format(game), self.bot)
                     break
 
                 elif user in opened.enrolled:
                     found = 1
-                    await s.whisper(user, "You are already enrolled for this game", self.bot)
+                    await s.whisper(user, "You have already enrolled for this game", self.bot)
                     break
 
                 else:
                     found = 1
-                    await s.whisper(user, "You tried to enter a giveaway from  wrong channel, sorry can't do that",
+                    await s.whisper(user, "You tried to enter a giveaway from  wrong channel.\n"
+                                          "I'm sorry {}, I'm afraid I can't let you do that.".format(user.mention),
                                     self.bot)
                     break
 
         if not found:
-            await s.whisper(user, "Giveaway for the game you mentioned not found", self.bot)
+            await s.whisper(user, "Giveaway for the game you gave does not exists, check your spelling.", self.bot)
 
         try:
             await self.bot.delete_message(ctx.message)

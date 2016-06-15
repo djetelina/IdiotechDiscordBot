@@ -32,7 +32,7 @@ class General:
                     patrons = "N/A"
                     pledge = "N/A"
         await self.bot.say("{0} patrons, ${1} per month. Become a patron: https://www.patreon.com/{2}".format(
-            patrons, pledge,settings.patreon))
+            patrons, pledge, settings.patreon))
 
     @commands.command(description=desc.github, brief=desc.github)
     async def github(self):
@@ -67,7 +67,7 @@ class General:
         await self.bot.say('https://twitter.com/{}'.format(settings.twitter_handle))
 
     @commands.command(description=desc.fb, brief=desc.fb)
-    async def facebook(self):  # finds latest facebbok post and returns it, along with link to page
+    async def facebook(self):  # finds latest facebook post and returns it, along with link to page
 
         with aiohttp.ClientSession() as session:
             async with session.get('https://graph.facebook.com/v2.6/{}/posts'
@@ -162,9 +162,9 @@ https://www.facebook.com/idiotechgaming/""".format(d, tc.get_date_suf(d), calend
 
 def get_time() -> dict:
     """
-   Function to get local time in cities
-   :return: Dictionary with {"city":"%H:%M"}
-   """
+    Function to get local time in cities
+    :return: Dictionary with {"city":"%H:%M"}
+    """
     places = {'sf': 'US/Pacific', 'london': 'Europe/London', 'sydney': 'Australia/Sydney', 'perth': 'Australia/Perth',
               'ny': 'US/Eastern'}
     output = {}
