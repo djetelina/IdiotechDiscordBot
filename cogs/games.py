@@ -36,15 +36,15 @@ class Game:
             response = "{0} left {1}".format(user.name, self.game)
             log.info(response)
         else:
-            response = "{0} You can't leave a game you didn't join!".format(user.mention)
-            log.info("{0} tried leaving a game he wasn't part of".format(user.name))
+            response = "{0} You can't leave a game because you aren't in one!".format(user.mention)
+            log.info("{0} tried leaving a game whilst not in one".format(user.name))
         return response
 
     def cancel(self):
         for k, v in games.items():
             if v == self:
                 del games[k]
-                log.info("{} canceled their game".format(self.owner.name))
+                log.info("{} closed their game".format(self.owner.name))
                 break
 
 
@@ -99,7 +99,6 @@ class Games:
         # because we want sub-commands to be dynamic based on our self.dates dictionary
         with aiohttp.ClientSession() as session:
             url = "http://extrarandom-test.ddns.net:5000/dates"
-            # url = "http://localhost:5000/dates"
             async with session.get(url) as resp:
                 try:
                     data = await resp.json()
@@ -185,15 +184,15 @@ class Games:
         for game_name, running_game in games.items():
             if ctx.message.author == running_game.owner:
                 is_playing = True
-                reply = "You are already maintiang one game, close that one first!"
-                log.info("{} tried opening a game but he already owns one".format(
+                reply = "You are already hosting one game, close it to start another!"
+                log.info("{} tried opening a game but they are already hosting one".format(
                     ctx.message.author.name))
                 break
             for player in running_game.players:
                 if ctx.message.author == player:
                     is_playing = True
-                    reply = "You are already playing, leave the other game first by `!game leave`"
-                    log.info("{} tried opening a game but he is playing a different one".format(
+                    reply = "You are already in a game, leave the other game first by `!game leave`"
+                    log.info("{} tried opening a game whilst they were already in one".format(
                         ctx.message.author.name))
                     break
 
@@ -201,13 +200,13 @@ class Games:
             Game(game, ctx.message.author, self.bot)
             reply = """Your game is now open!
 
-            Why not telling people how to join you, where are you playing etc.?
+            Why not tell people how to join you, where are you playing etc.?
             `!game description <ANYTHING>`
 
             Done with your playing session? Remember to clean up after yourself!
             `!game close`
             """
-            await self.bot.say("{} just opened a community game, let's play {}!".format(
+            await self.bot.say("{} just opened a game of {}, type `!game join {}` to join!".format(
                 ctx.message.author.name, game))
             log.info("Game {} by {} opened".format(game, ctx.message.author.name))
 
@@ -219,14 +218,14 @@ class Games:
             if ctx.message.author == running_game.owner:
                 running_game.description = description
                 await s.whisper(ctx.message.author, "Description for your community game accepted", self.bot)
-                log.info("Description for game by {} provided".format(ctx.message.author.name))
+                log.info("Description for game hosted by {} provided".format(ctx.message.author.name))
 
     @play.command(name="close", pass_context=True, description=desc.game_close, brief=desc.game_close)
     async def _close(self, ctx):
         for game_name, running_game in games.items():
             if ctx.message.author == running_game.owner:
                 to_close = running_game.cancel()
-                await self.bot.say("Session for {0} is now closed!".format(running_game.game))
+                await self.bot.say("Session for {0} has been closed!".format(running_game.game))
                 break
 
     @play.command(name="join", pass_context=True, description=desc.game_join, brief=desc.game_join)
@@ -270,7 +269,7 @@ class Games:
             for player in running_game.players:
                 if ctx.message.author == player:
                     running_game.players.remove(player)
-                    self.bot.say("{0} is no longer playing {1}".format(player, running_game.game))
+                    self.bot.say("{0} is stopped playing {1}".format(player, running_game.game))
                     log.info("{0} left game {1}".format(player, running_game.game))
 
     @commands.command(description=desc.ow, brief=desc.owb)
@@ -362,7 +361,7 @@ async def get_status(fmt):
                     reply = "This error has occurred because you entered an incorrect format for get_status()."
 
             else:
-                reply = "Failed connecting to API - Error: {}".format(data["result"]["error"])
+                reply = "Failed to connect to API - Error: {}".format(data["result"]["error"])
 
     return reply
 

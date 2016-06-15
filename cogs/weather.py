@@ -44,7 +44,7 @@ class Weather:
                                                                                          brief, desc, cloud))
 
         else:
-            await self.bot.say("**Error:** City cannot contains spaces, use underscores instead of spaces.\n"
+            await self.bot.say("**Error:** City name cannot contains spaces, use underscores instead of spaces.\n"
                                "E.g. 'New_York' instead of 'New York'")
 
 
