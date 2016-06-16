@@ -8,6 +8,7 @@ extensions = [
     'cogs.versioning',
     'cogs.games',
     'cogs.spamfilter',
+    #'cogs.currency',
 ]
 
 # Status message for bot
