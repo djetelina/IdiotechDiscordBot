@@ -152,3 +152,9 @@ VERSIONING
 
 v_command = "My version number"
 changelog = "My latest changes"
+
+"""
+CURRENCY
+"""
+
+cc = "Convert currencies!"

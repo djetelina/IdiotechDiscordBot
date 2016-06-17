@@ -1,11 +1,9 @@
 import logging
 
-from discord import errors
-
 log = logging.getLogger(__name__)
 
 
-class SpamFilter():
+class SpamFilter:
     def __init__(self, bot):
         self.bot = bot
 
@@ -13,7 +11,8 @@ class SpamFilter():
         if not message.channel.is_private:
             if len(message.author.roles) == 1:
                 if linkcheck(message.content):
-                    log.info("Suspicious (spam) message from {0.author.name} identified, deleting".format(message))
+                    log.warning("Suspicious message from {0.author.name} identified, deleting."
+                                "Message: {0.content}".format(message))
                     try:
                         await self.bot.delete_message(message)
                     except Exception as e:
@@ -22,7 +21,7 @@ class SpamFilter():
 
 def linkcheck(msg):
     no_space_msg = msg.replace(" ", "").lower()
-    suspicious = ["http", "www", ".com", "://", "g2a"]
+    suspicious = ["http", "www", ".com", "://", "g2a", "dotcom"]
     for word in suspicious:
         if word in no_space_msg:
             return True

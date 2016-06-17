@@ -33,10 +33,14 @@ async def on_message(message):
 
 @bot.event
 async def on_command(command, ctx):
+    if ctx.subcommand_passed is not None:
+        cmd = "{0.name} {1.subcommand_passed}".format(command, ctx)
+    else:
+        cmd = command.name
     try:
-        log.info("#{2}: {1} called {0}".format(command.name, ctx.message.author.name, ctx.message.channel.name))
+        log.info("#{1.message.channel.name}: {1.message.author.name} called `!{0}`".format(cmd, ctx))
     except AttributeError:
-        log.info("PM: {1} called {0}".format(command.name, ctx.message.author.name))
+        log.info("PM: {1.message.author.name} called `!{0}`".format(cmd, ctx))
 
     stats = bot.get_cog('Stats')
     if stats is not None:

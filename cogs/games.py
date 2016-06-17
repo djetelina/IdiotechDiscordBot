@@ -96,8 +96,9 @@ class Games:
     @commands.command(pass_context=True, description=desc.release_dates, brief=desc.release_datesb)
     async def release(self, ctx):
         # We are using manual argument detection instead of @commands.group,
-        # because we want sub-commands to be dynamic based on our self.dates dictionary
+        # because our subcommand is actually search.
         with aiohttp.ClientSession() as session:
+            # API is maintained by Extra_Random
             url = "http://extrarandom-test.ddns.net:5000/dates"
             async with session.get(url) as resp:
                 try:
@@ -126,7 +127,8 @@ class Games:
                         if "second" in game_list[release_date]:
                             second = game_list[release_date]["second"]
 
-                        dates.update({name: datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))})
+                        dates.update(
+                            {name: datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))})
                 except json.decoder.JSONDecodeError:
                     await self.bot.say("Error getting dates from server - Try again later")
                     log.info("Couldn't get dates.json from server. Check http://extrarandom-test.ddns.net:5000/test is "
@@ -206,7 +208,7 @@ class Games:
             Done with your playing session? Remember to clean up after yourself!
             `!game close`
             """
-            await self.bot.say("{} just opened a game of {}, type `!game join {}` to join!".format(
+            await self.bot.say("{0} just opened a game of {1}, type `!game join {1}` to join!".format(
                 ctx.message.author.name, game))
             log.info("Game {} by {} opened".format(game, ctx.message.author.name))
 
@@ -224,7 +226,7 @@ class Games:
     async def _close(self, ctx):
         for game_name, running_game in games.items():
             if ctx.message.author == running_game.owner:
-                to_close = running_game.cancel()
+                running_game.cancel()
                 await self.bot.say("Session for {0} has been closed!".format(running_game.game))
                 break
 
@@ -332,6 +334,7 @@ class Games:
                                          "Most Played Hero:   *{5}, {6} played*"
                                          "".format(battletag, reg.upper(), time_played, games_played,
                                                    won_lost, most_played, most_games, win_percent))
+
 
 async def get_status(fmt):
     steam_api = 'http://is.steam.rip/api/v1/?request=SteamStatus'

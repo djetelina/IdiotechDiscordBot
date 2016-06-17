@@ -1,5 +1,6 @@
 import aiohttp
 from discord.ext import commands
+from helpers import descriptions as desc
 
 
 class Currency:
@@ -40,8 +41,11 @@ class Currency:
                          "ZAR": "R",  # "South African Rand"
                          }
 
-    @commands.command(hidden=True)
+    @commands.command(desc=desc.cc, brief=desc.cc)
     async def cc(self, amount: float, base: str, to: str):
+        """
+        example: `!cc 50 EUR USD`
+        """
         base = base.upper()
         to = to.upper()
         amount = round(amount, 2)

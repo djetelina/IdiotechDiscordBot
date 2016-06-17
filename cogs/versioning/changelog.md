@@ -1,14 +1,23 @@
 Changelog
 =========
 
+1.0.2.4
+-------
+* Added command to help you convert currencies! 
+* [!cc][<number> <from> <to>] for example `!cc 50 USD EUR`
+
+* Added [!patreon][] to check/show many patrons give how much money to Idiotech <3 
+* Removed [!e3][] command
+* Grammar fixes
+_____
+
 1.0.2.3
 -------
 * Added very simple spamfilter
-_____
 
 1.0.2.2
 -------
-* [!e3] which returns an E3 timetable
+* [!e3][] which returns an E3 timetable
 * [!steam][sales] - returns link to webpage will list of sales on
 * Fixed giveaway topic not updating after a giveaway was closed
 
