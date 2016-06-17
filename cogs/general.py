@@ -64,6 +64,7 @@ class General:
 
     @commands.command(description=desc.twitter, brief=desc.twitter)
     async def twitter(self):  # returns link to Idiotech's twitter
+        # TODO Use api to pull latest tweet(s?) https://dev.twitter.com/rest/public
         await self.bot.say('https://twitter.com/{}'.format(settings.twitter_handle))
 
     @commands.command(description=desc.fb, brief=desc.fb)

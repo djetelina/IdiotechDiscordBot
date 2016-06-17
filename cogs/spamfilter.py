@@ -21,7 +21,7 @@ class SpamFilter:
 
 def linkcheck(msg):
     no_space_msg = msg.replace(" ", "").lower()
-    suspicious = ["http", "www", ".com", "://", "g2a", "dotcom"]
+    suspicious = ["http", "www", ".com", "://", "g2a", "dotcom", "kinguin", "youtu.be", "/channel/"]
     for word in suspicious:
         if word in no_space_msg:
             return True

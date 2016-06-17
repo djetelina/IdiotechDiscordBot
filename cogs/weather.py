@@ -2,7 +2,7 @@ import aiohttp
 import pycountry
 from discord.ext import commands
 
-from helpers import tokens as t
+from helpers import tokens as t, descriptions as desc
 
 
 class Weather:
@@ -13,8 +13,7 @@ class Weather:
         self.base_url = "http://api.openweathermap.org/data/2.5/weather?q="
         self.a_url = "&appid="
 
-    @commands.command(passcontext=True, description="Get Weather Status in <loc> (a given city name)",
-                      brief="Finds Weather Status for input city")
+    @commands.command(passcontext=True, description=desc.weather, brief=desc.weatherb)
     async def weather(self, *, loc: str):
         spaces = ' ' in loc
         if not spaces:
