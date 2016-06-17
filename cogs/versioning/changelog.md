@@ -6,7 +6,7 @@ Changelog
 * Added command to help you convert currencies! 
 * [!cc][<number> <from> <to>] for example `!cc 50 USD EUR`
 
-* Added [!patreon][] to check/show many patrons give how much money to Idiotech <3 
+* Added [!patreon][] to check and show how many patrons give how much money to Idiotech 
 * Removed [!e3][] command
 * Grammar fixes
 _____
