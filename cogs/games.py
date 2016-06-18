@@ -4,7 +4,7 @@ import bs4
 import requests
 import json
 
-from helpers import descriptions as desc, time_calculations as tc, simplify as s
+from helpers import descriptions as desc, time_calculations as tc, simplify as s, settings
 
 from datetime import datetime
 
@@ -99,7 +99,7 @@ class Games:
         # because our subcommand is actually search.
         with aiohttp.ClientSession() as session:
             # API is maintained by Extra_Random
-            url = "http://extrarandom-test.ddns.net:5000/dates"
+            url = "{}/dates".format(settings.ex_api)
             async with session.get(url) as resp:
                 try:
                     data = await resp.json()

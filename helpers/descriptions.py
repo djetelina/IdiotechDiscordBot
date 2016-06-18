@@ -158,3 +158,10 @@ CURRENCY
 """
 
 cc = "Convert currencies!"
+
+"""
+WEATHER
+"""
+
+weather = "Get Weather Status in <loc> (a given city name)"
+weatherb = "Finds Weather Status for input city"
