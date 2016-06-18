@@ -8,6 +8,8 @@ extensions = [
     'cogs.spamfilter',
     'cogs.currency',
 ]
+# URL for the API
+ex_api = "http://extrarandom-test.ddns.net:5000"
 
 # Status message for bot
 now_playing = "!help"
