@@ -1,6 +1,5 @@
 .idea/
 cogs/avatar/
 cogs/db/
-helpers/tokens.py
 *.log
 *.pyc

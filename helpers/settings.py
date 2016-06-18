@@ -3,8 +3,6 @@ extensions = [
     'cogs.giveaway',
     'cogs.general',
     'cogs.restricted',
-    'cogs.stats',
-    'cogs.weather',
     'cogs.versioning',
     'cogs.games',
     'cogs.spamfilter',

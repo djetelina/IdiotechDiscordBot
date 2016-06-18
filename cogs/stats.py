@@ -6,6 +6,7 @@ from discord.ext import commands
 
 from helpers import descriptions as desc
 
+# TODO postgresql (reason being Heroku)
 
 class Stats:
     def __init__(self, bot):
