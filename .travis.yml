@@ -3,3 +3,6 @@ python:
 - "3.5"
 install: "pip install -r requirements.txt"
 script: python -m tests.maintest
+addons:
+    code_climate:
+        repo_token: 058c3e88739f04ae4ff0e0250434052b9fdc1c7ab6be3b21315b1a8db3ac233d
