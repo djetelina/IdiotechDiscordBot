@@ -27,6 +27,7 @@ class GiveawaysDB(Base):
 class Stats:
     def __init__(self, bot):
         self.bot = bot
+        logging.info(os.environ.get("DATABASE_URL"))
         self.engine = create_engine(os.environ.get("DATABASE_URL"))
         if not database_exists(self.engine.url):
             logging.info("Database not found")
