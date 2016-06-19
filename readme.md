@@ -20,7 +20,7 @@ To request a feature please use [issue tracker](https://github.com/iScrE4m/Idiot
 * Create Discord app and bot user [here](https://discordapp.com/developers/applications/me)
 * Setup [Heroku](https://www.heroku.com/)
 * Run heroku addons:create heroku-postgresql:hobby-dev
-* Create config variables based on helpers/tokens.py
+* Create config variables based on helpers/tokens.py and add `ON_HEROKU` (bind literally any var to it)
 * Run remote through Heroku (heroku ps:scale worker=1)
 
 ### Local

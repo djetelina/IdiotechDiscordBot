@@ -1,7 +1,5 @@
 import os
 import logging
-import psycopg2
-from urllib import parse
 
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
@@ -20,6 +18,7 @@ class CommandsDB(Base):
     command = Column(String(250), nullable=False)
     used = Column(Integer, default=1)
 
+
 class GiveawaysDB(Base):
     __tablename__="giveaways"
     id = Column(Integer, primary_key=True)
@@ -27,41 +26,23 @@ class GiveawaysDB(Base):
     given = Column(Integer, default=1)
 
 
-
 class Stats:
     def __init__(self, bot):
         self.bot = bot
-        logging.info(os.environ.get("DATABASE_URL"))
-        self.engine = create_engine("postgres://", creator=self.connect, echo=True)
-        if not database_exists(self.engine.url):
-            logging.info("Database not found")
-            create_database(self.engine.url)
-            logging.info("Database created")
+        self.engine = create_engine(os.environ.get("DATABASE_URL"))
+        logging.debug(self.engine)
+        if "ON_HEROKU" not in os.environ:
+            if not database_exists(self.engine.url):
+                logging.info("Database not found")
+                create_database(self.engine.url)
+                logging.info("Database created")
         Base.metadata.create_all(self.engine)
         Base.metadata.bind= self.engine
         self.Session = sessionmaker(bind=self.engine)
         self.db = self.Session()
+        logging.info(self.db)
         self.sessioncmd = 0
         self.sessionga = 0
-
-    def connect(self):
-        logging.info("connect called")
-        parse.uses_netloc.append("postgres")
-        url = parse.urlparse(os.environ["DATABASE_URL"])
-        logging.info(url)
-        logging.info(url.path)
-        logging.info(url.username)
-        logging.info(url.password)
-        logging.info(url.hostname)
-        logging.info(url.port)
-
-
-        return psycopg2.connect(database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port
-        )
 
     async def on_command_p(self, command: str):
         self.sessioncmd += 1
