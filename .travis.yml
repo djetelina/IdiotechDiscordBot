@@ -3,9 +3,9 @@ python:
 - "3.5"
 install: "pip install -r requirements.txt"
 services:
-  -postgresql
+  - postgresql
 before_script:
-  -psql -c 'create database idiobot;' -U postgres
+  - psql -c 'create database idiobot;' -U postgres
 script: python -m tests.maintest
 addons:
     code_climate:
