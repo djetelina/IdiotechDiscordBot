@@ -7,6 +7,7 @@ extensions = [
     'cogs.games',
     'cogs.spamfilter',
     'cogs.currency',
+    'cogs.stats',
 ]
 # URL for the API
 ex_api = "http://extrarandom-test.ddns.net:5000"

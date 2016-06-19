@@ -19,11 +19,14 @@ To request a feature please use [issue tracker](https://github.com/iScrE4m/Idiot
 
 * Create Discord app and bot user [here](https://discordapp.com/developers/applications/me)
 * Setup [Heroku](https://www.heroku.com/)
+* Run heroku addons:create heroku-postgresql:hobby-dev
 * Create config variables based on helpers/tokens.py
 * Run remote through Heroku (heroku ps:scale worker=1)
 
 ### Local
 * Install Python 3.5+
 * Run ```pip install -r requirements.txt```
-* Create .env file (you can skip the next step if you are on linux using autoenv, just run python main.py then)
+* Create .env file with local variables
+* Create local Postgresql db and add it to .env as DATABASE_URL
 * Run using `heroku local` (if you have Heroku set up) or `foreman start` (https://github.com/vlucas/phpdotenv)
+    * If you are on linux using autoenv, you can `python main.py` from your env
