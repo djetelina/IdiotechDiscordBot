@@ -50,11 +50,13 @@ class Currency:
         to = to.upper()
         amount = round(amount, 2)
         if base not in self.currency:
-            await self.bot.say("Currency '{}' unavailable for conversion.".format(base))
+            await self.bot.say("Currency '{}' unavailable for conversion.".format(
+                base))
             return
 
         if to not in self.currency:
-            await self.bot.say("Currency '{}' unavailable for conversion.".format(to))
+            await self.bot.say("Currency '{}' unavailable for conversion.".format(
+                to))
             return
 
         with aiohttp.ClientSession() as session:
@@ -68,10 +70,12 @@ class Currency:
                     base_s = self.currency[base]
                     to_s = self.currency[to]
 
-                    await self.bot.say("{}{} ({}) is {}{} ({})".format(amount, base_s, base, result, to_s, to))
+                    await self.bot.say("{}{} ({}) is {}{} ({})".format(
+                        amount, base_s, base, result, to_s, to))
 
                 except Exception:
-                    await self.bot.say("An error occurred whilst getting currencies. Check spellings.")
+                    await self.bot.say(
+                        "An error occurred whilst getting currencies. Check spellings.")
                     return
 
 

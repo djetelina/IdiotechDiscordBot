@@ -107,32 +107,12 @@ class Games:
                     data = data["results"]
                     game_list = data["games"]
 
-                    dates = {}
+                    dates = self.release_dates(game_list)
 
-                    for release_date in game_list:
-                        name = release_date
-
-                        hour = 0
-                        minute = 0
-                        second = 0
-
-                        day = game_list[release_date]["day"]
-                        month = game_list[release_date]["month"]
-                        year = game_list[release_date]["year"]
-
-                        if "hour" in game_list[release_date]:
-                            hour = game_list[release_date]["hour"]
-                        if "minute" in game_list[release_date]:
-                            minute = game_list[release_date]["minute"]
-                        if "second" in game_list[release_date]:
-                            second = game_list[release_date]["second"]
-
-                        dates.update(
-                            {name: datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))})
                 except json.decoder.JSONDecodeError:
                     await self.bot.say("Error getting dates from server - Try again later")
-                    log.info("Couldn't get dates.json from server. Check http://extrarandom-test.ddns.net:5000/test is "
-                             "online.")
+                    log.warning("Couldn't get dates.json from server. Check if "
+                             "http://extrarandom-test.ddns.net:5000/test is online.")
                     return
 
         for game in dates:
@@ -142,27 +122,55 @@ class Games:
         arg = " ".join(ctx.message.content.split()[1:])
 
         if len(arg) > 0:
-            found = False
-            msg = "Found games starting with `{}`:\n\n```Ruby\n".format(arg.capitalize())
-            for game in dates:
-                if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
-                    days, hrs, mins = tc.calc_until(dates[game])
-                    msg += "{}\n".format(tc.create_msg(game, days, hrs, mins, maxlen))
-                    found = True
-
-            if not found:
-                msg += ("No game in our release list found, that starts with {}".format(arg))
-
-            msg += "```"
+            msg = self.game_found(arg, dates, maxlen)
 
         else:
             msg = "**Release Dates List**\n\n```Ruby\n"
             for game, time in sorted(dates.items(), key=lambda x: x[1]):
                 days, hrs, mins = tc.calc_until(dates[game])
-                msg += "{}\n".format(tc.create_msg(game, days, hrs, mins, maxlen))
+                msg += "{}\n".format(tc.create_msg(
+                    game, days, hrs, mins, maxlen))
             msg += "```"
 
         await self.bot.say(msg)
+
+    def game_found(self, arg, dates, maxlen):
+        found = False
+        msg = "Found games starting with `{}`:\n\n```Ruby\n".format(arg.capitalize())
+        for game in dates:
+            if game.lower().startswith(arg.lower()) or game.lower() is arg.lower():
+                days, hrs, mins = tc.calc_until(dates[game])
+                msg += "{}\n".format(tc.create_msg(game, days, hrs, mins, maxlen))
+                found = True
+
+        if not found:
+            msg += ("No game in our release list found, that starts with {}".format(arg))
+
+        msg += "```"
+        return msg
+
+    def release_dates(self, game_list):
+        dates = {}
+        for release_date in game_list:
+            name = release_date
+            hour = 0
+            minute = 0
+            second = 0
+
+            day = game_list[release_date]["day"]
+            month = game_list[release_date]["month"]
+            year = game_list[release_date]["year"]
+
+            if "hour" in game_list[release_date]:
+                hour = game_list[release_date]["hour"]
+            if "minute" in game_list[release_date]:
+                minute = game_list[release_date]["minute"]
+            if "second" in game_list[release_date]:
+                second = game_list[release_date]["second"]
+
+            dates.update(
+                  {name: datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))})
+        return dates
 
     @commands.group(name="game", pass_context=True, description=desc.game, brief=desc.game)
     async def play(self, ctx):

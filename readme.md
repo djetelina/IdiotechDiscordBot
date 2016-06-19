@@ -9,6 +9,7 @@ Bot for [Idiotech's Discord Server](https://discord.gg/0z3KQXI6apyyeNOD)
 * Don't collect any longterm user information (not even chat logs)
 * Make your code readable by humans
 * Document if you can
+* Use pep8 with 120 max-length (PyCharm recommended)
 
 ## Request a feature
 

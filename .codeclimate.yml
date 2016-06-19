@@ -6,8 +6,6 @@ engines:
       - python
   fixme:
     enabled: true
-  pep8:
-    enabled: true
   radon:
     enabled: true
 ratings:
