@@ -1,5 +1,7 @@
 import os
 import logging
+import psycopg2
+import urllib.parse as parse
 
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
@@ -24,11 +26,12 @@ class GiveawaysDB(Base):
     game = Column(String(250), nullable=False)
     given = Column(Integer, default=1)
 
+
+
 class Stats:
     def __init__(self, bot):
         self.bot = bot
-        logging.info(os.environ.get("DATABASE_URL"))
-        self.engine = create_engine(os.environ.get("DATABASE_URL"))
+        self.engine = create_engine("postgres://", creator=lambda: self.connect)
         if not database_exists(self.engine.url):
             logging.info("Database not found")
             create_database(self.engine.url)
@@ -39,6 +42,24 @@ class Stats:
         self.db = self.Session()
         self.sessioncmd = 0
         self.sessionga = 0
+
+    def connect(self):
+        parse.uses_netloc.append("postgres")
+        url = parse.urlparse(os.environ["DATABASE_URL"])
+        logging.info(url)
+        logging.info(url.path)
+        logging.info(url.username)
+        logging.info(url.password)
+        logging.info(url.hostname)
+        logging.info(url.port)
+        conn = psycopg2.connect(database=url.path[1:],
+            user=url.username,
+            password=url.password,
+            host=url.hostname,
+            port=url.port
+        )
+
+        return conn
 
     async def on_command_p(self, command: str):
         self.sessioncmd += 1
