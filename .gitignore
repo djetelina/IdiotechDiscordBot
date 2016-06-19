@@ -3,3 +3,4 @@ cogs/avatar/
 cogs/db/
 *.log
 *.pyc
+*.env

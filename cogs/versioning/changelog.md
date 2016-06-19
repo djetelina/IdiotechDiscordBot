@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.0.3
+=====
+* I'm now running from a server, YAY!
+* For potentional developers: It's now a bit more complicated to run me for testing, but it made other things a lot easier and better!
+_____
+
 1.0.2.4
 -------
 * Added command to help you convert currencies! 
@@ -9,7 +15,6 @@ Changelog
 * Added [!patreon][] to check and show how many patrons give how much money to Idiotech 
 * Removed [!e3][] command
 * Grammar fixes
-_____
 
 1.0.2.3
 -------

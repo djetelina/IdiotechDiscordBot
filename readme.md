@@ -6,8 +6,7 @@ Bot for [Idiotech's Discord Server](https://discord.gg/0z3KQXI6apyyeNOD)
 
 ## Rules for developing
 
-* Don't collect any user information (not even chat logs)
-    * Our logger is in 'w' filemode, no long term collecting!
+* Don't collect any longterm user information (not even chat logs)
 * Make your code readable by humans
 * Document if you can
 
@@ -15,18 +14,15 @@ Bot for [Idiotech's Discord Server](https://discord.gg/0z3KQXI6apyyeNOD)
 
 To request a feature please use [issue tracker](https://github.com/iScrE4m/IdiotechDiscordBot/issues)
 
-## Requirements
+## Run your testing branch
 
-run ```pip install -r requirements.txt```
+* Create Discord app and bot user [here](https://discordapp.com/developers/applications/me)
+* Setup [Heroku](https://www.heroku.com/)
+* Create config variables based on helpers/tokens.py
+* Run remote through Heroku (heroku ps:scale worker=1)
 
-* Python 3.5+
-* [discord.py](https://github.com/Rapptz/discord.py)
-* bs4
-* requests
-* pytz
-* Pycountry
-
-## Info
-
-* [Server Invite](https://discord.gg/0z3KQXI6apyyeNOD)
-* [Idiotech's YouTube](https://www.youtube.com/channel/UC0YagOInbZxj10gaWwb1Nag)
+### Local
+* Install Python 3.5+
+* Run ```pip install -r requirements.txt```
+* Create .env file (you can skip the next step if you are on linux using autoenv, just run python main.py then)
+* Run using `heroku local` (if you have Heroku set up) or `foreman start` (https://github.com/vlucas/phpdotenv)
