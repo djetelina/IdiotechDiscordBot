@@ -76,7 +76,7 @@ class Giveaway:
                 if self.code:
                     await s.whisper(winner, "Your game code: {}".format(self.code), self.bot)
                     await s.whisper(self.owner, "I have sent them the code you provided.", self.bot)
-                    log.info("Code sent to winner")
+                    log.info("Code sent to the winner")
 
             except IndexError:
                 await self.bot.send_message(

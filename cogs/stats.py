@@ -40,7 +40,7 @@ class Stats:
         Base.metadata.bind= self.engine
         self.Session = sessionmaker(bind=self.engine)
         self.db = self.Session()
-        logging.info(self.db)
+        logging.debug(self.db)
         self.sessioncmd = 0
         self.sessionga = 0
 

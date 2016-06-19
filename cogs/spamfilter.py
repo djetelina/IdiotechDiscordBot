@@ -1,4 +1,5 @@
 import logging
+from helpers import settings
 
 log = logging.getLogger(__name__)
 
@@ -11,8 +12,10 @@ class SpamFilter:
         if not message.channel.is_private:
             if len(message.author.roles) == 1:
                 if linkcheck(message.content):
-                    log.warning("Suspicious message from {0.author.name} identified, deleting."
-                                "Message: {0.content}".format(message))
+                    announce = "Suspicious message from {0.author.name} identified, deleting. "\
+                                "Message: {0.content}".format(message)
+                    log.warning(announce)
+                    await self.bot.send_message(self.bot.get_channel(settings.channels['admin']), announce)
                     try:
                         await self.bot.delete_message(message)
                     except Exception as e:
