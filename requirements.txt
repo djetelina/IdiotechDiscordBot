@@ -7,3 +7,4 @@ pytz
 cffi
 sqlalchemy
 sqlalchemy_utils
+psycopg2
