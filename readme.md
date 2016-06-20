@@ -1,8 +1,10 @@
 # Idiotech's Discord Bot
 
-[![Build Status](https://travis-ci.org/iScrE4m/IdiotechDiscordBot.svg?branch=master)](https://travis-ci.org/iScrE4m/IdiotechDiscordBot) [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php) [![Code Climate](https://codeclimate.com/github/iScrE4m/IdiotechDiscordBot/badges/gpa.svg)](https://codeclimate.com/github/iScrE4m/IdiotechDiscordBot) [![Test Coverage](https://codeclimate.com/github/iScrE4m/IdiotechDiscordBot/badges/coverage.svg)](https://codeclimate.com/github/iScrE4m/IdiotechDiscordBot/coverage)  
+**Development stopped**: Idiotech no longer wishes for the bot to be on his server.
 
-Bot for [Idiotech's Discord Server](https://discord.gg/0z3KQXI6apyyeNOD)
+[![Build Status](https://travis-ci.org/iScrE4m/IdiotechDiscordBot.svg?branch=master)](https://travis-ci.org/iScrE4m/IdiotechDiscordBot) [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php) [![Code Climate](https://codeclimate.com/github/iScrE4m/IdiotechDiscordBot/badges/gpa.svg)](https://codeclimate.com/github/iScrE4m/IdiotechDiscordBot)
+
+Bot for Idiotech's Discord Server
 
 ## Rules for developing
 
