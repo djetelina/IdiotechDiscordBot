@@ -11,7 +11,7 @@ except:
 main = """Bot for Idiotech's Discord{}
 
 Owner: iScrE4m
-Contributors: Extra_Random, Otter
+Contributors: Otter
 Source code: https://github.com/iScrE4m/IdiotechDiscordBot
 Request a feature: https://github.com/iScrE4m/IdiotechDiscordBot/issues
 
